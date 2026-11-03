@@ -2,7 +2,7 @@
 
 **Version:** 1.0 (created 2026-11-03)  
 **Source of truth:** All 15 approved docs in `docs/`  
-**Current phase:** Phase 1 — Foundation (in progress)
+**Current phase:** Phase 1-3 (in progress — foundation, public shell, admin pages complete)
 
 ---
 
@@ -65,10 +65,10 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 |----|------|--------|--------------|----------|
 | PHASE-3-01 | Admin login page | CO | PHASE-1-04 | Frontend Engineer |
 | PHASE-3-02 | Admin dashboard layout (sidebar + header) | CO | PHASE-1-01, PHASE-1-04 | Frontend Engineer |
-| PHASE-3-03 | Admin dashboard pages (brands, inventory, customers, etc.) | IP | PHASE-3-01, PHASE-3-02 | Frontend Engineer |
+| PHASE-3-03 | Admin dashboard pages (brands, inventory, customers, etc.) | CO | PHASE-3-01, PHASE-3-02 | Frontend Engineer |
 | PHASE-3-04 | Role-based sidebar filtering per API.md §9 | CO | PHASE-3-01, AUTH_SECURITY.md | Frontend Engineer |
 | PHASE-3-05 | Admin forms (create/edit brands, models, variants, colours) | NS | PHASE-3-03 | Frontend Engineer |
-| PHASE-3-06 | Admin API routes (dashboard, customers, sales, payments, stock) | CO | PHASE-1-05 | Backend Engineer |
+| PHASE-3-06 | Admin API routes (dashboard, customers, sales, payments, stock, bookings, finance, insurance, rto, invoices, refunds, brands) | CO | PHASE-1-05 | Backend Engineer |
 
 ---
 
@@ -76,9 +76,9 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 | ID | Task | Status | Dependencies | Assignee |
 |----|------|--------|--------------|----------|
-| PHASE-4-01 | Staff authentication and dashboard | IP | PHASE-1-04 | Security Engineer + Frontend Engineer |
-| PHASE-4-02 | Staff portal pages (leads, tasks, document uploads) | IP | PHASE-4-01 | Frontend Engineer |
-| PHASE-4-03 | Staff pages (dashboard, enquiries, leads, tasks, login) | CO | PHASE-4-01 | Frontend Engineer |
+| PHASE-4-01 | Staff authentication and dashboard | CO | PHASE-1-04 | Security Engineer + Frontend Engineer |
+| PHASE-4-02 | Staff portal pages (leads, tasks, document uploads) | CO | PHASE-4-01 | Frontend Engineer |
+| PHASE-4-03 | Staff pages (dashboard, enquiries, leads, bookings, insurance, registration, finance, service, tasks, performance, login) | CO | PHASE-4-01 | Frontend Engineer |
 
 ---
 
@@ -86,9 +86,20 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 | ID | Task | Status | Dependencies | Assignee |
 |----|------|--------|--------------|----------|
-| PHASE-5-01 | Payment recording and allocations | NS | PHASE-1-05, PHASE-3-03 | Backend Engineer |
-| PHASE-5-02 | GST invoices with CGST/SGST/IGST split | NS | PHASE-1-05, PHASE-5-01 | Backend Engineer |
-| PHASE-5-03 | Refund lifecycle (pending → approved → completed) | NS | PHASE-1-05 | Backend Engineer |
+| PHASE-5-01 | Payment recording and allocations | IP | PHASE-1-05, PHASE-3-03 | Backend Engineer |
+| PHASE-5-02 | GST invoices with CGST/SGST/IGST split | IP | PHASE-1-05, PHASE-5-01 | Backend Engineer |
+| PHASE-5-03 | Refund lifecycle (pending → approved → completed) | IP | PHASE-1-05 | Backend Engineer |
+
+---
+
+## Phase 7 — Finance, Insurance & RTO
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P7-1 | Finance applications | CO | P5-5 | Backend Engineer |
+| P7-2 | Insurance applications | CO | P5-5 | Backend Engineer |
+| P7-3 | RTO applications | CO | P5-5 | Backend Engineer |
+| P7-4 | Document uploads (secure, role-restricted) | CO | P7-1, P7-2, P7-3 | Backend Engineer |
 
 ---
 
