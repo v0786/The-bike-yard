@@ -1,7 +1,7 @@
 // Motorcycle Detail Page
 // Follows FEATURES.md bike detail, PRD.md, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 // Types for detail page
 type SpecsItem = {
@@ -189,9 +189,9 @@ export function BikeDetailPage({
                       fill="currentColor"
                     >
                       <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                    </path>
-                    <path d="M12 1L12 5.75" />
-                    <span className="ml-2">{feature}</span>
+                      <path d="M12 1L12 5.75" />
+                    </svg>
+                      <span className="ml-2">{feature}</span>
                   </li>
                 ))}
               </ul>
@@ -208,16 +208,16 @@ export function BikeDetailPage({
                   </button>
                 )}
                 <button
-                  className={`rounded-md px-6 py-3 bg-brand-primary text-white font-medium hover:bg-brand-accent transition-colors ${available ? "bg-brand-success" : ""} text-white ${!available ? "opacity-50" : ""}`}>
-                    {available ? "Schedule Test Ride" : "Enquire"}
-                  </button>
+                  className={`rounded-md px-6 py-3 bg-brand-primary text-white font-medium hover:bg-brand-accent transition-colors ${available ? "bg-brand-success" : ""} text-white ${!available ? "opacity-50" : ""}`}
+                >
+                  {available ? "Schedule Test Ride" : "Enquire"}
                 </button>
               </div>
 
               {/* WhatsApp Enquiry */}
               <div className="mt-4">
                 <a
-                  href="https://wa.me/918097172040?text=Hello%20The%20Bike%20Yard.%20I%20am%20interested%20in%20the%20{brand}%20{model}%20{variant}%20{%22condition%22:%20%22{condition}%22}.%20Please%20send%20me%20more%20details.%20%7C%20Year%3A%20{year || "N/A"}%20%7C%20Kilometers%3A%20{kmDriven || "N/A"}"
+                  href={`https://wa.me/918097172040?text=Hello%20The%20Bike%20Yard.%20I%20am%20interested%20in%20the%20${brand}%20${model}%20${variant}%20${encodeURIComponent(JSON.stringify({ condition }))}.%20Please%20send%20me%20more%20details.%20%7C%20Year%3A%20${year || "N/A"}%20%7C%20Kilometers%3A%20${kmDriven || "N/A"}`}
                   target="_blank"
                   rel="noopener noreferrer"
                   className="flex items-center gap-2 text-sm text-brand-primary hover:text-brand-accent transition-colors">

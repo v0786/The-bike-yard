@@ -4,16 +4,49 @@ const nextConfig = {
   experimental: {
     // App Router stable in Next.js 16
   },
-  // Configure TypeScript check separately via typescript() in webpack config
   // Ignore TypeScript errors in build for now (will enforce in CI)
+  // TODO: Remove once pre-existing type errors in inherited pages are resolved
   typescript: {
-    // !! Default: `export const dynamic = 'force-static'` is NOT set
-    // !! Default: `export const revalidate = 0` is NOT set
-    // !! Skipping production type-check builds to speed up dev
     ignoreBuildErrors: true,
   },
   // Enable React 19 strict mode
   reactStrictMode: true,
+
+  // Security headers per AUTH_SECURITY §10
+  async headers() {
+    return [
+      {
+        source: "/:path*",
+        headers: [
+          {
+            key: "Strict-Transport-Security",
+            value: "max-age=31536000; includeSubDomains; preload",
+          },
+          {
+            key: "X-Content-Type-Options",
+            value: "nosniff",
+          },
+          {
+            key: "X-Frame-Options",
+            value: "DENY",
+          },
+          {
+            key: "Referrer-Policy",
+            value: "strict-origin-when-cross-origin",
+          },
+          {
+            key: "Permissions-Policy",
+            value: "camera=(), microphone=(), geolocation=()",
+          },
+          {
+            key: "Content-Security-Policy",
+            value:
+              "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:; connect-src 'self'; font-src 'self';",
+          },
+        ],
+      },
+    ];
+  },
 }
 
 export default nextConfig

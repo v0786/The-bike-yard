@@ -2,10 +2,13 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { enquiryCreateSchema } from "@/lib/validations"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 const enquirySchema = enquiryCreateSchema
 
 export async function POST(request: Request) {
+  const user = await requireAuth()
+
   try {
     const body = await request.json()
     const validated = enquirySchema.parse(body)
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
     return NextResponse.json({
       data: { customerId: customer.id, leadId: lead.id },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

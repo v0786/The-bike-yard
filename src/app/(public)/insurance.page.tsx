@@ -1,7 +1,7 @@
 // Insurance Page
 // Follows FEATURES.md F-FIN-03, PRD.md, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 export const metadata: Metadata = {
   title: "The Bike Yard — Insurance",
@@ -77,7 +77,7 @@ export function InsurancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Silver Policy</span>
                 </li>
@@ -88,7 +88,7 @@ export function InsurancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Gold Policy</span>
                 </li>
@@ -99,7 +99,7 @@ export function InsurancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Platinum Policy</span>
                 </li>
@@ -154,7 +154,7 @@ export function InsurancePage() {
                   fill="currentColor"
                 >
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.02 19.5 19.5 0 0 1-6-1.02m-3.5-3.5a2 2 0 0 0-2.73-.57l-2.17 2.72a1 1 0 0 1-2.02 0l-2.17-2.72A2 2 0 0 0 4.27 21H5a2 2 0 0 1 2 1.92 19.79 19.79 0 0 1 6.73-6.07L16.73 4.07a2 2 0 0 0-.57-2.73ZM5 10v5h14V10H5zm0 8v-2a6 6 0 0 1 12 0v2a6 6 0 0 0 12 0v-6a6 6 0 0 0-12 0v2a6 6 0 0 0 12 0v-6Z" />
-                </span>
+                  </svg>
                 info@thebikeyard.in
               </p>
               <p className="text-sm text-brand-secondary/60">

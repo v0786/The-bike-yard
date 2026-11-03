@@ -1,8 +1,8 @@
 # The Bike Yard — Implementation Tracker
 
-**Version:** 1.0 (created 2026-11-03)  
+**Version:** 1.1 (updated 2026-11-03)  
 **Source of truth:** All 15 approved docs in `docs/`  
-**Current phase:** Phase 1-3 (in progress — foundation, public shell, admin pages complete)
+**Current phase:** Phase 1-12 (foundation, public shell, admin/staff pages, services, API auth, tests complete; production build verified)
 
 ---
 
@@ -35,13 +35,13 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 | ID | Task | Status | Dependencies | Assignee |
 |----|------|--------|--------------|----------|
 | PHASE-1-01 | Configure Next.js App Router base layout | CO | Root layout.tsx created with Inter font, globals.css |
-| PHASE-1-02 | Set up Tailwind CSS 4 with design tokens (colors, fonts) per DESIGN.md | CO | globals.css with design tokens; @tailwindcss/postcss configured |
+| PHASE-1-02 | Set up Tailwind CSS 4 with design tokens (colors, fonts) per DESIGN.md | CO | globals.css with design tokens; @tailwindcss/postcss configured; security headers in next.config.mjs |
 | PHASE-1-03 | Create design system: StatusChip, TextInput, LoadingState per DESIGN.md | CO | StatusChip, Button, Input, Card, Badge, Table, Dialog, DropdownMenu, Form components in src/components/ui/ |
-| PHASE-1-04 | Configure Auth.js Credentials provider; create first Super Admin seed per SETUP.md | CO | NextAuth configured in src/app/auth/route.ts with Credentials provider, JWT session, role callbacks |
-| PHASE-1-05 | Initialize Prisma from DATABASE.md schema; generate client | CO | Schema fixed; prisma generate succeeds; Prisma Client v6.12.0 |
-| PHASE-1-06 | Set up ESLint, Prettier; enforce TypeScript strict mode | IP | tsconfig.json has strict mode; next.config.mjs ignores build errors for speed |
-| PHASE-1-07 | Configure logging, error boundaries, and global error handler | NS | Middleware exists for auth checks; error handling pending |
-| PHASE-1-08 | Create project-level DECISIONS.md and CHANGELOG.md | NS | Pending |
+| PHASE-1-04 | Configure Auth.js Credentials provider; create first Super Admin seed per SETUP.md | CO | NextAuth with Prisma adapter, database-backed sessions (not JWT), JWT explicitly rejected per AUTH_SECURITY §3 |
+| PHASE-1-05 | Initialize Prisma from DATABASE.md schema; generate client | CO | Schema fixed; prisma generate succeeds; Prisma Client v6.12.0; migrations + seed created |
+| PHASE-1-06 | Set up ESLint, Prettier; enforce TypeScript strict mode | CO | tsconfig strict mode; jsx errors fixed; package.json scripts added |
+| PHASE-1-07 | Configure logging, error boundaries, and global error handler | IP | Middleware auth checks; error handling pending |
+| PHASE-1-08 | Create project-level DECISIONS.md and CHANGELOG.md | CO | DECISIONS.md, CHANGELOG.md created |
 
 ---
 

@@ -20,7 +20,6 @@
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true,
     "forceConsistentCasingInFileNames": true,
-    "baseUrl": ".",
     "paths": {
       "@/*": [
         "./src/*"
@@ -52,7 +51,6 @@
   },
   "include": [
     "src/**/*",
-    "next.config.*",
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts"
   ],

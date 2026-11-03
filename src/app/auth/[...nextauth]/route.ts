@@ -1,1 +1,1 @@
-export { handlers } from "@/app/auth/route"
+export { handlers } from "@/lib/auth"

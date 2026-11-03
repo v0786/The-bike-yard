@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { getChatbotResponse } from "@/services/chatbot.service"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 const chatbotSchema = z.object({
   question: z.string().min(1, "Question is required"),
@@ -10,6 +11,8 @@ const chatbotSchema = z.object({
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const user = await requireAuth()
+
   try {
     const body = await request.json()
     const validated = chatbotSchema.parse(body)
@@ -20,7 +23,7 @@ export async function POST(request: Request) {
     )
 
     return NextResponse.json({ data: response })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: { code: "VALIDATION_ERROR", message: "Invalid request", details: error.errors } },

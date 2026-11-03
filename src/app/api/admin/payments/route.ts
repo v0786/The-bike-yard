@@ -2,10 +2,13 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { paymentCreateSchema } from "@/lib/validations"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
+  const user = await requireRole(["Manager", "Super Admin", "Owner", "Accountant"])
+
   try {
     const payments = await prisma.payment.findMany({
       include: {
@@ -16,7 +19,7 @@ export async function GET() {
       orderBy: { createdAt: "desc" },
     })
     return NextResponse.json({ data: payments })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Failed to fetch payments" } },
       { status: 500 }
@@ -25,6 +28,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await requireRole(["Manager", "Super Admin", "Owner", "Accountant"])
+
   try {
     const body = await request.json()
     const validated = paymentCreateSchema.parse(body)
@@ -56,7 +61,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ data: payment }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

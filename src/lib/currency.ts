@@ -27,7 +27,7 @@ export function toRupees(paise: number): number {
 export function splitGst(gstAmount: number, placeOfSupply: string, gstRate: number) {
   const isIntraState = placeOfSupply === "27" // Maharashtra state code
   const cgst = isIntraState ? Math.floor(gstAmount / 2) : 0
-  const sgst = isIntraState ? Math.floor(gstAmount / 2) : 0
+  const sgst = isIntraState ? gstAmount - cgst : 0 // ensures cgst+sgst = gstAmount
   const igst = isIntraState ? 0 : gstAmount
   return { cgst, sgst, igst }
 }

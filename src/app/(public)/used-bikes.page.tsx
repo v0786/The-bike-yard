@@ -1,7 +1,7 @@
 // Second-Hand Vehicles Catalogue Page
 // Follows FEATURES.md F-STK-01 to F-STK-07, PRD.md, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 type BikeCardProps = {
   id: string

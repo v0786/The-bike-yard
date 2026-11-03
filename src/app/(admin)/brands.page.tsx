@@ -1,7 +1,7 @@
 // Brands & Models Management
 // Follows FEATURES.md F-CAT-01 to F-CAT-08, DATABASE.md, DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 type Brand = {
   id: string

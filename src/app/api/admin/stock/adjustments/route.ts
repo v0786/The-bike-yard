@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 const adjustmentSchema = z.object({
   stockUnitId: z.string().uuid(),
@@ -12,6 +13,8 @@ const adjustmentSchema = z.object({
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+
   try {
     const body = await request.json()
     const validated = adjustmentSchema.parse(body)
@@ -27,7 +30,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ data: movement }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: { code: "VALIDATION_ERROR", message: "Invalid adjustment data", details: error.errors } },

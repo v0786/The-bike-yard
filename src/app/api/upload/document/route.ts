@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 const uploadSchema = z.object({
   customerId: z.string().uuid(),
@@ -16,6 +17,8 @@ const uploadSchema = z.object({
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const user = await requireAuth()
+
   try {
     const body = await request.json()
     const validated = uploadSchema.parse(body)
@@ -34,7 +37,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ data: document }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: { code: "VALIDATION_ERROR", message: "Invalid upload data", details: error.errors } },

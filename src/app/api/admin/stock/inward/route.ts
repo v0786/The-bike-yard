@@ -1,6 +1,7 @@
 import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 const inwardSchema = z.object({
   chassisNumber: z.string().min(1),
@@ -16,6 +17,8 @@ const inwardSchema = z.object({
 export const dynamic = "force-dynamic"
 
 export async function POST(request: Request) {
+  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+
   try {
     const body = await request.json()
     const validated = inwardSchema.parse(body)
@@ -45,7 +48,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ data: unit }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         { error: { code: "VALIDATION_ERROR", message: "Invalid inward data", details: error.errors } },

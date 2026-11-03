@@ -1,4 +1,4 @@
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 export const metadata: Metadata = {
   title: "The Bike Yard — Admin Dashboard",

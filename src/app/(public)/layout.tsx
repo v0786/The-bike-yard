@@ -1,4 +1,4 @@
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 import { Navbar, Footer } from "@/components/public/Navbar"
 
 // Type for navbar links

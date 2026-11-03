@@ -1,7 +1,7 @@
 // Finance Page
 // Follows FEATURES.md F-PAY-06, F-FIN-01 to F-FIN-06, PRD.md, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 export const metadata: Metadata = {
   title: "The Bike Yard — Finance",
@@ -82,7 +82,7 @@ export function FinancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Zero down payment schemes</span>
                 </li>
@@ -93,7 +93,7 @@ export function FinancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Flexible tenure up to 5 years</span>
                 </li>
@@ -104,7 +104,7 @@ export function FinancePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
+                  </svg>
                   <path d="M12 1L12 5.75" />
                   <span>Interest rates starting at competitive rates</span>
                 </li>

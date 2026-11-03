@@ -2,10 +2,13 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { customerCreateSchema } from "@/lib/validations"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
+  const user = await requireAuth()
+
   try {
     const customers = await prisma.customer.findMany({
       where: { deletedAt: null },
@@ -21,6 +24,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await requireAuth()
+
   try {
     const body = await request.json()
     const validated = customerCreateSchema.parse(body)

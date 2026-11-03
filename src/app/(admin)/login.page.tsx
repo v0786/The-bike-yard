@@ -1,7 +1,7 @@
 // Admin Login Page
 // Follows AUTH_SECURITY.md, API.md §9, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 export const metadata: Metadata = {
   title: "The Bike Yard — Admin Login",

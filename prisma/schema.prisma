@@ -126,26 +126,50 @@ model Dealership {
   email       String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  roles      Role[]
+  users      User[] @relation("UserDealership")
+  settings   Settings[]
+  customers  Customer[]
 }
 
 model User {
-  id                String @id @default(uuid()) @db.Uuid
-  email             String @unique
-  password          String
-  name              String?
-  role              String
-  dealershipId      String? @db.Uuid
-  isActive          Boolean @default(true)
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
+  id            String    @id @default(uuid()) @db.Uuid
+  name          String?
+  email         String?   @unique
+  emailVerified DateTime?
+  image         String?
+  passwordHash  String
+  firstName     String
+  lastName      String
+  phone         String?
+  roleId        String   @db.Uuid
+  dealershipId  String?  @db.Uuid
+  isActive      Boolean  @default(true)
+  lastLoginAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  user           Role     @relation("UserRole", fields: [roleId], references: [id])
+  dealership     Dealership? @relation("UserDealership", fields: [dealershipId], references: [id], onDelete: SetNull)
+
+  auditLogs      AuditLog[] @relation("UserAuditLogs")
+  staffTasks     StaffTask[] @relation("UserStaffTasks")
+  serviceRequests ServiceRequest[] @relation("UserServiceRequests")
+  sessions       Session[] @relation("SessionUser")
+  accounts       Account[]
+  notifications  Notification[] @relation("UserNotifications")
+  createdTasks   StaffTask[] @relation("UserCreatedTasks")
 }
 
 model StaffTask {
-  id            String @id @default(uuid()) @db.Uuid
+  id            String   @id @default(uuid()) @db.Uuid
   title         String
   description   String?
-  assignedTo    String @db.Uuid
-  creator       String @db.Uuid
+  assignedTo    String   @db.Uuid
+  creator       String   @db.Uuid
+  assignedToUser User     @relation("UserStaffTasks", fields: [assignedTo], references: [id], onDelete: Cascade)
+  creatorUser   User     @relation("UserCreatedTasks", fields: [creator], references: [id], onDelete: SetNull)
   status        StaffTaskStatus @default(open)
   priority      String   @default("normal")
   dueDate       DateTime?
@@ -161,7 +185,8 @@ model AuditLog {
   action        String
   oldValues     Json?
   newValues     Json?
-  userId        String @db.Uuid
+  userId   String @db.Uuid
+  user     User   @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
   ipAddress     String?
   timestamp     DateTime @default(now())
 }
@@ -228,7 +253,7 @@ model StockUnit {
   notes            String?
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
-
+  testRides  TestRide[]
 }
 
 // -------------------
@@ -254,7 +279,8 @@ model Reservation {
 
 model Booking {
   id            String @id @default(uuid()) @db.Uuid
-  customerId    String @db.Uuid
+  customer   Customer? @relation("CustomerBookings", fields: [customerId], references: [id])
+  customerId   String @db.Uuid
   stockUnitId   String? @db.Uuid
   bookingNumber String @unique
   advanceAmount BigInt
@@ -273,7 +299,8 @@ model Booking {
 
 model Sale {
   id            String @id @default(uuid()) @db.Uuid
-  customerId    String @db.Uuid
+  customer   Customer? @relation("CustomerSales", fields: [customerId], references: [id])
+  customerId   String @db.Uuid
   stockUnitId   String @db.Uuid
   bookingId     String? @db.Uuid
   saleNumber    String @unique
@@ -408,12 +435,14 @@ model Refund {
 model ServiceRequest {
   id              String @id @default(uuid()) @db.Uuid
   requestNumber String @unique
-  customerId      String @db.Uuid
+  customer   Customer? @relation("CustomerServiceRequests", fields: [customerId], references: [id])
+  customerId   String @db.Uuid
   saleId          String? @db.Uuid // null for walk-in/non-sale
   stockUnitId     String? @db.Uuid
   requestType     RequestType
   description     String
   assignedTo      String? @db.Uuid
+  assignedToUser  User?   @relation("UserServiceRequests", fields: [assignedTo], references: [id], onDelete: SetNull)
   status          String   @default("open") // open/acknowledged/in_progress/resolved/closed/cancelled
   priority        String   @default("normal") // low/normal/high/urgent
   resolvedAt      DateTime?
@@ -544,6 +573,276 @@ model StockMovement {
   @@index([stockUnitId])
   @@index([createdAt])
   @@index([type])
+}
+
+// -------------------
+// Users, Roles, Permissions
+// -------------------
+
+model Role {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique
+  description String?
+  dealershipId String  @db.Uuid
+  createdAt   DateTime @default(now())
+
+  dealership   Dealership @relation(fields: [dealershipId], references: [id])
+  users        User[]     @relation("UserRole")
+  permissions  RolePermission[]
+}
+
+model Permission {
+  id          String   @id @default(uuid()) @db.Uuid
+  code        String   @unique
+  module      String
+  description String?
+  createdAt   DateTime @default(now())
+
+  roles RolePermission[]
+}
+
+model RolePermission {
+  id          String   @id @default(uuid()) @db.Uuid
+  roleId      String   @db.Uuid
+  permissionId String  @db.Uuid
+
+  role       Role     @relation(fields: [roleId], references: [id])
+  permission Permission @relation(fields: [permissionId], references: [id])
+
+  @@unique([roleId, permissionId])
+}
+
+model Session {
+  id           String   @id @default(uuid()) @db.Uuid
+  sessionToken String   @unique
+  userId       String   @db.Uuid
+  expires      DateTime
+  user         User     @relation("SessionUser", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------
+// NextAuth Adapter Models
+// -------------------
+
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @db.Uuid
+  type              String
+  provider          String
+  providerAccountId String
+  refresh_token     String?
+  access_token      String?
+  expires_at        Int?
+  token_type        String?
+  scope             String?
+  id_token          String?
+  session_state     String?
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+}
+
+model VerificationToken {
+  identifier String
+  token      String   @unique
+  expires    DateTime
+
+  @@unique([identifier, token])
+}
+
+// -------------------
+// Customers, Leads, Bookings
+// -------------------
+
+model Customer {
+  id            String   @id @default(uuid()) @db.Uuid
+  dealershipId  String   @db.Uuid
+  firstName     String
+  lastName      String
+  phone         String
+  email         String?
+  address       String?
+  city          String?
+  state         String?
+  pincode       String?
+  gstin         String?
+  idDocumentType String?
+  idDocumentNumber String?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+  deletedAt     DateTime?
+
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
+  leads          Lead[] @relation("CustomerLeads")
+  bookings       Booking[] @relation("CustomerBookings")
+  sales          Sale[] @relation("CustomerSales")
+  serviceRequests ServiceRequest[] @relation("CustomerServiceRequests")
+}
+
+model Lead {
+  id              String   @id @default(uuid()) @db.Uuid
+  customerId      String   @db.Uuid
+  staffId         String?  @db.Uuid
+  variantId       String?  @db.Uuid
+  colourId        String?  @db.Uuid
+  source          String   @default("walkin")
+  status          String   @default("new")
+  estimatedBudget BigInt?
+  notes           String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  customer   Customer @relation("CustomerLeads", fields: [customerId], references: [id])
+  activities LeadActivity[]
+  testRides TestRide[]
+}
+
+model LeadActivity {
+  id            String   @id @default(uuid()) @db.Uuid
+  leadId        String   @db.Uuid
+  staffId       String   @db.Uuid
+  type          String
+  notes         String?
+  nextFollowUpAt DateTime?
+  createdAt     DateTime @default(now())
+
+  lead Lead @relation(fields: [leadId], references: [id])
+}
+
+model TestRide {
+  id            String   @id @default(uuid()) @db.Uuid
+  leadId        String   @db.Uuid
+  stockUnitId   String?  @db.Uuid
+  staffId       String   @db.Uuid
+  scheduledAt   DateTime
+  status        String   @default("scheduled")
+  feedback      String?
+  createdAt     DateTime @default(now())
+
+  lead      Lead     @relation(fields: [leadId], references: [id])
+  stockUnit StockUnit? @relation(fields: [stockUnitId], references: [id], onDelete: SetNull)
+}
+
+// -------------------
+// Settings, Notifications
+// -------------------
+
+model Settings {
+  id                 String   @id @default(uuid()) @db.Uuid
+  dealershipId       String   @db.Uuid
+  theme              String   @default("light")
+  primaryColour      String   @default("#111827")
+  secondaryColour    String   @default("#6366f1")
+  fontFamily         String   @default("Inter")
+  fontSize           String   @default("medium")
+  sidebarMode        String   @default("expanded")
+  invoicePrefix      String   @default("TBY")
+  invoiceNumberSequence Int   @default(1)
+  gstRateDefault     Int      @default(0)
+  logoUrl            String?
+  faviconUrl         String?
+  notificationsEmail Boolean @default(false)
+  notificationsInApp Boolean @default(true)
+  language           String   @default("en")
+  createdAt          DateTime @default(now())
+  updatedAt          DateTime @updatedAt
+
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
+}
+
+model Notification {
+  id        String   @id @default(uuid()) @db.Uuid
+  userId    String   @db.Uuid
+  title     String
+  message   String
+  type      String   @default("info")
+  isRead    Boolean  @default(false)
+  readAt    DateTime?
+  createdAt DateTime @default(now())
+
+  user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+}
+
+// -------------------
+// CMS: Blogs, FAQs, Social, Banners
+// -------------------
+
+model Blog {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  slug        String   @unique
+  content     String
+  excerpt     String?
+  featuredImageUrl String?
+  status      String   @default("draft")
+  publishedAt DateTime?
+  createdBy   String   @db.Uuid
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Faq {
+  id        String   @id @default(uuid()) @db.Uuid
+  question  String
+  answer    String
+  category  String?
+  order     Int      @default(0)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+model SocialLink {
+  id        String   @id @default(uuid()) @db.Uuid
+  platform  String
+  url       String
+  isActive  Boolean  @default(true)
+}
+
+model Banner {
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String
+  imageUrl  String
+  linkUrl   String?
+  position  String   @default("home")
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now())
+}
+
+// -------------------
+// Chatbot Knowledge
+// -------------------
+
+model ChatbotKnowledgeSource {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String
+  content     String
+  sourceType  String
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model ChatbotFeedback {
+  id        String   @id @default(uuid()) @db.Uuid
+  sessionId String
+  question  String
+  answer    String
+  helpful   Boolean?
+  createdAt DateTime @default(now())
+}
+
+// -------------------
+// Expense
+// -------------------
+
+model Expense {
+  id          String   @id @default(uuid()) @db.Uuid
+  category    String
+  amount      BigInt
+  description String?
+  date        DateTime
+  recordedBy  String   @db.Uuid
+  createdAt   DateTime @default(now())
 }
 
 // Seed helpers (fictional, development only)

@@ -1,7 +1,7 @@
 // New Vehicles Catalogue Page
 // Follows FEATURES.md F-CAT-01 to F-CAT-08, PRD.md, and DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 type BikeCardProps = {
   id: string

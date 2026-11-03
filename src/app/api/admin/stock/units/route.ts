@@ -2,17 +2,20 @@ import { NextResponse } from "next/server"
 import { z } from "zod"
 import { prisma } from "@/lib/prisma"
 import { stockUnitCreateSchema } from "@/lib/validations"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
+  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+
   try {
     const units = await prisma.stockUnit.findMany({
       include: { variant: { include: { model: { include: { brand: true } } } }, colour: true },
       orderBy: { createdAt: "desc" },
     })
     return NextResponse.json({ data: units })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Failed to fetch stock units" } },
       { status: 500 }
@@ -21,6 +24,8 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
+  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+
   try {
     const body = await request.json()
     const validated = stockUnitCreateSchema.parse(body)
@@ -44,7 +49,7 @@ export async function POST(request: Request) {
     })
 
     return NextResponse.json({ data: unit }, { status: 201 })
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

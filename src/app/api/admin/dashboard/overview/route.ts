@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET() {
+  const user = await requireAuth()
+
   try {
     const [
       todaySales,
@@ -47,7 +50,7 @@ export async function GET() {
     ]
 
     return NextResponse.json({ data })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Failed to fetch dashboard" } },
       { status: 500 }

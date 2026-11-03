@@ -1,7 +1,7 @@
 // Main homepage bringing together all sections
 // Follows DESIGN.md, FEATURES.md, and PRD.md specifications
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 import { Navbar, Footer } from "@/components/public/Navbar"
 import { HeroSection } from "@/components/public/HeroSection"
 

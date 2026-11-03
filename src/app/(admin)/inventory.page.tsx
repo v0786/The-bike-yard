@@ -1,7 +1,7 @@
 // Inventory Management
 // Follows FEATURES.md F-STK-01 to F-STK-07, DATABASE.md, DESIGN.md
 
-import Metadata from "next/metadata"
+import type { Metadata } from "next/metadata"
 
 type StockUnit = {
   id: string
@@ -83,7 +83,6 @@ export function InventoryPage() {
                 <div
                   key={status}
                   className={`border rounded-2xl p-6 ${bg} ${color} text-sm`}
-                )
                 >
                   <div className="w-12 h-12 rounded-lg mb-3 flex items-center justify-center">
                     <svg

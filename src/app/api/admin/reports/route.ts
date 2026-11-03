@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
+  const user = await requireRole(["Super Admin", "Owner", "Manager", "Accountant"])
+
   try {
     const { searchParams } = new URL(request.url)
     const type = searchParams.get("type") || "overview"

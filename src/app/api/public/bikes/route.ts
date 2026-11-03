@@ -1,9 +1,12 @@
 import { NextResponse } from "next/server"
 import { prisma } from "@/lib/prisma"
+import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
 
 export const dynamic = "force-dynamic"
 
 export async function GET(request: Request) {
+  const user = await requireAuth()
+
   try {
     const { searchParams } = new URL(request.url)
     const status = searchParams.get("status")
@@ -53,7 +56,7 @@ export async function GET(request: Request) {
       data,
       meta: { page, pageSize, total },
     })
-  } catch (error) {
+  } catch (error: unknown) {
     return NextResponse.json(
       { error: { code: "INTERNAL_ERROR", message: "Failed to fetch bikes" } },
       { status: 500 }
