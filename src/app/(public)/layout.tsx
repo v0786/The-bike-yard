@@ -1,4 +1,5 @@
 import Metadata from "next/metadata"
+import { Navbar, Footer } from "@/components/public/Navbar"
 
 // Type for navbar links
 type NavLink = {
@@ -19,6 +20,9 @@ export const metadata: Metadata = {
   description: "Complete motorcycle dealership management and digital showroom for The Bike Yard, Khopat, Thane, Maharashtra, India. Suzuki, Honda, TVS new and second-hand motorcycles.",
 }
 
+Navbar.displayName = "Navbar"
+Footer.displayName = "Footer"
+
 export default function PublicLayout({
   children,
 }: {
@@ -34,9 +38,3 @@ export default function PublicLayout({
     </main>
   )
 }
-
-// Navbar component
-Navbar.displayName = "Navbar"
-
-// Footer component
-Footer.displayName = "Footer"

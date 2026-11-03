@@ -2,26 +2,37 @@
   "compilerOptions": {
     "module": "es2020",
     "target": "es2020",
-    "lib": ["es2020", "dom"],
-    "types": ["next", "node"],
+    "lib": [
+      "es2020",
+      "dom"
+    ],
+    "types": [
+      "next",
+      "node"
+    ],
     "allowImportingTsExtensions": true,
     "isolatedModules": true,
     "strict": true,
     "jsx": "react-jsx",
     "esModuleInterop": true,
     "resolveJsonModule": true,
+    // Recommended Options
     "skipLibCheck": true,
     "noUncheckedSideEffectImports": true,
     "forceConsistentCasingInFileNames": true,
+    "baseUrl": ".",
+    "paths": {
+      "@/*": [
+        "./src/*"
+      ]
+    },
     "declaration": true,
     "declarationMap": true,
     "outDir": "./dist",
     "rootDir": "./src",
-
     // Stricter Typechecking Options
     "noUncheckedIndexedAccess": true,
     "exactOptionalPropertyTypes": true,
-
     // Style Options
     "noImplicitReturns": false,
     "noImplicitOverride": false,
@@ -29,15 +40,24 @@
     "noUnusedParameters": false,
     "noFallthroughCasesInSwitch": false,
     "noPropertyAccessFromIndexSignature": false,
-
-    // Recommended Options
-    "skipLibCheck": true
+    "allowJs": true,
+    "noEmit": true,
+    "incremental": true,
+    "moduleResolution": "bundler",
+    "plugins": [
+      {
+        "name": "next"
+      }
+    ]
   },
-
   "include": [
     "src/**/*",
     "next.config.*",
+    ".next/types/**/*.ts",
+    ".next/dev/types/**/*.ts"
   ],
-
-  "exclude": ["node_modules", "dist"]
+  "exclude": [
+    "node_modules",
+    "dist"
+  ]
 }

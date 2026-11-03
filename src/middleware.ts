@@ -8,9 +8,9 @@ export function middleware(request: NextRequest) {
   const path = request.nextUrl.pathname
 
   // Public routes - no auth required
-  // Protected routes start with /((admin)) or /((staff))
-  const isAdminRoute = path.startsWith("/((admin))")
-  const isStaffRoute = path.startsWith("/((staff))")
+  // Protected routes start with /admin or /staff
+  const isAdminRoute = path.startsWith("/admin")
+  const isStaffRoute = path.startsWith("/staff")
 
   // Skip middleware for auth pages and public assets
   if (
@@ -66,10 +66,9 @@ export function middleware(request: NextRequest) {
 export const config = {
   // Match all routes except static assets and auth pages
   matcher: [
-    "/((admin))/(.*)",
-    "/((staff))/(.*)",
-    "/((api)/(.*)",
-    "/((auth)/(.*)",
-    "/((.*)",
+    "/admin/:path*",
+    "/staff/:path*",
+    "/api/:path*",
+    "/auth/:path*",
   ],
 }

@@ -2,9 +2,8 @@
 // Follows DESIGN.md, FEATURES.md, and PRD.md specifications
 
 import Metadata from "next/metadata"
-import { Navbar } from "@/components/public/Navbar"
+import { Navbar, Footer } from "@/components/public/Navbar"
 import { HeroSection } from "@/components/public/HeroSection"
-import { Footer } from "@/components/public/Footer"
 
 type NavLink = {
   href: string
@@ -37,7 +36,7 @@ export default function HomePage() {
         <HeroSection />
       </section>
 
-      <!-- Explore New Bikes Section -->
+      {/* Explore New Bikes Section */}
       <section className="py-24 sm:py-32 bg-bg-secondary">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="text-center mb-12">
@@ -183,7 +182,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <!-- Why Choose Us Section -->
+      {/* Why Choose Us Section */}
       <section className="py-24 sm:py-32 bg-bg-primary">
         <div className="max-w-[1600px] mx-auto px-6">
           <div className="grid lg:grid-cols-2 gap-12 items-center">
@@ -208,7 +207,6 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
                   <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Premium Suzuki, Honda, TVS brands
@@ -220,7 +218,6 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
                   <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   4.9⭐ rating | 267 reviews
@@ -232,7 +229,6 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
                   <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Home: Khopat, Thane, Maharashtra
@@ -244,7 +240,6 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  </path>
                   <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Test rides available
@@ -283,7 +278,7 @@ export default function HomePage() {
         </div>
       </section>
 
-      <!-- Footer -->
+      {/* Footer */}
       <Footer />
     </main>
   )

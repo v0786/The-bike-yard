@@ -33,7 +33,7 @@ export function Navbar() {
   return (
     <nav className="border-b border-brand-secondary bg-bg-secondary/80 backdrop-blur-sm sticky top-0 left-0 right-0 z-50">
       <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between flex-col sm:flex-row">
-        <!-- Logo -->
+        {/* Logo */}
         <div className="flex items-center gap-3">
           <div className="w-10 h-10 rounded-full bg-gradient-to-br from-brand-primary to-brand-secondary flex items-center justify-center">
             <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="currentColor">
@@ -43,7 +43,7 @@ export function Navbar() {
           <span className="text-2xl font-bold tracking-tighter">The Bike Yard</span>
         </div>
 
-        <!-- Desktop navigation -->
+        {/* Desktop navigation */}
         <div className="hidden sm:block items-center gap-8">
           {navLinks.map((link, index) => (
             <a
@@ -56,7 +56,7 @@ export function Navbar() {
           ))}
         </div>
 
-        <!-- Mobile navigation toggle -->
+        {/* Mobile navigation toggle */}
         <button
           className="sm:hidden p-2 rounded-lg hover:bg-brand-secondary/20"
           aria-label="Open main navigation"
@@ -66,7 +66,7 @@ export function Navbar() {
           </svg>
         </button>
 
-        <!-- User menu (authenticated users) -->
+        {/* User menu (authenticated users) */}
         {typeof window !== "undefined" && 
           (window as any).userRole && 
           (window as any).userRole !== "no-auth" && (
@@ -89,7 +89,7 @@ export function Navbar() {
 }
 
 // Footer component
-function Footer() {
+export function Footer() {
   return (
     <footer className="border-t border-brand-secondary bg-brand-primary py-12">
       <div className="max-w-[1600px] mx-auto px-6 pb-8">
@@ -150,7 +150,7 @@ function Footer() {
           </div>
         </div>
 
-        <!-- Bottom bar -->
+        {/* Bottom bar */}
         <div className="pt-8 border-t border-brand-secondary/30 flex flex-col sm:flex-row justify-between items-center gap-4 text-sm">
           <p className="text-brand-secondary/60">
             © {new Date().getFullYear()} The Bike Yard. All rights reserved.
