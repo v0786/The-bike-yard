@@ -2,12 +2,12 @@
 // This is the source-of-truth data model for The Bike Yard dealership management platform.
 
 generator client {
-  provider = "postgresql"
+  provider = "prisma-client-js"
   // NOTE: Run `prisma generate` after saving this file to rebuild @prisma/client
 }
 
 datasource db {
-  provider = postgresql
+  provider = "postgresql"
   url      = env("DATABASE_URL")
 }
 
@@ -118,7 +118,7 @@ enum PaymentAllocationTarget {
 // -------------------
 
 model Dealership {
-  id          UUID @default(autoguid()) @id
+  id          String @id @default(uuid()) @db.Uuid
   name        String
   address     String?
   gstin       String?
@@ -129,29 +129,25 @@ model Dealership {
 }
 
 model User {
-  id                UUID @default(autoguid()) @id
+  id                String @id @default(uuid()) @db.Uuid
   email             String @unique
   password          String
   name              String?
   role              String
-  dealershipId      UUID? @relation(fields: [dealershipId], references: [id], onDelete: SetNull)
+  dealershipId      String? @db.Uuid
   isActive          Boolean @default(true)
   createdAt         DateTime @default(now())
   updatedAt         DateTime @updatedAt
-  auditLogs         AuditLog[]
-  staffTasks        StaffTask[]
-  serviceRequests   ServiceRequest[] @relation("AssignedRequests", fields: [assignedTo], references: [id])
-  auditLogEntries   AuditLog[] @relation("UserActions", references: [userId])
 }
 
 model StaffTask {
-  id            UUID @default(autoguid()) @id
+  id            String @id @default(uuid()) @db.Uuid
   title         String
   description   String?
-  assignedTo    UUID   @relation(fields: [assignedTo], references: [User], onDelete: Cascade)
-  creator       UUID   @relation(fields: [creator], references: [User], onDelete: SetNull)
+  assignedTo    String @db.Uuid
+  creator       String @db.Uuid
   status        StaffTaskStatus @default(open)
-  priority      String   @default(normal)
+  priority      String   @default("normal")
   dueDate       DateTime?
   completedAt   DateTime?
   createdAt     DateTime @default(now())
@@ -159,13 +155,13 @@ model StaffTask {
 }
 
 model AuditLog {
-  id            UUID @default(autoguid()) @id
+  id            String @id @default(uuid()) @db.Uuid
   entityType    String
-  entityId      UUID
+  entityId      String @db.Uuid
   action        String
   oldValues     Json?
   newValues     Json?
-  userId        UUID   @relation(fields: [userId], references: [User], onDelete: SetNull)
+  userId        String @db.Uuid
   ipAddress     String?
   timestamp     DateTime @default(now())
 }
@@ -175,7 +171,7 @@ model AuditLog {
 // -------------------
 
 model Brand {
-  id          UUID @default(autoguid()) @id
+  id          String @id @default(uuid()) @db.Uuid
   name        String @unique
   description String?
   createdAt   DateTime @default(now())
@@ -183,8 +179,8 @@ model Brand {
 }
 
 model Model {
-  id          UUID @default(autoguid()) @id
-  brandId     UUID   @relation(fields: [brandId], references: [Brand], onDelete: Cascade)
+  id          String @id @default(uuid()) @db.Uuid
+  brandId     String @db.Uuid
   name        String
   description String?
   createdAt   DateTime @default(now())
@@ -194,9 +190,9 @@ model Model {
 }
 
 model Variant {
-  id              UUID @default(autoguid()) @id
-  modelId         UUID   @relation(fields: [modelId], references: [Model], onDelete: Cascade)
-  colourId        UUID   @relation(fields: [colourId], references: [Colour], onDelete: SetNull)
+  id              String @id @default(uuid()) @db.Uuid
+  modelId         String @db.Uuid
+  colourId        String @db.Uuid
   engineCC        Int?
   mileage         String?
   createdAt       DateTime @default(now())
@@ -206,7 +202,7 @@ model Variant {
 }
 
 model Colour {
-  id          UUID @default(autoguid()) @id
+  id          String @id @default(uuid()) @db.Uuid
   name        String @unique
   hexCode     String?
   createdAt   DateTime @default(now())
@@ -218,12 +214,12 @@ model Colour {
 // -------------------
 
 model StockUnit {
-  id               UUID @default(autoguid()) @id
+  id               String @id @default(uuid()) @db.Uuid
   chassisNumber    String @unique
   engineNumber     String @unique
-  variantId        UUID   @relation(fields: [variantId], references: [Variant], onDelete: SetNull)
-  colourId         UUID?   @relation(fields: [colourId], references: [Colour], onDelete: SetNull)
-  dealershipId     UUID?   @relation(fields: [dealershipId], references: [Dealership], onDelete: SetNull)
+  variantId        String @db.Uuid
+  colourId         String? @db.Uuid
+  dealershipId     String? @db.Uuid
   purchasePrice    BigInt
   purchaseInvoiceNumber String?
   receivedDate     DateTime?
@@ -233,8 +229,6 @@ model StockUnit {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
 
-  @@unique([chassisNumber])
-  @@unique([engineNumber])
 }
 
 // -------------------
@@ -242,10 +236,10 @@ model StockUnit {
 // -------------------
 
 model Reservation {
-  id           UUID @default(autoguid()) @id
-  stockUnitId  UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
-  customerId   UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  bookingId    UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  id           String @id @default(uuid()) @db.Uuid
+  stockUnitId  String @db.Uuid
+  customerId   String @db.Uuid
+  bookingId    String? @db.Uuid
   reservedAt   DateTime @default(now())
   expiresAt    DateTime?
   releasedAt   DateTime?
@@ -259,12 +253,12 @@ model Reservation {
 // -------------------
 
 model Booking {
-  id            UUID @default(autoguid()) @id
-  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: Cascade)
-  stockUnitId   UUID?   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: SetNull)
+  id            String @id @default(uuid()) @db.Uuid
+  customerId    String @db.Uuid
+  stockUnitId   String? @db.Uuid
   bookingNumber String @unique
   advanceAmount BigInt
-  advanceStatus String   @default(pending) // pending/confirmed/delivered/cancelled
+  advanceStatus String   @default("pending") // pending/confirmed/delivered/cancelled
   confirmedAt   DateTime?
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
@@ -278,10 +272,10 @@ model Booking {
 // -------------------
 
 model Sale {
-  id            UUID @default(autoguid()) @id
-  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  stockUnitId   UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
-  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  id            String @id @default(uuid()) @db.Uuid
+  customerId    String @db.Uuid
+  stockUnitId   String @db.Uuid
+  bookingId     String? @db.Uuid
   saleNumber    String @unique
   exShowroomPrice BigInt
   onRoadPrice   BigInt
@@ -308,10 +302,10 @@ model Sale {
 // -------------------
 
 model Payment {
-  id            UUID @default(autoguid()) @id
-  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
-  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  id            String @id @default(uuid()) @db.Uuid
+  customerId    String @db.Uuid
+  saleId        String? @db.Uuid
+  bookingId     String? @db.Uuid
   amount        BigInt
   method        String   // cash, upi, qr, bank, card, finance, partial
   referenceId   String?
@@ -331,10 +325,10 @@ model Payment {
 // -------------------
 
 model PaymentAllocation {
-  id            UUID @default(autoguid()) @id
-  paymentId     UUID   @relation(fields: [paymentId], references: [Payment], onDelete: Cascade)
-  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
-  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  id            String @id @default(uuid()) @db.Uuid
+  paymentId     String @db.Uuid
+  saleId        String? @db.Uuid
+  bookingId     String? @db.Uuid
   amount        BigInt
   allocatedAt   DateTime @default(now())
 
@@ -352,9 +346,9 @@ model PaymentAllocation {
 // -------------------
 
 model Invoice {
-  id            UUID @default(autoguid()) @id
+  id            String @id @default(uuid()) @db.Uuid
   invoiceNumber String @unique
-  saleId        UUID   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  saleId        String @db.Uuid
   type          String   // tax_invoice/sales_invoice
   subtotal      BigInt   // taxable value excluding GST
   gstAmount     BigInt   // total GST = cgst + sgst + igst
@@ -371,7 +365,7 @@ model Invoice {
   dueDate       DateTime?
   status        String   // issued/paid/void
   pdfUrl        String?
-  createdBy     UUID     @relation(fields: [createdBy], references: [User], onDelete: SetNull)
+  createdBy     String @db.Uuid
 
   @@index([saleId])
   @@index([status])
@@ -386,16 +380,16 @@ model Invoice {
 // -------------------
 
 model Refund {
-  id            UUID @default(autoguid()) @id
+  id            String @id @default(uuid()) @db.Uuid
   refundNumber  String @unique
-  paymentId     UUID   @relation(fields: [paymentId], references: [Payment], onDelete: SetNull)
-  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
-  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  paymentId     String @db.Uuid
+  saleId        String? @db.Uuid
+  bookingId     String? @db.Uuid
   amount        BigInt   // must not exceed unrefunded payment amount
   reason        String   // required free-text reason
   status        RefundStatus @default(pending) // pending/approved/completed/rejected
-  requestedBy   UUID     @relation(fields: [requestedBy], references: [User], onDelete: SetNull)
-  approvedBy    UUID?   @relation(fields: [approvedBy], references: [User], onDelete: SetNull)
+  requestedBy   String @db.Uuid
+  approvedBy    String? @db.Uuid
   processedAt   DateTime?
   createdAt     DateTime @default(now())
 
@@ -412,16 +406,16 @@ model Refund {
 // -------------------
 
 model ServiceRequest {
-  id              UUID @default(autoguid()) @id
+  id              String @id @default(uuid()) @db.Uuid
   requestNumber String @unique
-  customerId      UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId          UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull) // null for walk-in/non-sale
-  stockUnitId     UUID?   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: SetNull)
+  customerId      String @db.Uuid
+  saleId          String? @db.Uuid // null for walk-in/non-sale
+  stockUnitId     String? @db.Uuid
   requestType     RequestType
   description     String
-  assignedTo      UUID?   @relation(fields: [assignedTo], references: [User], onDelete: SetNull)
-  status          String   @default(open) // open/acknowledged/in_progress/resolved/closed/cancelled
-  priority        String   @default(normal) // low/normal/high/urgent
+  assignedTo      String? @db.Uuid
+  status          String   @default("open") // open/acknowledged/in_progress/resolved/closed/cancelled
+  priority        String   @default("normal") // low/normal/high/urgent
   resolvedAt      DateTime?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
@@ -437,15 +431,15 @@ model ServiceRequest {
 // -------------------
 
 model FinanceApplication {
-  id              UUID @default(autoguid()) @id
+  id              String @id @default(uuid()) @db.Uuid
   applicationNumber String @unique
-  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  customerId        String @db.Uuid
+  saleId            String? @db.Uuid
   financeType       String   // loan/lease/other
   amountRequested   BigInt
   interestRate      Int      // basis points
   tenureMonths      Int
-  status            String   @default(submitted) // submitted/under_review/approved/disbursed/rejected
+  status            String   @default("submitted") // submitted/under_review/approved/disbursed/rejected
   quotedPremium     BigInt?
   boundAt           DateTime?
   disbursedAt       DateTime?
@@ -462,16 +456,16 @@ model FinanceApplication {
 // -------------------
 
 model InsuranceApplication {
-  id              UUID @default(autoguid()) @id
+  id              String @id @default(uuid()) @db.Uuid
   applicationNumber String @unique
-  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  customerId        String @db.Uuid
+  saleId            String? @db.Uuid
   provider          String?
   policyType        String?
   premiumAmount     BigInt?
   policyExpiry      DateTime?
   policyNumber      String?
-  status            String   @default(submitted) // submitted/quoted/bound/expired/cancelled
+  status            String   @default("submitted") // submitted/quoted/bound/expired/cancelled
   quotedAt          DateTime?
   boundAt           DateTime?
   expiredAt         DateTime?
@@ -488,12 +482,12 @@ model InsuranceApplication {
 // -------------------
 
 model RTOApplication {
-  id              UUID @default(autoguid()) @id
+  id              String @id @default(uuid()) @db.Uuid
   applicationNumber String @unique
-  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  customerId        String @db.Uuid
+  saleId            String? @db.Uuid
   registrationNumber String?
-  status            String   @default(submitted) // submitted/under_processing/number_assigned/delivered/rejected
+  status            String   @default("submitted") // submitted/under_processing/number_assigned/delivered/rejected
   numberAssignedAt  DateTime?
   deliveredAt       DateTime?
   rejectedReason    String?
@@ -509,21 +503,21 @@ model RTOApplication {
 // -------------------
 
 model Document {
-  id            UUID @default(autoguid()) @id
-  customerId    UUID?   @relation(fields: [customerId], references: [User], onDelete: SetNull)
-  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
-  financeApplicationId UUID? @relation(fields: [financeApplicationId], references: [FinanceApplication], onDelete: SetNull)
-  insuranceApplicationId UUID? @relation(fields: [insuranceApplicationId], references: [InsuranceApplication], onDelete: SetNull)
-  rtoApplicationId UUID? @relation(fields: [rtoApplicationId], references: [RTOApplication], onDelete: SetNull)
+  id            String @id @default(uuid()) @db.Uuid
+  customerId    String? @db.Uuid
+  saleId        String? @db.Uuid
+  financeApplicationId String? @db.Uuid
+  insuranceApplicationId String? @db.Uuid
+  rtoApplicationId String? @db.Uuid
   documentType  String
   fileName      String
   storageKey    String
   mimeType      String
   sizeBytes     Int
-  accessLevel   String   @default(restricted) // restricted/finance/rto/insurance/admin_only
+  accessLevel   String   @default("restricted") // restricted/finance/rto/insurance/admin_only
   retentionUntil DateTime? // NULL = policy not yet approved; computed from retention policy
   isPrivate     Boolean  @default(true)
-  uploadedBy    UUID     @relation(fields: [uploadedBy], references: [User], onDelete: SetNull)
+  uploadedBy    String @db.Uuid
   uploadedAt    DateTime @default(now())
   deletedAt     DateTime? // Soft delete; storage purge is a separate approved job
 
@@ -537,15 +531,15 @@ model Document {
 // -------------------
 
 model StockMovement {
-  id            UUID @default(autoguid()) @id
-  stockUnitId   UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
+  id            String @id @default(uuid()) @db.Uuid
+  stockUnitId   String @db.Uuid
   type          StockMovementType
   quantity      Int    @default(1)
   referenceType String? // sale/booking/inward/refund/manual
-  referenceId   UUID?
+  referenceId   String? @db.Uuid
   notes         String?
   createdAt     DateTime @default(now())
-  createdBy     UUID?   @relation(fields: [createdBy], references: [User], onDelete: SetNull)
+  createdBy     String? @db.Uuid
 
   @@index([stockUnitId])
   @@index([createdAt])
