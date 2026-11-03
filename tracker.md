@@ -103,6 +103,54 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 ---
 
+## Phase 8 — Staff Portal, Tasks & Notifications
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P8-1 | Staff dashboard | CO | P1-2, P5-2 | Frontend Engineer |
+| P8-2 | Daily tasks | CO | P1-2 | Frontend Engineer |
+| P8-3 | Notifications | NS | P8-2 | Backend Engineer |
+| P8-4 | My performance | CO | P5-5, P6-1 | Frontend Engineer |
+| P8-5 | Service requests | CO | P5-5 | Frontend Engineer |
+
+---
+
+## Phase 9 — Reports & Analytics
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P9-1 | Dashboard overview cards | CO | P5-5, P6-1, P4-3 | Backend Engineer |
+| P9-2 | Sales/revenue charts | IP | P5-5, P6-1 | Backend Engineer |
+| P9-3 | Best-selling variants | NS | P5-5 | Backend Engineer |
+| P9-4 | Stock ageing | NS | P4-3 | Backend Engineer |
+| P9-5 | Salesperson performance | NS | P5-5, P1-1 | Backend Engineer |
+| P9-6 | Export reports | NS | P9-1 to P9-5 | Backend Engineer |
+
+---
+
+## Phase 10 — Blogs, Social Media, FAQ, Settings
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P10-1 | Blogs management | IP | P1-2 | Backend Engineer |
+| P10-2 | Social media links | IP | P1-2 | Backend Engineer |
+| P10-3 | FAQ management | IP | P1-2 | Backend Engineer |
+| P10-4 | Settings | CO | P0-6 | Backend Engineer |
+| P10-5 | Public social/FAQ display | NS | P10-2, P10-3 | Frontend Engineer |
+
+---
+
+## Phase 11 — AI Chatbot Integration
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P11-1 | Chatbot knowledge source | IP | P3-1, P10-3 | Backend Engineer |
+| P11-2 | Chatbot responses | IP | P11-1 | Backend Engineer |
+| P11-3 | Chatbot enquiry collection | NS | P11-2, P5-2 | Backend Engineer |
+| P11-4 | No hallucination guard | IP | P11-2 | Backend Engineer |
+
+---
+
 ## Open Owner Decisions (blocking vs non-blocking)
 
 **Block Phase 6 (live payments/invoices) until approved:**
