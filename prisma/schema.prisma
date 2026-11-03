@@ -1,0 +1,581 @@
+// Generated from DATABASE.md v1.1 — do not edit manually without updating docs
+// This is the source-of-truth data model for The Bike Yard dealership management platform.
+
+generator client {
+  provider = "postgresql"
+  // NOTE: Run `prisma generate` after saving this file to rebuild @prisma/client
+}
+
+datasource db {
+  provider = postgresql
+  url      = env("DATABASE_URL")
+}
+
+// -------------------
+// Enums
+// -------------------
+
+enum StockUnitStatus {
+  available
+  reserved
+  sold
+  delivered
+}
+
+enum ReservationStatus {
+  active
+  released
+  expired
+  converted
+}
+
+enum StockMovementType {
+  inward
+  reservation
+  release
+  sale
+  return
+  adjustment
+  delivery
+}
+
+enum LeadStatus {
+  new
+  contacted
+  qualified
+  lost
+}
+
+enum BookingStatus {
+  pending
+  confirmed
+  delivered
+  cancelled
+}
+
+enum SaleStatus {
+  pending
+  partial
+  paid
+  delivered
+  cancelled
+}
+
+enum PaymentStatus {
+  pending
+  completed
+  failed
+  refunded
+}
+
+enum RefundStatus {
+  pending
+  approved
+  completed
+  rejected
+}
+
+enum DocumentAccessLevel {
+  restricted
+  finance
+  rto
+  insurance
+  admin_only
+}
+
+enum DocumentType {
+  customer_id
+  finance
+  insurance
+  rto
+  invoice
+  receipt
+  other
+}
+
+enum RequestType {
+  service
+  complaint
+  document
+  enquiry
+  other
+}
+
+enum StaffTaskStatus {
+  open
+  in_progress
+  completed
+  overdue
+}
+
+enum PaymentAllocationTarget {
+  sale
+  booking
+}
+
+// -------------------
+// Core Models
+// -------------------
+
+model Dealership {
+  id          UUID @default(autoguid()) @id
+  name        String
+  address     String?
+  gstin       String?
+  phone       String?
+  email       String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model User {
+  id                UUID @default(autoguid()) @id
+  email             String @unique
+  password          String
+  name              String?
+  role              String
+  dealershipId      UUID? @relation(fields: [dealershipId], references: [id], onDelete: SetNull)
+  isActive          Boolean @default(true)
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+  auditLogs         AuditLog[]
+  staffTasks        StaffTask[]
+  serviceRequests   ServiceRequest[] @relation("AssignedRequests", fields: [assignedTo], references: [id])
+  auditLogEntries   AuditLog[] @relation("UserActions", references: [userId])
+}
+
+model StaffTask {
+  id            UUID @default(autoguid()) @id
+  title         String
+  description   String?
+  assignedTo    UUID   @relation(fields: [assignedTo], references: [User], onDelete: Cascade)
+  creator       UUID   @relation(fields: [creator], references: [User], onDelete: SetNull)
+  status        StaffTaskStatus @default(open)
+  priority      String   @default(normal)
+  dueDate       DateTime?
+  completedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+}
+
+model AuditLog {
+  id            UUID @default(autoguid()) @id
+  entityType    String
+  entityId      UUID
+  action        String
+  oldValues     Json?
+  newValues     Json?
+  userId        UUID   @relation(fields: [userId], references: [User], onDelete: SetNull)
+  ipAddress     String?
+  timestamp     DateTime @default(now())
+}
+
+// -------------------
+// Catalogue Models
+// -------------------
+
+model Brand {
+  id          UUID @default(autoguid()) @id
+  name        String @unique
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+model Model {
+  id          UUID @default(autoguid()) @id
+  brandId     UUID   @relation(fields: [brandId], references: [Brand], onDelete: Cascade)
+  name        String
+  description String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+
+  @@unique([brandId, name])
+}
+
+model Variant {
+  id              UUID @default(autoguid()) @id
+  modelId         UUID   @relation(fields: [modelId], references: [Model], onDelete: Cascade)
+  colourId        UUID   @relation(fields: [colourId], references: [Colour], onDelete: SetNull)
+  engineCC        Int?
+  mileage         String?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  @@unique([modelId, engineCC])
+}
+
+model Colour {
+  id          UUID @default(autoguid()) @id
+  name        String @unique
+  hexCode     String?
+  createdAt   DateTime @default(now())
+  updatedAt   DateTime @updatedAt
+}
+
+// -------------------
+// Stock Unit (physical motorcycle)
+// -------------------
+
+model StockUnit {
+  id               UUID @default(autoguid()) @id
+  chassisNumber    String @unique
+  engineNumber     String @unique
+  variantId        UUID   @relation(fields: [variantId], references: [Variant], onDelete: SetNull)
+  colourId         UUID?   @relation(fields: [colourId], references: [Colour], onDelete: SetNull)
+  dealershipId     UUID?   @relation(fields: [dealershipId], references: [Dealership], onDelete: SetNull)
+  purchasePrice    BigInt
+  purchaseInvoiceNumber String?
+  receivedDate     DateTime?
+  currentStatus    StockUnitStatus @default(available)
+  location         String?
+  notes            String?
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+
+  @@unique([chassisNumber])
+  @@unique([engineNumber])
+}
+
+// -------------------
+// Reservation / Booking
+// -------------------
+
+model Reservation {
+  id           UUID @default(autoguid()) @id
+  stockUnitId  UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
+  customerId   UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  bookingId    UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  reservedAt   DateTime @default(now())
+  expiresAt    DateTime?
+  releasedAt   DateTime?
+  status       ReservationStatus @default(active)
+
+  @@index([stockUnitId, status], name: "reservation_active_unit_idx")
+}
+
+// -------------------
+// Booking (advance payment record)
+// -------------------
+
+model Booking {
+  id            UUID @default(autoguid()) @id
+  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: Cascade)
+  stockUnitId   UUID?   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: SetNull)
+  bookingNumber String @unique
+  advanceAmount BigInt
+  advanceStatus String   @default(pending) // pending/confirmed/delivered/cancelled
+  confirmedAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([stockUnitId])
+}
+
+// -------------------
+// Sale
+// -------------------
+
+model Sale {
+  id            UUID @default(autoguid()) @id
+  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  stockUnitId   UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
+  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  saleNumber    String @unique
+  exShowroomPrice BigInt
+  onRoadPrice   BigInt
+  discount      BigInt   @default(0)
+  finalSellingPrice BigInt
+  gstAmount     BigInt
+  cgstAmount    BigInt
+  sgstAmount    BigInt
+  igstAmount    BigInt
+  placeOfSupply String?
+  hsnCode       String?
+  gstRate       Int      // basis points (e.g. 2800 = 28.00%)
+  status        SaleStatus @default(pending)
+  deliveryDate  DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([stockUnitId])
+}
+
+// -------------------
+// Payment
+// -------------------
+
+model Payment {
+  id            UUID @default(autoguid()) @id
+  customerId    UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  amount        BigInt
+  method        String   // cash, upi, qr, bank, card, finance, partial
+  referenceId   String?
+  notes         String?
+  status        PaymentStatus @default(pending)
+  recordedAt    DateTime @default(now())
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  @@index([saleId])
+  @@index([bookingId])
+  @@index([customerId])
+}
+
+// -------------------
+// Payment Allocation (maps payment to sale or booking)
+// -------------------
+
+model PaymentAllocation {
+  id            UUID @default(autoguid()) @id
+  paymentId     UUID   @relation(fields: [paymentId], references: [Payment], onDelete: Cascade)
+  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  amount        BigInt
+  allocatedAt   DateTime @default(now())
+
+  @@unique([paymentId])
+  @@index([paymentId])
+  @@index([saleId])
+  @@index([bookingId])
+
+  // Exactly one of saleId or bookingId must be set
+  // Enforced by: CHECK ((saleId IS NOT NULL) <> (bookingId IS NOT NULL))
+}
+
+// -------------------
+// Invoice
+// -------------------
+
+model Invoice {
+  id            UUID @default(autoguid()) @id
+  invoiceNumber String @unique
+  saleId        UUID   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  type          String   // tax_invoice/sales_invoice
+  subtotal      BigInt   // taxable value excluding GST
+  gstAmount     BigInt   // total GST = cgst + sgst + igst
+  cgstAmount    BigInt
+  sgstAmount    BigInt
+  igstAmount    BigInt
+  total         BigInt   // subtotal + gstAmount
+  gstRate       Int      // basis points at issue
+  placeOfSupply String? // State code/name
+  hsnCode       String?  // HSN/SAC code; owner/tax advisor to confirm
+  gstin         String?  // Dealership GSTIN snapshot
+  customerGstin String? // Customer GSTIN (if B2B)
+  issuedAt      DateTime @default(now())
+  dueDate       DateTime?
+  status        String   // issued/paid/void
+  pdfUrl        String?
+  createdBy     UUID     @relation(fields: [createdBy], references: [User], onDelete: SetNull)
+
+  @@index([saleId])
+  @@index([status])
+
+  // Tax split rule: intra-state → cgst = sgst = gst/2, igst = 0
+  //               inter-state → igst = gst, cgst = sgst = 0
+  // Enforced by: CHECK (gstAmount = cgstAmount + sgstAmount + igstAmount)
+}
+
+// -------------------
+// Refund
+// -------------------
+
+model Refund {
+  id            UUID @default(autoguid()) @id
+  refundNumber  String @unique
+  paymentId     UUID   @relation(fields: [paymentId], references: [Payment], onDelete: SetNull)
+  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  bookingId     UUID?   @relation(fields: [bookingId], references: [Booking], onDelete: SetNull)
+  amount        BigInt   // must not exceed unrefunded payment amount
+  reason        String   // required free-text reason
+  status        RefundStatus @default(pending) // pending/approved/completed/rejected
+  requestedBy   UUID     @relation(fields: [requestedBy], references: [User], onDelete: SetNull)
+  approvedBy    UUID?   @relation(fields: [approvedBy], references: [User], onDelete: SetNull)
+  processedAt   DateTime?
+  createdAt     DateTime @default(now())
+
+  @@index([paymentId])
+  @@index([status])
+
+  // Lifecycle: pending → approved → completed, or pending → rejected
+  // Only an approved refund may be completed
+  // Requester cannot self-approve: enforced by APP logic (approvedBy ≠ requestedBy where policy requires)
+}
+
+// -------------------
+// Service Request
+// -------------------
+
+model ServiceRequest {
+  id              UUID @default(autoguid()) @id
+  requestNumber String @unique
+  customerId      UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId          UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull) // null for walk-in/non-sale
+  stockUnitId     UUID?   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: SetNull)
+  requestType     RequestType
+  description     String
+  assignedTo      UUID?   @relation(fields: [assignedTo], references: [User], onDelete: SetNull)
+  status          String   @default(open) // open/acknowledged/in_progress/resolved/closed/cancelled
+  priority        String   @default(normal) // low/normal/high/urgent
+  resolvedAt      DateTime?
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+  deletedAt       DateTime?
+
+  @@index([customerId])
+  @@index([status])
+  @@index([assignedTo])
+}
+
+// -------------------
+// Finance Application
+// -------------------
+
+model FinanceApplication {
+  id              UUID @default(autoguid()) @id
+  applicationNumber String @unique
+  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  financeType       String   // loan/lease/other
+  amountRequested   BigInt
+  interestRate      Int      // basis points
+  tenureMonths      Int
+  status            String   @default(submitted) // submitted/under_review/approved/disbursed/rejected
+  quotedPremium     BigInt?
+  boundAt           DateTime?
+  disbursedAt       DateTime?
+  rejectedReason    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+// -------------------
+// Insurance Application
+// -------------------
+
+model InsuranceApplication {
+  id              UUID @default(autoguid()) @id
+  applicationNumber String @unique
+  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  provider          String?
+  policyType        String?
+  premiumAmount     BigInt?
+  policyExpiry      DateTime?
+  policyNumber      String?
+  status            String   @default(submitted) // submitted/quoted/bound/expired/cancelled
+  quotedAt          DateTime?
+  boundAt           DateTime?
+  expiredAt         DateTime?
+  cancelledAt       DateTime?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+// -------------------
+// RTO Application
+// -------------------
+
+model RTOApplication {
+  id              UUID @default(autoguid()) @id
+  applicationNumber String @unique
+  customerId        UUID   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId            UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  registrationNumber String?
+  status            String   @default(submitted) // submitted/under_processing/number_assigned/delivered/rejected
+  numberAssignedAt  DateTime?
+  deliveredAt       DateTime?
+  rejectedReason    String?
+  createdAt         DateTime @default(now())
+  updatedAt         DateTime @updatedAt
+
+  @@index([customerId])
+  @@index([status])
+}
+
+// -------------------
+// Document
+// -------------------
+
+model Document {
+  id            UUID @default(autoguid()) @id
+  customerId    UUID?   @relation(fields: [customerId], references: [User], onDelete: SetNull)
+  saleId        UUID?   @relation(fields: [saleId], references: [Sale], onDelete: SetNull)
+  financeApplicationId UUID? @relation(fields: [financeApplicationId], references: [FinanceApplication], onDelete: SetNull)
+  insuranceApplicationId UUID? @relation(fields: [insuranceApplicationId], references: [InsuranceApplication], onDelete: SetNull)
+  rtoApplicationId UUID? @relation(fields: [rtoApplicationId], references: [RTOApplication], onDelete: SetNull)
+  documentType  String
+  fileName      String
+  storageKey    String
+  mimeType      String
+  sizeBytes     Int
+  accessLevel   String   @default(restricted) // restricted/finance/rto/insurance/admin_only
+  retentionUntil DateTime? // NULL = policy not yet approved; computed from retention policy
+  isPrivate     Boolean  @default(true)
+  uploadedBy    UUID     @relation(fields: [uploadedBy], references: [User], onDelete: SetNull)
+  uploadedAt    DateTime @default(now())
+  deletedAt     DateTime? // Soft delete; storage purge is a separate approved job
+
+  @@index([customerId])
+  @@index([documentType])
+  @@index([retentionUntil])
+}
+
+// -------------------
+// Stock Movement
+// -------------------
+
+model StockMovement {
+  id            UUID @default(autoguid()) @id
+  stockUnitId   UUID   @relation(fields: [stockUnitId], references: [StockUnit], onDelete: Cascade)
+  type          StockMovementType
+  quantity      Int    @default(1)
+  referenceType String? // sale/booking/inward/refund/manual
+  referenceId   UUID?
+  notes         String?
+  createdAt     DateTime @default(now())
+  createdBy     UUID?   @relation(fields: [createdBy], references: [User], onDelete: SetNull)
+
+  @@index([stockUnitId])
+  @@index([createdAt])
+  @@index([type])
+}
+
+// Seed helpers (fictional, development only)
+///  seed {
+///    // Create default dealership
+///    dealership: {
+///      name = "The Bike Yard"
+///      address = "Khopat, Thane, Maharashtra, India"
+///    }
+///    // Create Super Admin user
+///    user: {
+///      email = "admin@thebikeyard.local"
+///      password = "changed-immediately"
+///      name = "Super Admin"
+///      role = "Super Admin"
+///    }
+///    // Create basic brand/model/variant/colour combos
+///    brand: { name = "Hero" }
+///    model: { name = "Splendor", brand: { create: { name: "Hero" } } }
+///    variant: { model: { create: { name: "Splendor" } }, engineCC = 125 }
+///    colour: { name = "Black", hexCode = "#000000" }
+///    stockUnit: {
+///      chassisNumber = "ME4JC654K98765432"
+///      engineNumber = "JC65E98765432"
+///      variant: { connect: { model: { name: "Splendor", brand: { name: "Hero" } } } }
+///      colour: { connect: { name: "Black" } }
+///      purchasePrice = 6500000
+///    }
+///  }
