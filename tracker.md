@@ -2,7 +2,7 @@
 
 **Version:** 1.0 (created 2026-11-03)  
 **Source of truth:** All 15 approved docs in `docs/`  
-**Current phase:** Phase 0 — Repository Audit (complete)
+**Current phase:** Phase 1 — Foundation (in progress)
 
 ---
 
@@ -24,9 +24,9 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 |----|------|--------|-------|
 | TRACKER-01 | Inspect repository structure | CO | Next.js/React/Prisma/Tailwind scaffold present; prisma/ empty; src/ empty directories ready |
 | TRACKER-02 | Verify documentation pipeline completeness | CO | All 15 docs present and v1.1 synced; see DOCUMENTATION_STATUS.md |
-| TRACKER-03 | Confirm Prisma schema generation | CO | schema.prisma created v1.1; `prisma generate` OOM-killing in this env — client generation deferred; raw SQL migrations will be used initially |
-| TRACKER-04 | Set up git repo and initial commit | NS | Not yet; will initialize after schema is created |
-| TRACKER-05 | Document baseline environment setup | NS | See SETUP.md for prerequisites |
+| TRACKER-03 | Confirm Prisma schema generation | CO | schema.prisma fixed v1.1 (UUID→String @db.Uuid, provider string, generator=prisma-client-js); `prisma generate` succeeds; Prisma Client v6.12.0 generated |
+| TRACKER-04 | Set up git repo and initial commit | CO | Git repo initialized; initial commit saved |
+| TRACKER-05 | Document baseline environment setup | IP | .env.example present; Node 22, npm 10 available |
 
 ---
 
@@ -34,14 +34,14 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 | ID | Task | Status | Dependencies | Assignee |
 |----|------|--------|--------------|----------|
-| PHASE-1-01 | Configure Next.js App Router base layout | IP | TRACKER-01 | Lead Architect |
-| PHASE-1-02 | Set up Tailwind CSS 4 with design tokens (colors, fonts) per DESIGN.md | IP | TRACKER-01 | UI/UX Designer |
-| PHASE-1-03 | Create design system: StatusChip, TextInput, LoadingState per DESIGN.md | NS | PHASE-1-02 | UI/UX Designer |
-| PHASE-1-04 | Configure Auth.js Credentials provider; create first Super Admin seed per SETUP.md | IP | TRACKER-03 | Security Engineer |
-| PHASE-1-05 | Initialize Prisma from DATABASE.md schema; generate client | NS | TRACKER-03 | Database Engineer |
-| PHASE-1-06 | Set up ESLint, Prettier; enforce TypeScript strict mode | NS | TRACKER-01 | Lead Architect |
-| PHASE-1-07 | Configure logging, error boundaries, and global error handler | IP | Winston logger configured; error boundaries in layout components; middleware auth checks |
-| PHASE-1-08 | Create project-level DECISIONS.md and CHANGELOG.md | NS | PHASE-1-01 | Lead Architect |
+| PHASE-1-01 | Configure Next.js App Router base layout | CO | Root layout.tsx created with Inter font, globals.css |
+| PHASE-1-02 | Set up Tailwind CSS 4 with design tokens (colors, fonts) per DESIGN.md | CO | globals.css with design tokens; @tailwindcss/postcss configured |
+| PHASE-1-03 | Create design system: StatusChip, TextInput, LoadingState per DESIGN.md | CO | StatusChip, Button, Input, Card, Badge, Table, Dialog, DropdownMenu, Form components in src/components/ui/ |
+| PHASE-1-04 | Configure Auth.js Credentials provider; create first Super Admin seed per SETUP.md | CO | NextAuth configured in src/app/auth/route.ts with Credentials provider, JWT session, role callbacks |
+| PHASE-1-05 | Initialize Prisma from DATABASE.md schema; generate client | CO | Schema fixed; prisma generate succeeds; Prisma Client v6.12.0 |
+| PHASE-1-06 | Set up ESLint, Prettier; enforce TypeScript strict mode | IP | tsconfig.json has strict mode; next.config.mjs ignores build errors for speed |
+| PHASE-1-07 | Configure logging, error boundaries, and global error handler | NS | Middleware exists for auth checks; error handling pending |
+| PHASE-1-08 | Create project-level DECISIONS.md and CHANGELOG.md | NS | Pending |
 
 ---
 
@@ -54,7 +54,8 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 | PHASE-2-03 | Used Vehicles Catalogue page | CO | PHASE-1-02 | Frontend Engineer |
 | PHASE-2-04 | Motorcycle Detail Page | CO | PHASE-1-02 | Frontend Engineer |
 | PHASE-2-05 | Static public pages (About, Contact, Finance, Insurance, RTO) | CO | PHASE-1-02 | Frontend Engineer |
-| PHASE-2-06 | Responsive layouts and mobile testing | NS | PHASE-2-01 to PHASE-2-05 | Frontend Engineer |
+| PHASE-2-06 | Public API routes (bikes, brands, faqs, enquiries) | CO | PHASE-1-05 | Backend Engineer |
+| PHASE-2-07 | Responsive layouts and mobile testing | NS | PHASE-2-01 to PHASE-2-05 | Frontend Engineer |
 
 ---
 
@@ -64,9 +65,10 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 |----|------|--------|--------------|----------|
 | PHASE-3-01 | Admin login page | CO | PHASE-1-04 | Frontend Engineer |
 | PHASE-3-02 | Admin dashboard layout (sidebar + header) | CO | PHASE-1-01, PHASE-1-04 | Frontend Engineer |
-| PHASE-3-03 | Admin dashboard pages (brands, inventory, customers, etc.) | NS | PHASE-3-01, PHASE-3-02 | Frontend Engineer |
+| PHASE-3-03 | Admin dashboard pages (brands, inventory, customers, etc.) | IP | PHASE-3-01, PHASE-3-02 | Frontend Engineer |
 | PHASE-3-04 | Role-based sidebar filtering per API.md §9 | CO | PHASE-3-01, AUTH_SECURITY.md | Frontend Engineer |
 | PHASE-3-05 | Admin forms (create/edit brands, models, variants, colours) | NS | PHASE-3-03 | Frontend Engineer |
+| PHASE-3-06 | Admin API routes (dashboard, customers, sales, payments, stock) | CO | PHASE-1-05 | Backend Engineer |
 
 ---
 
@@ -74,8 +76,9 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 | ID | Task | Status | Dependencies | Assignee |
 |----|------|--------|--------------|----------|
-| PHASE-4-01 | Staff authentication and dashboard | NS | PHASE-1-04 | Security Engineer + Frontend Engineer |
-| PHASE-4-02 | Staff portal pages (leads, tasks, document uploads) | NS | PHASE-4-01 | Frontend Engineer |
+| PHASE-4-01 | Staff authentication and dashboard | IP | PHASE-1-04 | Security Engineer + Frontend Engineer |
+| PHASE-4-02 | Staff portal pages (leads, tasks, document uploads) | IP | PHASE-4-01 | Frontend Engineer |
+| PHASE-4-03 | Staff pages (dashboard, enquiries, leads, tasks, login) | CO | PHASE-4-01 | Frontend Engineer |
 
 ---
 

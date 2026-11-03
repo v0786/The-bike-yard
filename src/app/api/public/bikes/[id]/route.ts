@@ -1,0 +1,57 @@
+import { NextResponse } from "next/server"
+import { prisma } from "@/lib/prisma"
+
+export const dynamic = "force-dynamic"
+
+export async function GET(request: Request) {
+  try {
+    const { searchParams } = new URL(request.url)
+    const id = searchParams.get("id")
+
+    if (!id) {
+      return NextResponse.json(
+        { error: { code: "VALIDATION_ERROR", message: "Bike ID is required" } },
+        { status: 400 }
+      )
+    }
+
+    const unit = await prisma.stockUnit.findUnique({
+      where: { id },
+      include: {
+        variant: { include: { model: { include: { brand: true } } } },
+        colour: true,
+        movements: { orderBy: { createdAt: "desc" } },
+      },
+    })
+
+    if (!unit) {
+      return NextResponse.json(
+        { error: { code: "NOT_FOUND", message: "Bike not found" } },
+        { status: 404 }
+      )
+    }
+
+    return NextResponse.json({
+      data: {
+        id: unit.id,
+        brand: unit.variant.model.brand.name,
+        model: unit.variant.model.name,
+        variant: unit.variant.name,
+        colour: unit.colour?.name,
+        chassisNumber: unit.chassisNumber,
+        engineNumber: unit.engineNumber,
+        exShowroomPrice: unit.purchasePrice,
+        onRoadPrice: unit.purchasePrice,
+        availabilityStatus: unit.currentStatus,
+        imageUrl: unit.colour?.imageUrl || null,
+        specifications: unit.variant.specifications || {},
+        movements: unit.movements,
+      },
+    })
+  } catch (error) {
+    return NextResponse.json(
+      { error: { code: "INTERNAL_ERROR", message: "Failed to fetch bike detail" } },
+      { status: 500 }
+    )
+  }
+}
