@@ -1,85 +1,85 @@
 // New Vehicles Catalogue Page
 // Follows FEATURES.md F-CAT-01 to F-CAT-08, PRD.md, and DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 type BikeCardProps = {
-  id: string
-  brand: "Suzuki" | "Honda" | "TVS"
-  model: string
-  variant: string
-  colour: string
-  price: number
-  exShowroom: number
-  image: string
-  available: boolean
-}
+  id: string;
+  brand: 'Suzuki' | 'Honda' | 'TVS';
+  model: string;
+  variant: string;
+  colour: string;
+  price: number;
+  exShowroom: number;
+  image: string;
+  available: boolean;
+};
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — New Motorcycles and Scooters",
+  title: 'The Bike Yard — New Motorcycles and Scooters',
   description:
-    "New motorcycles and scooters at The Bike Yard, Khopat, Thane. Suzuki, Honda, TVS latest models with ex-showroom pricing.",
-}
+    'New motorcycles and scooters at The Bike Yard, Khopat, Thane. Suzuki, Honda, TVS latest models with ex-showroom pricing.',
+};
 
 export function NewBikesPage() {
   // Sample new bikes data - in production this comes from DATABASE.md Variant + Colour queries
   const newBikes = [
     {
-      id: "1",
-      brand: "Suzuki",
-      model: "Intruder",
-      variant: "150cc Standard",
-      colour: "Black",
+      id: '1',
+      brand: 'Suzuki',
+      model: 'Intruder',
+      variant: '150cc Standard',
+      colour: 'Black',
       price: 1250000,
       exShowroom: 1100000,
-      image: "/placeholder-new.svg",
+      image: '/placeholder-new.svg',
       available: true,
     },
     {
-      id: "2",
-      brand: "Honda",
-      model: "CB350",
-      variant: "350cc Standard",
-      colour: "Silver",
+      id: '2',
+      brand: 'Honda',
+      model: 'CB350',
+      variant: '350cc Standard',
+      colour: 'Silver',
       price: 1850000,
       exShowroom: 1650000,
-      image: "/placeholder-new.svg",
+      image: '/placeholder-new.svg',
       available: true,
     },
     {
-      id: "3",
-      brand: "TVS",
-      model: "Jupiter",
-      variant: "110cc SmartXONCE",
-      colour: "White",
+      id: '3',
+      brand: 'TVS',
+      model: 'Jupiter',
+      variant: '110cc SmartXONCE',
+      colour: 'White',
       price: 95000,
       exShowroom: 85000,
-      image: "/placeholder-new.svg",
+      image: '/placeholder-new.svg',
       available: true,
     },
     {
-      id: "4",
-      brand: "Suzuki",
-      model: "Access 125",
-      variant: "125cc Smart",
-      colour: "Red",
+      id: '4',
+      brand: 'Suzuki',
+      model: 'Access 125',
+      variant: '125cc Smart',
+      colour: 'Red',
       price: 105000,
       exShowroom: 95000,
-      image: "/placeholder-new.svg",
+      image: '/placeholder-new.svg',
       available: true,
     },
     {
-      id: "5",
-      brand: "TVS",
-      model: "Rider",
-      variant: "110cc",
-      colour: "Blue",
+      id: '5',
+      brand: 'TVS',
+      model: 'Rider',
+      variant: '110cc',
+      colour: 'Blue',
       price: 85000,
       exShowroom: 75000,
-      image: "/placeholder-new.svg",
+      image: '/placeholder-new.svg',
       available: false,
     },
-  ]
+  ];
 
   return (
     <section className="py-24 sm:py-32 bg-bg-secondary">
@@ -100,7 +100,7 @@ export function NewBikesPage() {
           {newBikes.map((bike) => (
             <article
               key={bike.id}
-              className={`border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow ${!bike.available ? "opacity-50" : ""}`}
+              className={`border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow ${!bike.available ? 'opacity-50' : ''}`}
             >
               <div className="relative h-64">
                 <div className="absolute inset-0">
@@ -137,18 +137,16 @@ export function NewBikesPage() {
                   {bike.brand} {bike.model}
                 </h3>
 
-                <p className="text-sm text-brand-secondary/60 mb-3">
-                  {bike.variant}
-                </p>
+                <p className="text-sm text-brand-secondary/60 mb-3">{bike.variant}</p>
 
                 <div className="flex items-end justify-between">
                   <div className="flex items-end gap-2">
                     <p className="font-medium">₹ {bike.price.toLocaleString()}</p>
-                    <p className="text-xs text-brand-secondary">Ex-showroom: ₹ {bike.exShowroom.toLocaleString()}</p>
+                    <p className="text-xs text-brand-secondary">
+                      Ex-showroom: ₹ {bike.exShowroom.toLocaleString()}
+                    </p>
                   </div>
-                  <button
-                    className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors w-full"
-                  >
+                  <button className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors w-full">
                     Enquire Now
                   </button>
                 </div>
@@ -161,9 +159,7 @@ export function NewBikesPage() {
         <div className="mt-12 p-6 bg-white rounded-2xl shadow-sm mb-8">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Brand
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Brand</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Brands</option>
                 <option value="Suzuki">Suzuki</option>
@@ -172,9 +168,7 @@ export function NewBikesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Price Range
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Price Range</label>
               <input
                 type="range"
                 className="w-full rounded-border border-border h-2 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
@@ -187,9 +181,7 @@ export function NewBikesPage() {
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Colour
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Colour</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Colours</option>
                 <option value="Black">Black</option>
@@ -200,9 +192,7 @@ export function NewBikesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Variant
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Variant</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Variants</option>
                 <option value="150cc Standard">150cc Standard</option>
@@ -215,5 +205,5 @@ export function NewBikesPage() {
         </div>
       </div>
     </section>
-  )
+  );
 }

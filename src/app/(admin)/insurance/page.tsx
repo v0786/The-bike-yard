@@ -1,6 +1,13 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function InsurancePage() {
   return (
@@ -28,11 +35,13 @@ export default function InsurancePage() {
               <TableCell>ICICI Lombard</TableCell>
               <TableCell>Comprehensive</TableCell>
               <TableCell>₹25,000</TableCell>
-              <TableCell><StatusChip status="submitted" /></TableCell>
+              <TableCell>
+                <StatusChip status="submitted" />
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

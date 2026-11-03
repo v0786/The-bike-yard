@@ -1,7 +1,14 @@
-import { prisma } from "@/lib/prisma"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import { prisma } from '@/lib/prisma';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function StockUnitsPage() {
   return (
@@ -38,5 +45,5 @@ export default function StockUnitsPage() {
         </Table>
       </div>
     </div>
-  )
+  );
 }

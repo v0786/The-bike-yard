@@ -13,7 +13,5 @@
     "AI_PROVIDER": "stub",
     "PAYMENT_PROVIDER": "stub"
   },
-  "crons": [
-    { "path": "/api/admin/reports/daily-closing", "schedule": "0 0 * * *" }
-  ]
+  "crons": [{ "path": "/api/admin/reports/daily-closing", "schedule": "0 0 * * *" }]
 }

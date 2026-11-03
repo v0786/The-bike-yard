@@ -1,13 +1,13 @@
 // Insurance Page
 // Follows FEATURES.md F-FIN-03, PRD.md, and DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — Insurance",
+  title: 'The Bike Yard — Insurance',
   description:
-    "Insurance options for motorcycles at The Bike Yard. Policy information and assistance.",
-}
+    'Insurance options for motorcycles at The Bike Yard. Policy information and assistance.',
+};
 
 export function InsurancePage() {
   return (
@@ -22,12 +22,14 @@ export function InsurancePage() {
               Two-Wheeler Insurance
             </h2>
             <p className="text-brand-secondary/60 text-lg mb-8 leading-relaxed">
-              Protect your motorcycle with comprehensive insurance coverage. We assist with
-                policy selection, renewal, and claims processing for all major brands.
+              Protect your motorcycle with comprehensive insurance coverage. We assist with policy
+              selection, renewal, and claims processing for all major brands.
             </p>
 
             <div className="border rounded-2xl p-6 bg-white shadow-sm mb-8">
-              <h4 className="font-bold text-brand-primary text-sm uppercase mb-3">Coverage Types</h4>
+              <h4 className="font-bold text-brand-primary text-sm uppercase mb-3">
+                Coverage Types
+              </h4>
               <div className="grid grid-cols-2 gap-4 text-sm">
                 <div>
                   <label className="flex items-start gap-3">
@@ -46,7 +48,7 @@ export function InsurancePage() {
                     <input
                       type="checkbox"
                       className="w-4 h-4 rounded border-brand-primary border-brand-primary/20 focus:ring-brand-primary"
-                      />
+                    />
                     <span>
                       <strong>Comprehensive Coverage</strong> (Own damage + third-party)
                     </span>
@@ -154,16 +156,14 @@ export function InsurancePage() {
                   fill="currentColor"
                 >
                   <path d="M22 16.92v3a2 2 0 0 1-2.18 2 19.79 19.79 0 0 1-8.63-3.02 19.5 19.5 0 0 1-6-1.02m-3.5-3.5a2 2 0 0 0-2.73-.57l-2.17 2.72a1 1 0 0 1-2.02 0l-2.17-2.72A2 2 0 0 0 4.27 21H5a2 2 0 0 1 2 1.92 19.79 19.79 0 0 1 6.73-6.07L16.73 4.07a2 2 0 0 0-.57-2.73ZM5 10v5h14V10H5zm0 8v-2a6 6 0 0 1 12 0v2a6 6 0 0 0 12 0v-6a6 6 0 0 0-12 0v2a6 6 0 0 0 12 0v-6Z" />
-                  </svg>
+                </svg>
                 info@thebikeyard.in
               </p>
-              <p className="text-sm text-brand-secondary/60">
-                Phone: 080971 72040
-              </p>
+              <p className="text-sm text-brand-secondary/60">Phone: 080971 72040</p>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

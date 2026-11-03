@@ -1,35 +1,34 @@
-"use client"
+'use client';
 
-import * as React from "react"
-import { cn } from "@/lib/utils"
+import * as React from 'react';
+import { cn } from '@/lib/utils';
 
 interface BadgeProps extends React.HTMLAttributes<HTMLSpanElement> {
-  variant?: "default" | "secondary" | "destructive" | "outline" | "success" | "warning"
+  variant?: 'default' | 'secondary' | 'destructive' | 'outline' | 'success' | 'warning';
 }
 
 const variants = {
-  default: "bg-primary text-primary-foreground",
-  secondary: "bg-secondary text-secondary-foreground",
-  destructive:
-    "bg-destructive text-destructive-foreground",
-  outline: "border border-input",
-  success: "bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400",
-  warning: "bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400",
-}
+  default: 'bg-primary text-primary-foreground',
+  secondary: 'bg-secondary text-secondary-foreground',
+  destructive: 'bg-destructive text-destructive-foreground',
+  outline: 'border border-input',
+  success: 'bg-green-100 text-green-800 dark:bg-green-900/30 dark:text-green-400',
+  warning: 'bg-amber-100 text-amber-800 dark:bg-amber-900/30 dark:text-amber-400',
+};
 
 const Badge = React.forwardRef<HTMLSpanElement, BadgeProps>(
   ({ className, variant, ...props }, ref) => (
     <span
       ref={ref}
       className={cn(
-        "inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold",
-        variants[variant],
+        'inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold',
+        variants[variant ?? 'default'],
         className
       )}
       {...props}
     />
   )
-)
-Badge.displayName = "Badge"
+);
+Badge.displayName = 'Badge';
 
-export { Badge }
+export { Badge };

@@ -1,6 +1,13 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function InventoryPage() {
   return (
@@ -26,13 +33,19 @@ export default function InventoryPage() {
               <TableCell>ME4JC654K98765432</TableCell>
               <TableCell>Hero Splendor</TableCell>
               <TableCell>Black</TableCell>
-              <TableCell><StatusChip status="available" /></TableCell>
+              <TableCell>
+                <StatusChip status="available" />
+              </TableCell>
               <TableCell>₹6,50,000</TableCell>
-              <TableCell><Button size="sm" variant="outline">Details</Button></TableCell>
+              <TableCell>
+                <Button size="sm" variant="outline">
+                  Details
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

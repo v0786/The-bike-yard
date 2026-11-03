@@ -1,6 +1,13 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { Badge } from "@/components/ui/badge"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { Badge } from '@/components/ui/badge';
 
 export default function BrandsPage() {
   return (
@@ -23,18 +30,30 @@ export default function BrandsPage() {
             <TableRow>
               <TableCell>Hero</TableCell>
               <TableCell>3</TableCell>
-              <TableCell><Badge>Active</Badge></TableCell>
-              <TableCell><Button size="sm" variant="outline">Edit</Button></TableCell>
+              <TableCell>
+                <Badge>Active</Badge>
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="outline">
+                  Edit
+                </Button>
+              </TableCell>
             </TableRow>
             <TableRow>
               <TableCell>Honda</TableCell>
               <TableCell>4</TableCell>
-              <TableCell><Badge>Active</Badge></TableCell>
-              <TableCell><Button size="sm" variant="outline">Edit</Button></TableCell>
+              <TableCell>
+                <Badge>Active</Badge>
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="outline">
+                  Edit
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

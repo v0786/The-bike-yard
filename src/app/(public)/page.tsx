@@ -1,37 +1,37 @@
 // Main homepage bringing together all sections
 // Follows DESIGN.md, FEATURES.md, and PRD.md specifications
 
-import type { Metadata } from "next/metadata"
-import { Navbar, Footer } from "@/components/public/Navbar"
-import { HeroSection } from "@/components/public/HeroSection"
+import type { Metadata } from '@/types/metadata';
+import { Navbar, Footer } from '@/components/public/Navbar';
+import { HeroSection } from '@/components/public/HeroSection';
 
 type NavLink = {
-  href: string
-  label: string
-  description?: string
-}
+  href: string;
+  label: string;
+  description?: string;
+};
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — Premium Motorcycle Showroom",
+  title: 'The Bike Yard — Premium Motorcycle Showroom',
   description:
-    "Complete motorcycle dealership management and digital showroom for The Bike Yard, Khopat, Thane, Maharashtra, India. Suzuki, Honda, TVS new and second-hand motorcycles. Rating: 4.9/5 | 267 reviews.",
-}
+    'Complete motorcycle dealership management and digital showroom for The Bike Yard, Khopat, Thane, Maharashtra, India. Suzuki, Honda, TVS new and second-hand motorcycles. Rating: 4.9/5 | 267 reviews.',
+};
 
 export default function HomePage() {
   const navLinks: NavLink[] = [
-    { href: "/", label: "Home" },
-    { href: "/new-bikes", label: "New Bikes" },
-    { href: "/used-bikes", label: "Used Bikes" },
-    { href: "/finance", label: "Finance" },
-    { href: "/insurance", label: "Insurance" },
-    { href: "/rto", label: "RTO" },
-    { href: "/test-ride", label: "Test Ride" },
-    { href: "/contact", label: "Contact" },
-  ]
+    { href: '/', label: 'Home' },
+    { href: '/new-bikes', label: 'New Bikes' },
+    { href: '/used-bikes', label: 'Used Bikes' },
+    { href: '/finance', label: 'Finance' },
+    { href: '/insurance', label: 'Insurance' },
+    { href: '/rto', label: 'RTO' },
+    { href: '/test-ride', label: 'Test Ride' },
+    { href: '/contact', label: 'Contact' },
+  ];
 
   return (
     <main className="min-h-screen bg-bg-primary text-brand-primary">
-      <Navbar navLinks={navLinks} />
+      <Navbar />
       <section className="pt-24">
         <HeroSection />
       </section>
@@ -62,9 +62,7 @@ export default function HomePage() {
                       viewBox="0 0 400 300"
                       fill="currentColor"
                     >
-                      <path
-                        d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z"
-                      />
+                      <path d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z" />
                     </svg>
                   </div>
                 </div>
@@ -77,9 +75,7 @@ export default function HomePage() {
                   <h3 className="font-semibold text-brand-primary hover:text-brand-accent transition-colors">
                     Suzuki Intruder
                   </h3>
-                  <p className="text-sm text-brand-secondary/60">
-                    150cc · Standard · Available
-                  </p>
+                  <p className="text-sm text-brand-secondary/60">150cc · Standard · Available</p>
                 </div>
               </div>
               <div className="p-4 flex justify-between items-end">
@@ -87,9 +83,7 @@ export default function HomePage() {
                   <p className="font-medium">₹ 1.25 Lakhs</p>
                   <p className="text-xs text-brand-secondary">Ex-showroom</p>
                 </div>
-                <button
-                  className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors"
-                >
+                <button className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors">
                   View Details
                 </button>
               </div>
@@ -104,9 +98,7 @@ export default function HomePage() {
                       viewBox="0 0 400 300"
                       fill="currentColor"
                     >
-                      <path
-                        d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z"
-                      />
+                      <path d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z" />
                     </svg>
                   </div>
                 </div>
@@ -119,9 +111,7 @@ export default function HomePage() {
                   <h3 className="font-semibold text-brand-primary hover:text-brand-accent transition-colors">
                     Honda CB350
                   </h3>
-                  <p className="text-sm text-brand-secondary/60">
-                    350cc · Standard · Available
-                  </p>
+                  <p className="text-sm text-brand-secondary/60">350cc · Standard · Available</p>
                 </div>
               </div>
               <div className="p-4 flex justify-between items-end">
@@ -129,9 +119,7 @@ export default function HomePage() {
                   <p className="font-medium">₹ 1.85 Lakhs</p>
                   <p className="text-xs text-brand-secondary">Ex-showroom</p>
                 </div>
-                <button
-                  className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors"
-                >
+                <button className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors">
                   View Details
                 </button>
               </div>
@@ -146,9 +134,7 @@ export default function HomePage() {
                       viewBox="0 0 400 300"
                       fill="currentColor"
                     >
-                      <path
-                        d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z"
-                      />
+                      <path d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 200 L 100 200 Z" />
                     </svg>
                   </div>
                 </div>
@@ -161,9 +147,7 @@ export default function HomePage() {
                   <h3 className="font-semibold text-brand-primary hover:text-brand-accent transition-colors">
                     TVS Jupiter
                   </h3>
-                  <p className="text-sm text-brand-secondary/60">
-                    110cc · Scooter · Available
-                  </p>
+                  <p className="text-sm text-brand-secondary/60">110cc · Scooter · Available</p>
                 </div>
               </div>
               <div className="p-4 flex justify-between items-end">
@@ -171,9 +155,7 @@ export default function HomePage() {
                   <p className="font-medium">₹ 85,000</p>
                   <p className="text-xs text-brand-secondary">Ex-showroom</p>
                 </div>
-                <button
-                  className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors"
-                >
+                <button className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors">
                   View Details
                 </button>
               </div>
@@ -194,10 +176,9 @@ export default function HomePage() {
                 India's Most Trusted Motorcycle Showroom
               </h2>
               <p className="text-brand-secondary/60 text-lg mb-6 leading-relaxed">
-                With 267 verified reviews and a 4.9/5 rating, The Bike Yard has become
-                Thane's most trusted motorcycle dealership. We pride ourselves on
-                transparency, quality service, and helping customers find their
-                perfect motorcycle.
+                With 267 verified reviews and a 4.9/5 rating, The Bike Yard has become Thane's most
+                trusted motorcycle dealership. We pride ourselves on transparency, quality service,
+                and helping customers find their perfect motorcycle.
               </p>
               <ul className="grid grid-cols-2 gap-4 text-sm mb-6">
                 <li>
@@ -207,7 +188,7 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
+                    <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Premium Suzuki, Honda, TVS brands
                 </li>
@@ -218,7 +199,7 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
+                    <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   4.9⭐ rating | 267 reviews
                 </li>
@@ -229,7 +210,7 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
+                    <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Home: Khopat, Thane, Maharashtra
                 </li>
@@ -240,7 +221,7 @@ export default function HomePage() {
                     fill="currentColor"
                   >
                     <path d="M12 5.75a6.25 6.25 0 1 0 0 12.5 6.25 6.25 0 0 0 0-12.5Z" />
-                  <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
+                    <path d="M12 1L12 5.75M5.25 12h1.5a4.75 4.75 0 0 1 0 9.5h-1.5M12 19.25h.0079" />
                   </svg>
                   Test rides available
                 </li>
@@ -251,8 +232,10 @@ export default function HomePage() {
               <div className="border-l-4 border-brand-primary pl-6">
                 <h3 className="font-bold text-brand-primary text-lg">Opening Hours</h3>
                 <p className="text-sm text-brand-secondary/60">
-                  Monday - Friday: 9:00 AM - 8:00 PM<br />
-                  Saturday: 9:00 AM - 9:00 PM<br />
+                  Monday - Friday: 9:00 AM - 8:00 PM
+                  <br />
+                  Saturday: 9:00 AM - 9:00 PM
+                  <br />
                   Sunday: 10:00 AM - 6:00 PM
                 </p>
               </div>
@@ -281,5 +264,5 @@ export default function HomePage() {
       {/* Footer */}
       <Footer />
     </main>
-  )
+  );
 }

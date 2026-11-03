@@ -1,5 +1,12 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { StatusChip } from "@/components/ui/status-chip"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function ReportsPage() {
   return (
@@ -58,11 +65,13 @@ export default function ReportsPage() {
               <TableCell>—</TableCell>
               <TableCell>—</TableCell>
               <TableCell>—</TableCell>
-              <TableCell><StatusChip status="pending" /></TableCell>
+              <TableCell>
+                <StatusChip status="pending" />
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

@@ -1,34 +1,33 @@
-import { NextResponse } from "next/server"
-import { z } from "zod"
-import { prisma } from "@/lib/prisma"
-import { stockUnitCreateSchema } from "@/lib/validations"
-import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { stockUnitCreateSchema } from '@/lib/validations';
+import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+  const user = await requireRole(['Manager', 'Super Admin', 'Owner']);
 
   try {
     const units = await prisma.stockUnit.findMany({
-      include: { variant: { include: { model: { include: { brand: true } } } }, colour: true },
-      orderBy: { createdAt: "desc" },
-    })
-    return NextResponse.json({ data: units })
+      orderBy: { createdAt: 'desc' },
+    });
+    return NextResponse.json({ data: units });
   } catch (error: unknown) {
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to fetch stock units" } },
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch stock units' } },
       { status: 500 }
-    )
+    );
   }
 }
 
 export async function POST(request: Request) {
-  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+  const user = await requireRole(['Manager', 'Super Admin', 'Owner']);
 
   try {
-    const body = await request.json()
-    const validated = stockUnitCreateSchema.parse(body)
+    const body = await request.json();
+    const validated = stockUnitCreateSchema.parse(body);
 
     const unit = await prisma.stockUnit.create({
       data: {
@@ -45,29 +44,28 @@ export async function POST(request: Request) {
         location: validated.location || null,
         notes: validated.notes || null,
       },
-      include: { variant: { include: { model: { include: { brand: true } } } }, colour: true },
-    })
+    });
 
-    return NextResponse.json({ data: unit }, { status: 201 })
+    return NextResponse.json({ data: unit }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {
           error: {
-            code: "VALIDATION_ERROR",
-            message: "Invalid stock unit data",
-            details: error.errors.map((e) => ({
-              field: e.path.join("."),
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid stock unit data',
+            details: error.issues.map((e) => ({
+              field: e.path.join('.'),
               message: e.message,
             })),
           },
         },
         { status: 400 }
-      )
+      );
     }
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to create stock unit" } },
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to create stock unit' } },
       { status: 500 }
-    )
+    );
   }
 }

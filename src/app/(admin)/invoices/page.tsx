@@ -1,6 +1,13 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function InvoicesPage() {
   return (
@@ -27,12 +34,18 @@ export default function InvoicesPage() {
               <TableCell>TBY-2026-0001</TableCell>
               <TableCell>Rahul Sharma</TableCell>
               <TableCell>₹8,96,000</TableCell>
-              <TableCell><StatusChip status="issued" /></TableCell>
-              <TableCell><Button size="sm" variant="outline">Download PDF</Button></TableCell>
+              <TableCell>
+                <StatusChip status="issued" />
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="outline">
+                  Download PDF
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

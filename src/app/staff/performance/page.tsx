@@ -19,5 +19,5 @@ export default function StaffPerformancePage() {
         </div>
       </div>
     </div>
-  )
+  );
 }

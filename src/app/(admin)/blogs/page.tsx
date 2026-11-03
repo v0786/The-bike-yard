@@ -6,5 +6,5 @@ export default function BlogsPage() {
         <p className="text-gray-500">No blog posts yet.</p>
       </div>
     </div>
-  )
+  );
 }

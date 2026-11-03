@@ -6,5 +6,5 @@ export default function StaffBookingsPage() {
         <p className="text-gray-500">No assigned bookings.</p>
       </div>
     </div>
-  )
+  );
 }

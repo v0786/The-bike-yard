@@ -36,5 +36,5 @@ export function AdminHeader() {
         </button>
       </div>
     </header>
-  )
+  );
 }

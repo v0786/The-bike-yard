@@ -1,6 +1,13 @@
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function StaffPage() {
   return (
@@ -25,12 +32,18 @@ export default function StaffPage() {
               <TableCell>Super Admin</TableCell>
               <TableCell>admin@thebikeyard.local</TableCell>
               <TableCell>Super Admin</TableCell>
-              <TableCell><StatusChip status="active" /></TableCell>
-              <TableCell><Button size="sm" variant="outline">Edit</Button></TableCell>
+              <TableCell>
+                <StatusChip status="active" />
+              </TableCell>
+              <TableCell>
+                <Button size="sm" variant="outline">
+                  Edit
+                </Button>
+              </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

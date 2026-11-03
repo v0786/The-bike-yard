@@ -224,6 +224,7 @@ model Variant {
   updatedAt       DateTime @updatedAt
 
   @@unique([modelId, engineCC])
+  stockUnits StockUnit[]
 }
 
 model Colour {
@@ -232,6 +233,7 @@ model Colour {
   hexCode     String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  stockUnits StockUnit[]
 }
 
 // -------------------
@@ -254,6 +256,9 @@ model StockUnit {
   createdAt        DateTime @default(now())
   updatedAt        DateTime @updatedAt
   testRides  TestRide[]
+  variant   Variant   @relation(fields: [variantId], references: [id])
+  colour    Colour?   @relation(fields: [colourId], references: [id])
+  sales       Sale[]      @relation("StockUnitSales")
 }
 
 // -------------------
@@ -322,6 +327,7 @@ model Sale {
 
   @@index([customerId])
   @@index([stockUnitId])
+  stockUnit   StockUnit   @relation("StockUnitSales", fields: [stockUnitId], references: [id])
 }
 
 // -------------------
@@ -478,6 +484,7 @@ model FinanceApplication {
 
   @@index([customerId])
   @@index([status])
+  customer   Customer   @relation(fields: [customerId], references: [id])
 }
 
 // -------------------
@@ -504,6 +511,7 @@ model InsuranceApplication {
 
   @@index([customerId])
   @@index([status])
+  customer   Customer   @relation(fields: [customerId], references: [id])
 }
 
 // -------------------
@@ -525,6 +533,7 @@ model RTOApplication {
 
   @@index([customerId])
   @@index([status])
+  customer   Customer   @relation(fields: [customerId], references: [id])
 }
 
 // -------------------
@@ -677,6 +686,9 @@ model Customer {
   bookings       Booking[] @relation("CustomerBookings")
   sales          Sale[] @relation("CustomerSales")
   serviceRequests ServiceRequest[] @relation("CustomerServiceRequests")
+  financeApplications FinanceApplication[]
+  insuranceApplications InsuranceApplication[]
+  rtoApplications RTOApplication[]
 }
 
 model Lead {

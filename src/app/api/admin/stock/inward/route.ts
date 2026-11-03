@@ -1,7 +1,7 @@
-import { NextResponse } from "next/server"
-import { z } from "zod"
-import { prisma } from "@/lib/prisma"
-import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
+import { NextResponse } from 'next/server';
+import { z } from 'zod';
+import { prisma } from '@/lib/prisma';
+import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
 const inwardSchema = z.object({
   chassisNumber: z.string().min(1),
@@ -12,16 +12,16 @@ const inwardSchema = z.object({
   purchaseInvoiceNumber: z.string().optional(),
   supplierName: z.string().optional(),
   receivedDate: z.string().datetime(),
-})
+});
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic';
 
 export async function POST(request: Request) {
-  const user = await requireRole(["Manager", "Super Admin", "Owner"])
+  const user = await requireRole(['Manager', 'Super Admin', 'Owner']);
 
   try {
-    const body = await request.json()
-    const validated = inwardSchema.parse(body)
+    const body = await request.json();
+    const validated = inwardSchema.parse(body);
 
     const unit = await prisma.stockUnit.create({
       data: {
@@ -33,31 +33,37 @@ export async function POST(request: Request) {
         purchaseInvoiceNumber: validated.purchaseInvoiceNumber || null,
         supplierName: validated.supplierName || null,
         receivedDate: validated.receivedDate,
-        currentStatus: "available",
+        currentStatus: 'available',
       },
-    })
+    });
 
     await prisma.stockMovement.create({
       data: {
         stockUnitId: unit.id,
-        type: "inward",
+        type: 'inward',
         quantity: 1,
-        referenceType: "inward",
-        notes: "Stock inward",
+        referenceType: 'inward',
+        notes: 'Stock inward',
       },
-    })
+    });
 
-    return NextResponse.json({ data: unit }, { status: 201 })
+    return NextResponse.json({ data: unit }, { status: 201 });
   } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
-        { error: { code: "VALIDATION_ERROR", message: "Invalid inward data", details: error.errors } },
+        {
+          error: {
+            code: 'VALIDATION_ERROR',
+            message: 'Invalid inward data',
+            details: error.issues,
+          },
+        },
         { status: 400 }
-      )
+      );
     }
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to record stock inward" } },
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to record stock inward' } },
       { status: 500 }
-    )
+    );
   }
 }

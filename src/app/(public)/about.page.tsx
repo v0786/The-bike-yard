@@ -1,13 +1,13 @@
 // About Us Page
 // Follows PRD.md, DESIGN.md, FEATURES.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — About Us",
+  title: 'The Bike Yard — About Us',
   description:
-    "Learn about The Bike Yard motorcycle dealership in Khopat, Thane, Maharashtra. Rating 4.9/5 from 267 reviews.",
-}
+    'Learn about The Bike Yard motorcycle dealership in Khopat, Thane, Maharashtra. Rating 4.9/5 from 267 reviews.',
+};
 
 export function AboutPage() {
   return (
@@ -22,12 +22,11 @@ export function AboutPage() {
               Our Story
             </h2>
             <p className="text-brand-secondary/60 text-lg mb-8 leading-relaxed">
-              The Bike Yard was established with a single mission: to provide Thane and
-              the surrounding communities with premium motorcycles and scooters from
-              trusted brands — Suzuki, Honda, and TVS. Located at Shop No A/01, Mount
-              Casa Building, Lal Bahadur Shastri Marg, opposite Amar Gyan Industrial
-              Estate, Khopat Signal, we've been serving the local riding community
-              since our founding.
+              The Bike Yard was established with a single mission: to provide Thane and the
+              surrounding communities with premium motorcycles and scooters from trusted brands —
+              Suzuki, Honda, and TVS. Located at Shop No A/01, Mount Casa Building, Lal Bahadur
+              Shastri Marg, opposite Amar Gyan Industrial Estate, Khopat Signal, we've been serving
+              the local riding community since our founding.
             </p>
 
             <div className="grid grid-cols-2 gap-4 mb-8">
@@ -43,8 +42,8 @@ export function AboutPage() {
 
             <blockquote className="pt-8 border-t border-border border-brand-secondary/30 ml-8">
               <p className="text-brand-secondary/60 italic">
-                "The Bike Yard made finding my perfect Honda CB350 effortless. The team
-                was knowledgeable, transparent, and never pressured me. Highly recommended!"
+                "The Bike Yard made finding my perfect Honda CB350 effortless. The team was
+                knowledgeable, transparent, and never pressured me. Highly recommended!"
               </p>
               <cite className="font-medium text-brand-primary mt-2">— Verified Customer</cite>
             </blockquote>
@@ -55,9 +54,7 @@ export function AboutPage() {
               <h3 className="font-bold text-brand-primary text-sm uppercase">Our Brands</h3>
               <ul className="grid grid-cols-3 gap-2">
                 <li>
-                  <div
-                    className="border rounded-xl p-3 bg-brand-secondary/20"
-                  >
+                  <div className="border rounded-xl p-3 bg-brand-secondary/20">
                     <svg
                       className="w-6 h-6 text-brand-primary"
                       viewBox="0 0 24 24"
@@ -69,9 +66,7 @@ export function AboutPage() {
                   </div>
                 </li>
                 <li>
-                  <div
-                    className="border rounded-xl p-3 bg-brand-secondary/20"
-                  >
+                  <div className="border rounded-xl p-3 bg-brand-secondary/20">
                     <svg
                       className="w-6 h-6 text-brand-primary"
                       viewBox="0 0 24 24"
@@ -83,9 +78,7 @@ export function AboutPage() {
                   </div>
                 </li>
                 <li>
-                  <div
-                    className="border rounded-xl p-3 bg-brand-secondary/20"
-                  >
+                  <div className="border rounded-xl p-3 bg-brand-secondary/20">
                     <svg
                       className="w-6 h-6 text-brand-primary"
                       viewBox="0 0 24 24"
@@ -102,8 +95,10 @@ export function AboutPage() {
             <div>
               <h3 className="font-bold text-brand-primary text-sm uppercase">Opening Hours</h3>
               <p className="text-sm text-brand-secondary/60">
-                Monday - Friday: 9:00 AM - 8:00 PM<br />
-                Saturday: 9:00 AM - 9:00 PM<br />
+                Monday - Friday: 9:00 AM - 8:00 PM
+                <br />
+                Saturday: 9:00 AM - 9:00 PM
+                <br />
                 Sunday: 10:00 AM - 6:00 PM
               </p>
             </div>
@@ -145,5 +140,5 @@ export function AboutPage() {
         </div>
       </div>
     </section>
-  )
+  );
 }

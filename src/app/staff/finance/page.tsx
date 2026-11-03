@@ -6,5 +6,5 @@ export default function StaffFinancePage() {
         <p className="text-gray-500">No finance applications assigned.</p>
       </div>
     </div>
-  )
+  );
 }

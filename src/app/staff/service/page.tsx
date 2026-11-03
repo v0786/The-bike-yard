@@ -6,5 +6,5 @@ export default function StaffServicePage() {
         <p className="text-gray-500">No service requests assigned.</p>
       </div>
     </div>
-  )
+  );
 }

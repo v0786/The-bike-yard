@@ -2,17 +2,17 @@
 // Cinematic motorcycle showroom hero
 
 type HeroCTA = {
-  href: string
-  label: string
-  variant: "primary" | "secondary"
-}
+  href: string;
+  label: string;
+  variant: 'primary' | 'secondary';
+};
 
 const heroCTAs: HeroCTA[] = [
-  { href: "/new-bikes", label: "Explore New Bikes", variant: "primary" },
-  { href: "/used-bikes", label: "Explore Used Bikes", variant: "secondary" },
-  { href: "/test-ride", label: "Book a Test Ride", variant: "primary" },
-  { href: "/contact", label: "Contact Showroom", variant: "secondary" },
-]
+  { href: '/new-bikes', label: 'Explore New Bikes', variant: 'primary' },
+  { href: '/used-bikes', label: 'Explore Used Bikes', variant: 'secondary' },
+  { href: '/test-ride', label: 'Book a Test Ride', variant: 'primary' },
+  { href: '/contact', label: 'Contact Showroom', variant: 'secondary' },
+];
 
 export function HeroSection() {
   return (
@@ -32,8 +32,8 @@ export function HeroSection() {
             The Bike Yard
           </h1>
           <p className="text-brand-secondary/70 text-lg mb-8 leading-relaxed">
-            Shop Number A/01, THE BIKE YARD, Mount Casa Building, Lal Bahadur Shastri Marg,
-            Opposite Amar Gyan Industrial Estate, Khopat Signal, Thane, Maharashtra 400601.
+            Shop Number A/01, THE BIKE YARD, Mount Casa Building, Lal Bahadur Shastri Marg, Opposite
+            Amar Gyan Industrial Estate, Khopat Signal, Thane, Maharashtra 400601.
           </p>
 
           <div className="space-y-4">
@@ -41,7 +41,7 @@ export function HeroSection() {
               <a
                 key={index}
                 href={cta.href}
-                className={`inline-block rounded-md font-medium transition-all ${cta.variant === "primary" ? "bg-brand-primary text-white hover:bg-brand-accent" : "bg-white/10 text-brand-primary hover:bg-brand-secondary/20 px-6 py-3"}`}
+                className={`inline-block rounded-md font-medium transition-all ${cta.variant === 'primary' ? 'bg-brand-primary text-white hover:bg-brand-accent' : 'bg-white/10 text-brand-primary hover:bg-brand-secondary/20 px-6 py-3'}`}
               >
                 {cta.label}
               </a>
@@ -53,7 +53,11 @@ export function HeroSection() {
         <div className="relative">
           {/* Motorcycle silhouette / hero image placeholder */}
           <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-brand-secondary/30 to-brand-primary/30">
-            <svg className="absolute inset-0 w-full h-full object-cover" viewBox="0 0 800 600" fill="currentColor">
+            <svg
+              className="absolute inset-0 w-full h-full object-cover"
+              viewBox="0 0 800 600"
+              fill="currentColor"
+            >
               <path d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 500 L 100 500 Z" />
             </svg>
           </div>
@@ -64,5 +68,5 @@ export function HeroSection() {
         </div>
       </div>
     </section>
-  )
+  );
 }

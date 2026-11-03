@@ -6,5 +6,5 @@ export default function FaqPage() {
         <p className="text-gray-500">No FAQs yet.</p>
       </div>
     </div>
-  )
+  );
 }

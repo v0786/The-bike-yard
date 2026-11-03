@@ -1,79 +1,79 @@
 // Second-Hand Vehicles Catalogue Page
 // Follows FEATURES.md F-STK-01 to F-STK-07, PRD.md, and DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 type BikeCardProps = {
-  id: string
-  brand: "Suzuki" | "Honda" | "TVS"
-  model: string
-  condition: "Used"
-  year: number
-  kmDriven: number
-  price: number
-  colour: string
-  image: string
-  available: boolean
-}
+  id: string;
+  brand: 'Suzuki' | 'Honda' | 'TVS';
+  model: string;
+  condition: 'Used';
+  year: number;
+  kmDriven: number;
+  price: number;
+  colour: string;
+  image: string;
+  available: boolean;
+};
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — Used Motorcycles and Scooters",
+  title: 'The Bike Yard — Used Motorcycles and Scooters',
   description:
-    "Second-hand motorcycles and scooters at The Bike Yard, Khopat, Thane. Suzuki, Honda, TVS verified used vehicles with kilometres and year.",
-}
+    'Second-hand motorcycles and scooters at The Bike Yard, Khopat, Thane. Suzuki, Honda, TVS verified used vehicles with kilometres and year.',
+};
 
 export function UsedBikesPage() {
   // Sample used bikes data - in production this comes from DATABASE.md stockUnit queries
   const usedBikes = [
     {
-      id: "1",
-      brand: "Suzuki",
-      model: "Intruder",
-      condition: "Used",
+      id: '1',
+      brand: 'Suzuki',
+      model: 'Intruder',
+      condition: 'Used',
       year: 2021,
       kmDriven: 15000,
       price: 1150000,
-      colour: "Black",
-      image: "/placeholder-used.svg",
+      colour: 'Black',
+      image: '/placeholder-used.svg',
       available: true,
     },
     {
-      id: "2",
-      brand: "Honda",
-      model: "CB350",
-      condition: "Used",
+      id: '2',
+      brand: 'Honda',
+      model: 'CB350',
+      condition: 'Used',
       year: 2022,
       kmDriven: 8500,
       price: 1750000,
-      colour: "Silver",
-      image: "/placeholder-used.svg",
+      colour: 'Silver',
+      image: '/placeholder-used.svg',
       available: true,
     },
     {
-      id: "3",
-      brand: "TVS",
-      model: "Jupiter",
-      condition: "Used",
+      id: '3',
+      brand: 'TVS',
+      model: 'Jupiter',
+      condition: 'Used',
       year: 2020,
       kmDriven: 22000,
       price: 75000,
-      colour: "White",
-      image: "/placeholder-used.svg",
+      colour: 'White',
+      image: '/placeholder-used.svg',
       available: false,
     },
     {
-      id: "4",
-      brand: "Honda",
-      model: "Activa",
-      condition: "Used",
+      id: '4',
+      brand: 'Honda',
+      model: 'Activa',
+      condition: 'Used',
       year: 2019,
       kmDriven: 30000,
       price: 65000,
-      colour: "Red",
-      image: "/placeholder-used.svg",
+      colour: 'Red',
+      image: '/placeholder-used.svg',
       available: true,
     },
-  ]
+  ];
 
   return (
     <section className="py-24 sm:py-32 bg-bg-secondary">
@@ -94,7 +94,7 @@ export function UsedBikesPage() {
           {usedBikes.map((bike) => (
             <article
               key={bike.id}
-              className={`border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow ${!bike.available ? "opacity-50" : ""}`}
+              className={`border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow ${!bike.available ? 'opacity-50' : ''}`}
             >
               <div className="relative h-64">
                 <div className="absolute inset-0">
@@ -139,9 +139,7 @@ export function UsedBikesPage() {
                     <p className="font-medium">₹ {bike.price.toLocaleString()}</p>
                     <p className="text-xs text-brand-secondary">On-road estimate</p>
                   </div>
-                  <button
-                    className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors w-full"
-                  >
+                  <button className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors w-full">
                     Enquire Now
                   </button>
                 </div>
@@ -154,9 +152,7 @@ export function UsedBikesPage() {
         <div className="mt-12 p-6 bg-white rounded-2xl shadow-sm mb-8">
           <div className="grid grid-cols-2 gap-4">
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Brand
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Brand</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Brands</option>
                 <option value="Suzuki">Suzuki</option>
@@ -165,9 +161,7 @@ export function UsedBikesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Price Range
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Price Range</label>
               <input
                 type="range"
                 className="w-full rounded-border border-border h-2 focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20"
@@ -180,9 +174,7 @@ export function UsedBikesPage() {
 
           <div className="grid grid-cols-2 gap-4 mt-4">
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Year
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Year</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Years</option>
                 <option value="2024">2024</option>
@@ -193,9 +185,7 @@ export function UsedBikesPage() {
               </select>
             </div>
             <div>
-              <label className="block text-sm text-brand-primary mb-2">
-                Condition
-              </label>
+              <label className="block text-sm text-brand-primary mb-2">Condition</label>
               <select className="w-full rounded-border border-border focus:border-brand-primary focus:ring-2 focus:ring-brand-primary/20 py-2 pl-3">
                 <option value="">All Conditions</option>
                 <option value="Used">Used</option>
@@ -206,5 +196,5 @@ export function UsedBikesPage() {
         </div>
       </div>
     </section>
-  )
+  );
 }

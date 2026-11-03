@@ -6,5 +6,5 @@ export default function StaffInsurancePage() {
         <p className="text-gray-500">No insurance applications assigned.</p>
       </div>
     </div>
-  )
+  );
 }

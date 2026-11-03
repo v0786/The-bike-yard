@@ -1,8 +1,15 @@
-import { prisma } from "@/lib/prisma"
-import { formatInr } from "@/lib/currency"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import { prisma } from '@/lib/prisma';
+import { formatInr } from '@/lib/currency';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function SalesPage() {
   return (
@@ -36,12 +43,14 @@ export default function SalesPage() {
               </TableCell>
               <TableCell>03 Nov 2026</TableCell>
               <TableCell>
-                <Button size="sm" variant="outline">View Invoice</Button>
+                <Button size="sm" variant="outline">
+                  View Invoice
+                </Button>
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

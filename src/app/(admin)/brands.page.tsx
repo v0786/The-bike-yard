@@ -1,36 +1,50 @@
 // Brands & Models Management
 // Follows FEATURES.md F-CAT-01 to F-CAT-08, DATABASE.md, DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 type Brand = {
-  id: string
-  name: "Suzuki" | "Honda" | "TVS" | string
-  description: string
-  createdAt: string
-}
+  id: string;
+  name: 'Suzuki' | 'Honda' | 'TVS' | string;
+  description: string;
+  createdAt: string;
+};
 
 type Model = {
-  id: string
-  brandId: string
-  name: string
-  description: string
-  engineCC: number
-}
+  id: string;
+  brandId: string;
+  name: string;
+  description: string;
+  engineCC: number;
+};
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — Brands & Models",
-  description:
-    "Manage motorcycle brands and models for The Bike Yard dealership.",
-}
+  title: 'The Bike Yard — Brands & Models',
+  description: 'Manage motorcycle brands and models for The Bike Yard dealership.',
+};
 
 export function BrandsPage() {
   // Sample brands data
   const brands: Brand[] = [
-    { id: "1", name: "Suzuki", description: "Japanese motorcycle manufacturer", createdAt: "2024-01-15" },
-    { id: "2", name: "Honda", description: "Japanese motorcycle manufacturer", createdAt: "2024-01-15" },
-    { id: "3", name: "TVS", description: "Indian motorcycle manufacturer", createdAt: "2024-01-15" },
-  ]
+    {
+      id: '1',
+      name: 'Suzuki',
+      description: 'Japanese motorcycle manufacturer',
+      createdAt: '2024-01-15',
+    },
+    {
+      id: '2',
+      name: 'Honda',
+      description: 'Japanese motorcycle manufacturer',
+      createdAt: '2024-01-15',
+    },
+    {
+      id: '3',
+      name: 'TVS',
+      description: 'Indian motorcycle manufacturer',
+      createdAt: '2024-01-15',
+    },
+  ];
 
   return (
     <section className="py-24 sm:py-32 bg-bg-primary">
@@ -123,8 +137,12 @@ export function BrandsPage() {
                   <td className="p-4 text-left text-sm text-brand-secondary">Suzuki</td>
                   <td className="p-4 text-center text-sm text-brand-secondary">150</td>
                   <td className="p-4 text-right text-sm">
-                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">Edit</button>
-                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">Delete</button>
+                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">
+                      Edit
+                    </button>
+                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">
+                      Delete
+                    </button>
                   </td>
                 </tr>
                 <tr className="border-b border-brand-secondary/10">
@@ -132,8 +150,12 @@ export function BrandsPage() {
                   <td className="p-4 text-left text-sm text-brand-secondary">Honda</td>
                   <td className="p-4 text-center text-sm text-brand-secondary">350</td>
                   <td className="p-4 text-right text-sm">
-                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">Edit</button>
-                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">Delete</button>
+                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">
+                      Edit
+                    </button>
+                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">
+                      Delete
+                    </button>
                   </td>
                 </tr>
                 <tr className="border-b border-brand-secondary/10">
@@ -141,8 +163,12 @@ export function BrandsPage() {
                   <td className="p-4 text-left text-sm text-brand-secondary">TVS</td>
                   <td className="p-4 text-center text-sm text-brand-secondary">110</td>
                   <td className="p-4 text-right text-sm">
-                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">Edit</button>
-                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">Delete</button>
+                    <button className="text-xs text-brand-primary hover:text-brand-accent transition-colors">
+                      Edit
+                    </button>
+                    <button className="text-xs text-brand-secondary hover:text-red-600 transition-colors ml-2">
+                      Delete
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -157,5 +183,5 @@ export function BrandsPage() {
         </div>
       </div>
     </section>
-  )
+  );
 }

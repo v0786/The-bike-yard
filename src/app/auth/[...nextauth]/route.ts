@@ -1,1 +1,1 @@
-export { handlers } from "@/lib/auth"
+export { handlers } from '@/lib/auth';

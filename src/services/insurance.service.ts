@@ -1,13 +1,13 @@
 // Insurance service — insurance applications.
 
-import { prisma } from "@/lib/prisma"
+import { prisma } from '@/lib/prisma';
 
 export async function createInsuranceApplication(data: {
-  customerId: string
-  saleId?: string | null
-  provider?: string | null
-  policyType?: string | null
-  premium?: number | null
+  customerId: string;
+  saleId?: string | null;
+  provider?: string | null;
+  policyType?: string | null;
+  premium?: number | null;
 }) {
   return prisma.insuranceApplication.create({
     data: {
@@ -17,16 +17,16 @@ export async function createInsuranceApplication(data: {
       provider: data.provider || null,
       policyType: data.policyType || null,
       premium: data.premium || null,
-      status: "submitted",
+      status: 'submitted',
       documentsSubmitted: false,
     },
-  })
+  });
 }
 
 export async function getInsuranceApplications(filters?: {
-  customerId?: string
-  saleId?: string
-  status?: string
+  customerId?: string;
+  saleId?: string;
+  status?: string;
 }) {
   return prisma.insuranceApplication.findMany({
     where: {
@@ -35,25 +35,25 @@ export async function getInsuranceApplications(filters?: {
       status: filters?.status || undefined,
     },
     include: { customer: true, sale: true },
-    orderBy: { createdAt: "desc" },
-  })
+    orderBy: { createdAt: 'desc' },
+  });
 }
 
 export async function updateInsuranceApplication(
   id: string,
   data: Partial<{
-    provider: string | null
-    policyType: string | null
-    premium: number | null
-    policyNumber: string | null
-    expiryDate: Date | null
-    status: string
-    documentsSubmitted: boolean
+    provider: string | null;
+    policyType: string | null;
+    premium: number | null;
+    policyNumber: string | null;
+    expiryDate: Date | null;
+    status: string;
+    documentsSubmitted: boolean;
   }>
 ) {
   return prisma.insuranceApplication.update({
     where: { id },
     data,
     include: { customer: true, sale: true },
-  })
+  });
 }

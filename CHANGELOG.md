@@ -3,6 +3,7 @@
 ## [1.1.0] — 2026-11-03
 
 ### Added
+
 - Full Next.js App Router scaffold with public, admin, and staff interfaces
 - Prisma schema v1.1 with 34+ models (User, Role, Session, Dealership, StockUnit, Sale, Payment, Invoice, Refund, etc.)
 - Database-backed Auth.js sessions with Credentials provider and Prisma adapter
@@ -20,6 +21,7 @@
 - Security headers middleware configuration
 
 ### Fixed
+
 - Prisma schema: UUID→String @db.Uuid, provider string literal, generator=prisma-client-js
 - Auth: JWT→database-backed sessions (AUTH_SECURITY §2-3)
 - Auth: middleware now reads NextAuth cookies instead of headers
@@ -29,10 +31,12 @@
 - tsconfig rootDir/include cleaned up
 
 ### Changed
+
 - Route config: auth routes limited to /auth/:path* (webhooks excluded from auth middleware)
 - Prisma generate runs on postinstall
 
 ### Security
+
 - Server-side authorization on all API routes
 - Session stored in database (revocable)
 - Security headers per AUTH_SECURITY §10

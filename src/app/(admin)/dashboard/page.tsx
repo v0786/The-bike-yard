@@ -1,5 +1,12 @@
-import { prisma } from "@/lib/prisma"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
+import { prisma } from '@/lib/prisma';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
 
 export default function DashboardPage() {
   return (
@@ -49,5 +56,5 @@ export default function DashboardPage() {
         </Table>
       </div>
     </div>
-  )
+  );
 }

@@ -1,13 +1,12 @@
 // Admin Login Page
 // Follows AUTH_SECURITY.md, API.md §9, and DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — Admin Login",
-  description:
-    "Admin login for The Bike Yard dealership management system.",
-}
+  title: 'The Bike Yard — Admin Login',
+  description: 'Admin login for The Bike Yard dealership management system.',
+};
 
 export function AdminLoginPage() {
   return (
@@ -53,10 +52,26 @@ export function AdminLoginPage() {
         </form>
 
         <div className="text-center mt-8 text-sm text-brand-secondary/60">
-          <p>Forgot <a href="/auth/password-reset" className="text-brand-primary hover:text-brand-accent transition-colors">password?</a></p>
-          <p>Not an <a href="/staff" className="text-brand-primary hover:text-brand-accent transition-colors">staff member?</a></p>
+          <p>
+            Forgot{' '}
+            <a
+              href="/auth/password-reset"
+              className="text-brand-primary hover:text-brand-accent transition-colors"
+            >
+              password?
+            </a>
+          </p>
+          <p>
+            Not an{' '}
+            <a
+              href="/staff"
+              className="text-brand-primary hover:text-brand-accent transition-colors"
+            >
+              staff member?
+            </a>
+          </p>
         </div>
       </div>
     </section>
-  )
+  );
 }

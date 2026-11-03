@@ -1,9 +1,16 @@
-import { prisma } from "@/lib/prisma"
-import { formatInr } from "@/lib/currency"
-import { Table, TableHeader, TableBody, TableRow, TableHead, TableCell } from "@/components/ui/table"
-import { Badge } from "@/components/ui/badge"
-import { Button } from "@/components/ui/button"
-import { StatusChip } from "@/components/ui/status-chip"
+import { prisma } from '@/lib/prisma';
+import { formatInr } from '@/lib/currency';
+import {
+  Table,
+  TableHeader,
+  TableBody,
+  TableRow,
+  TableHead,
+  TableCell,
+} from '@/components/ui/table';
+import { Badge } from '@/components/ui/badge';
+import { Button } from '@/components/ui/button';
+import { StatusChip } from '@/components/ui/status-chip';
 
 export default function CustomersPage() {
   return (
@@ -35,12 +42,14 @@ export default function CustomersPage() {
                 <StatusChip status="active" />
               </TableCell>
               <TableCell>
-                <Button size="sm" variant="outline">View</Button>
+                <Button size="sm" variant="outline">
+                  View
+                </Button>
               </TableCell>
             </TableRow>
           </TableBody>
         </Table>
       </div>
     </div>
-  )
+  );
 }

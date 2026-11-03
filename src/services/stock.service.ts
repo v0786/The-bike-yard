@@ -1,31 +1,28 @@
 // Stock service — inventory, stock inward/outward, reservations, movements.
 // All mutations run in Prisma transactions per DATABASE.md §9.
 
-import { prisma } from "@/lib/prisma"
-import { z } from "zod"
+import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 import {
   stockUnitCreateSchema,
   stockMovementCreateSchema,
   reservationCreateSchema,
-} from "@/lib/validations"
+} from '@/lib/validations';
 
 export async function createStockUnit(data: z.infer<typeof stockUnitCreateSchema>) {
   return prisma.$transaction(async (tx) => {
     // Validate chassis/engine uniqueness
     const existing = await tx.stockUnit.findFirst({
       where: {
-        OR: [
-          { chassisNumber: data.chassisNumber },
-          { engineNumber: data.engineNumber },
-        ],
+        OR: [{ chassisNumber: data.chassisNumber }, { engineNumber: data.engineNumber }],
       },
-    })
+    });
     if (existing) {
       throw new Error(
         existing.chassisNumber === data.chassisNumber
-          ? "Chassis number already exists"
-          : "Engine number already exists"
-      )
+          ? 'Chassis number already exists'
+          : 'Engine number already exists'
+      );
     }
 
     const stockUnit = await tx.stockUnit.create({
@@ -43,28 +40,28 @@ export async function createStockUnit(data: z.infer<typeof stockUnitCreateSchema
         location: data.location || null,
         notes: data.notes || null,
       },
-    })
+    });
 
     // Record movement
     await tx.stockMovement.create({
       data: {
         stockUnitId: stockUnit.id,
-        type: "inward",
+        type: 'inward',
         quantity: 1,
-        referenceType: "inward",
-        notes: `Stock inward: ${data.supplierName || "Unknown supplier"}`,
+        referenceType: 'inward',
+        notes: `Stock inward: ${data.supplierName || 'Unknown supplier'}`,
         createdBy: null,
       },
-    })
+    });
 
-    return stockUnit
-  })
+    return stockUnit;
+  });
 }
 
 export async function getStockUnits(filters?: {
-  status?: string
-  search?: string
-  dealershipId?: string
+  status?: string;
+  search?: string;
+  dealershipId?: string;
 }) {
   return prisma.stockUnit.findMany({
     where: {
@@ -72,8 +69,8 @@ export async function getStockUnits(filters?: {
       dealershipId: filters?.dealershipId || undefined,
       OR: filters?.search
         ? [
-            { chassisNumber: { contains: filters.search, mode: "insensitive" } },
-            { engineNumber: { contains: filters.search, mode: "insensitive" } },
+            { chassisNumber: { contains: filters.search, mode: 'insensitive' } },
+            { engineNumber: { contains: filters.search, mode: 'insensitive' } },
           ]
         : undefined,
     },
@@ -84,8 +81,8 @@ export async function getStockUnits(filters?: {
         select: { movements: true, sales: true, reservations: true },
       },
     },
-    orderBy: { createdAt: "desc" },
-  })
+    orderBy: { createdAt: 'desc' },
+  });
 }
 
 export async function getStockUnitById(id: string) {
@@ -94,11 +91,11 @@ export async function getStockUnitById(id: string) {
     include: {
       variant: { include: { brand: true, model: true } },
       colour: true,
-      movements: { orderBy: { createdAt: "desc" }, take: 20 },
+      movements: { orderBy: { createdAt: 'desc' }, take: 20 },
       sales: true,
-      reservations: { orderBy: { reservedAt: "desc" } },
+      reservations: { orderBy: { reservedAt: 'desc' } },
     },
-  })
+  });
 }
 
 export async function createStockMovement(data: z.infer<typeof stockMovementCreateSchema>) {
@@ -112,7 +109,7 @@ export async function createStockMovement(data: z.infer<typeof stockMovementCrea
       notes: data.notes || null,
       createdBy: null,
     },
-  })
+  });
 }
 
 export async function createReservation(data: z.infer<typeof reservationCreateSchema>) {
@@ -121,19 +118,19 @@ export async function createReservation(data: z.infer<typeof reservationCreateSc
     const existing = await tx.reservation.findFirst({
       where: {
         stockUnitId: data.stockUnitId,
-        status: "active",
+        status: 'active',
       },
-    })
+    });
     if (existing) {
-      throw new Error("RESERVATION_CONFLICT: Unit already has an active reservation")
+      throw new Error('RESERVATION_CONFLICT: Unit already has an active reservation');
     }
 
     // Verify unit is available
     const unit = await tx.stockUnit.findUnique({
       where: { id: data.stockUnitId },
-    })
-    if (!unit || unit.currentStatus !== "available") {
-      throw new Error("Stock unit is not available for reservation")
+    });
+    if (!unit || unit.currentStatus !== 'available') {
+      throw new Error('Stock unit is not available for reservation');
     }
 
     const reservation = await tx.reservation.create({
@@ -143,66 +140,66 @@ export async function createReservation(data: z.infer<typeof reservationCreateSc
         expiresAt: data.expiresAt || null,
         status: data.status,
       },
-    })
+    });
 
     // Mark unit as reserved
     await tx.stockUnit.update({
       where: { id: data.stockUnitId },
-      data: { currentStatus: "reserved" },
-    })
+      data: { currentStatus: 'reserved' },
+    });
 
     // Record movement
     await tx.stockMovement.create({
       data: {
         stockUnitId: data.stockUnitId,
-        type: "reservation",
+        type: 'reservation',
         quantity: 1,
-        referenceType: "booking",
+        referenceType: 'booking',
         referenceId: reservation.id,
-        notes: "Unit reserved",
+        notes: 'Unit reserved',
         createdBy: null,
       },
-    })
+    });
 
-    return reservation
-  })
+    return reservation;
+  });
 }
 
 export async function releaseReservation(reservationId: string) {
   return prisma.$transaction(async (tx) => {
     const reservation = await tx.reservation.update({
       where: { id: reservationId },
-      data: { status: "released", releasedAt: new Date() },
+      data: { status: 'released', releasedAt: new Date() },
       include: { stockUnit: true },
-    })
+    });
 
     // Mark unit as available again
     await tx.stockUnit.update({
       where: { id: reservation.stockUnitId },
-      data: { currentStatus: "available" },
-    })
+      data: { currentStatus: 'available' },
+    });
 
     // Record movement
     await tx.stockMovement.create({
       data: {
         stockUnitId: reservation.stockUnitId,
-        type: "release",
+        type: 'release',
         quantity: 1,
-        referenceType: "booking",
+        referenceType: 'booking',
         referenceId: reservationId,
-        notes: "Reservation released",
+        notes: 'Reservation released',
         createdBy: null,
       },
-    })
+    });
 
-    return reservation
-  })
+    return reservation;
+  });
 }
 
 export async function getStockMovements(stockUnitId?: string) {
   return prisma.stockMovement.findMany({
     where: stockUnitId ? { stockUnitId } : undefined,
     include: { stockUnit: true },
-    orderBy: { createdAt: "desc" },
-  })
+    orderBy: { createdAt: 'desc' },
+  });
 }

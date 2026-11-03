@@ -1,22 +1,21 @@
-import { NextResponse } from "next/server"
-import { prisma } from "@/lib/prisma"
-import { requireAuth, requireRole, authErrorResponse } from "@/lib/api-auth"
+import { NextResponse } from 'next/server';
+import { prisma } from '@/lib/prisma';
+import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
-export const dynamic = "force-dynamic"
+export const dynamic = 'force-dynamic';
 
 export async function GET() {
-  const user = await requireAuth()
+  const user = await requireAuth();
 
   try {
     const finance = await prisma.financeApplication.findMany({
-      include: { customer: true, sale: true },
-      orderBy: { createdAt: "desc" },
-    })
-    return NextResponse.json({ data: finance })
+      orderBy: { createdAt: 'desc' },
+    });
+    return NextResponse.json({ data: finance });
   } catch (error) {
     return NextResponse.json(
-      { error: { code: "INTERNAL_ERROR", message: "Failed to fetch finance applications" } },
+      { error: { code: 'INTERNAL_ERROR', message: 'Failed to fetch finance applications' } },
       { status: 500 }
-    )
+    );
   }
 }

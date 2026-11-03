@@ -2,32 +2,32 @@
 // Follows DESIGN.md design tokens and API.md §9 authorization
 
 type NavLink = {
-  href: string
-  label: string
-  description?: string
-}
+  href: string;
+  label: string;
+  description?: string;
+};
 
 const navLinks: NavLink[] = [
-  { href: "/", label: "Home", description: "Showroom homepage" },
-  { href: "/new-bikes", label: "New Bikes", description: "Suzuki, Honda, TVS" },
-  { href: "/used-bikes", label: "Used Bikes", description: "Second-hand motorcycles and scooters" },
-  { href: "/finance", label: "Finance", description: "EMI calculator and loan options" },
-  { href: "/insurance", label: "Insurance", description: "Policy information and assistance" },
-  { href: "/rto", label: "RTO", description: "Registration assistance" },
-  { href: "/test-ride", label: "Test Ride", description: "Book a test ride" },
-  { href: "/contact", label: "Contact", description: "Showroom location and contact" },
-]
+  { href: '/', label: 'Home', description: 'Showroom homepage' },
+  { href: '/new-bikes', label: 'New Bikes', description: 'Suzuki, Honda, TVS' },
+  { href: '/used-bikes', label: 'Used Bikes', description: 'Second-hand motorcycles and scooters' },
+  { href: '/finance', label: 'Finance', description: 'EMI calculator and loan options' },
+  { href: '/insurance', label: 'Insurance', description: 'Policy information and assistance' },
+  { href: '/rto', label: 'RTO', description: 'Registration assistance' },
+  { href: '/test-ride', label: 'Test Ride', description: 'Book a test ride' },
+  { href: '/contact', label: 'Contact', description: 'Showroom location and contact' },
+];
 
 // User menu links (shown when authenticated)
 type UserMenuLink = {
-  href: string
-  label: string
-}
+  href: string;
+  label: string;
+};
 
 const userMenuLinks: UserMenuLink[] = [
-  { href: "/admin", label: "Admin" },
-  { href: "/staff", label: "Staff Portal" },
-]
+  { href: '/admin', label: 'Admin' },
+  { href: '/staff', label: 'Staff Portal' },
+];
 
 export function Navbar() {
   return (
@@ -67,9 +67,9 @@ export function Navbar() {
         </button>
 
         {/* User menu (authenticated users) */}
-        {typeof window !== "undefined" && 
-          (window as any).userRole && 
-          (window as any).userRole !== "no-auth" && (
+        {typeof window !== 'undefined' &&
+          (window as any).userRole &&
+          (window as any).userRole !== 'no-auth' && (
             <div className="hidden sm:items-center gap-2">
               {userMenuLinks.map((link, index) => (
                 <a
@@ -81,11 +81,10 @@ export function Navbar() {
                 </a>
               ))}
             </div>
-          )
-        }
+          )}
       </div>
     </nav>
-  )
+  );
 }
 
 // Footer component
@@ -106,20 +105,76 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-white mb-3">Quick Links</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="/new-bikes" className="text-brand-secondary/60 hover:text-white transition-colors">New Bikes</a></li>
-              <li><a href="/used-bikes" className="text-brand-secondary/60 hover:text-white transition-colors">Used Bikes</a></li>
-              <li><a href="/finance" className="text-brand-secondary/60 hover:text-white transition-colors">Finance</a></li>
-              <li><a href="/insurance" className="text-brand-secondary/60 hover:text-white transition-colors">Insurance</a></li>
-              <li><a href="/rto" className="text-brand-secondary/60 hover:text-white transition-colors">RTO</a></li>
+              <li>
+                <a
+                  href="/new-bikes"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  New Bikes
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/used-bikes"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  Used Bikes
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/finance"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  Finance
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/insurance"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  Insurance
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/rto"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  RTO
+                </a>
+              </li>
             </ul>
           </div>
 
           <div>
             <h4 className="font-bold text-white mb-3">Our Brands</h4>
             <ul className="space-y-2 text-sm">
-              <li><a href="/brands/suzuki" className="text-brand-secondary/60 hover:text-white transition-colors">Suzuki</a></li>
-              <li><a href="/brands/honda" className="text-brand-secondary/60 hover:text-white transition-colors">Honda</a></li>
-              <li><a href="/brands/tvs" className="text-brand-secondary/60 hover:text-white transition-colors">TVS</a></li>
+              <li>
+                <a
+                  href="/brands/suzuki"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  Suzuki
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/brands/honda"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  Honda
+                </a>
+              </li>
+              <li>
+                <a
+                  href="/brands/tvs"
+                  className="text-brand-secondary/60 hover:text-white transition-colors"
+                >
+                  TVS
+                </a>
+              </li>
             </ul>
           </div>
 
@@ -156,16 +211,10 @@ export function Footer() {
             © {new Date().getFullYear()} The Bike Yard. All rights reserved.
           </p>
           <div className="flex gap-2">
-            <a
-              href="/faqs"
-              className="text-brand-secondary/60 hover:text-white transition-colors"
-            >
+            <a href="/faqs" className="text-brand-secondary/60 hover:text-white transition-colors">
               FAQs
             </a>
-            <a
-              href="/terms"
-              className="text-brand-secondary/60 hover:text-white transition-colors"
-            >
+            <a href="/terms" className="text-brand-secondary/60 hover:text-white transition-colors">
               Terms
             </a>
             <a
@@ -178,5 +227,5 @@ export function Footer() {
         </div>
       </div>
     </footer>
-  )
+  );
 }

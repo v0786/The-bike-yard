@@ -1,13 +1,13 @@
 // RTO Assistance Page
 // Follows FEATURES.md F-FIN-04, PRD.md, and DESIGN.md
 
-import type { Metadata } from "next/metadata"
+import type { Metadata } from '@/types/metadata';
 
 export const metadata: Metadata = {
-  title: "The Bike Yard — RTO Assistance",
+  title: 'The Bike Yard — RTO Assistance',
   description:
-    "RTO registration assistance for new and used motorcycles at The Bike Yard, Khopat, Thane.",
-}
+    'RTO registration assistance for new and used motorcycles at The Bike Yard, Khopat, Thane.',
+};
 
 export function RTOPage() {
   return (
@@ -22,12 +22,14 @@ export function RTOPage() {
               Registration & RTO Assistance
             </h2>
             <p className="text-brand-secondary/60 text-lg mb-8 leading-relaxed">
-              Get help with motorcycle registration, transfer, and RTO formalities at The Bike
-              Yard. We guide you through the entire process for new and used vehicles.
+              Get help with motorcycle registration, transfer, and RTO formalities at The Bike Yard.
+              We guide you through the entire process for new and used vehicles.
             </p>
 
             <div className="border rounded-2xl p-6 bg-white shadow-sm mb-8">
-              <h4 className="font-bold text-brand-primary text-sm uppercase mb-3">Services Offered</h4>
+              <h4 className="font-bold text-brand-primary text-sm uppercase mb-3">
+                Services Offered
+              </h4>
               <ul className="space-y-3 text-sm">
                 <li>
                   <svg
@@ -89,11 +91,16 @@ export function RTOPage() {
           {/* Right side - RTO info card */}
           <div className="space-y-6">
             <div className="border rounded-2xl p-6 bg-white shadow-sm">
-              <h4 className="font-bold text-brand-primary text-sm uppercase">Maharashtra RTO Info</h4>
+              <h4 className="font-bold text-brand-primary text-sm uppercase">
+                Maharashtra RTO Info
+              </h4>
               <p className="text-sm text-brand-secondary/60">
-                <strong>RTO Code:</strong> MH-04 (Thane)<br />
-                <strong>Form 20:</strong> Application for registration of vehicle<br />
-                <strong>Form 35:</strong> Intimation of transfer of ownership<br />
+                <strong>RTO Code:</strong> MH-04 (Thane)
+                <br />
+                <strong>Form 20:</strong> Application for registration of vehicle
+                <br />
+                <strong>Form 35:</strong> Intimation of transfer of ownership
+                <br />
                 <strong>Processing time:</strong> 15-30 working days
               </p>
             </div>
@@ -110,13 +117,11 @@ export function RTOPage() {
                 </svg>
                 Thane RTO Office, Ghodbunder Road, Thane West
               </p>
-              <p className="text-sm text-brand-secondary/60">
-                Phone: 022-25891234
-              </p>
+              <p className="text-sm text-brand-secondary/60">Phone: 022-25891234</p>
             </div>
           </div>
         </div>
       </div>
     </section>
-  )
+  );
 }

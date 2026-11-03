@@ -6,5 +6,5 @@ export default function StaffRegistrationPage() {
         <p className="text-gray-500">No RTO applications assigned.</p>
       </div>
     </div>
-  )
+  );
 }
