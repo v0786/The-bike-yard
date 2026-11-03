@@ -151,6 +151,21 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 
 ---
 
+## Phase 12 — Testing, Security & Production Readiness
+
+| ID | Task | Status | Dependencies | Assignee |
+|----|------|--------|--------------|----------|
+| P12-1 | Unit tests | CO | All phases | QA Engineer |
+| P12-2 | Integration tests | NS | All phases | QA Engineer |
+| P12-3 | E2E tests | NS | All phases | QA Engineer |
+| P12-4 | Role-based authz tests | NS | P1-2 | QA Engineer |
+| P12-5 | Security review | NS | All phases | Security Engineer |
+| P12-6 | Accessibility review | NS | All phases | QA Engineer |
+| P12-7 | Production build | CO | All phases | Lead Architect |
+| P12-8 | Deployment config | NS | P12-7 | Lead Architect |
+
+---
+
 ## Open Owner Decisions (blocking vs non-blocking)
 
 **Block Phase 6 (live payments/invoices) until approved:**
