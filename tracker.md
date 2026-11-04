@@ -1,6 +1,6 @@
 # The Bike Yard — Implementation Tracker
 
-**Version:** 1.1 (updated 2026-11-03)  
+**Version:** 1.2 (updated 2026-11-04)  
 **Source of truth:** All 15 approved docs in `docs/`  
 **Current phase:** Phase 1-12 (production hardening complete; build verified; tests passing)
 

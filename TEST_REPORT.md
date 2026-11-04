@@ -4,7 +4,7 @@
 **Build:** `npx next build` — PASSED (zero TypeScript errors, `ignoreBuildErrors` removed)  
 **Type check:** `npx tsc --noEmit` — 0 errors  
 **Lint:** `npx eslint .` — PASSED (0 errors, 5 warnings)  
-**Unit tests:** `npx vitest run` — 88/88 PASSED
+**Unit tests:** `npx vitest run` — 88/88 PASSED  
 
 ## Test Summary
 
