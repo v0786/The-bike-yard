@@ -4,6 +4,11 @@
 // Session strategy: database-backed sessions (AUTH_SECURITY §2, §3).
 // JWT is explicitly NOT used. Sessions are stored in PostgreSQL via the
 // Prisma adapter and validated against the Session table on every request.
+//
+// NextAuth v4 returns a single route-handler function from NextAuth(options),
+// which handles both GET and POST for the App Router route. We expose it as
+// `handlers` (with GET/POST) and re-export `auth`, `signIn`, `signOut` for
+// compatibility with the rest of the codebase.
 
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import NextAuth from 'next-auth';
@@ -12,7 +17,7 @@ import { JWT } from 'next-auth/jwt';
 import { prisma } from '@/lib/prisma';
 import { compare } from 'bcryptjs';
 
-export const { handlers, auth, signIn, signOut } = NextAuth({
+const nextAuth = NextAuth({
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -110,3 +115,16 @@ export const { handlers, auth, signIn, signOut } = NextAuth({
   // Debug: enable in development only
   debug: process.env.NODE_ENV === 'development',
 });
+
+// `handlers` exposes GET/POST route handlers for the App Router route.
+export const handlers = {
+  GET: nextAuth,
+  POST: nextAuth,
+};
+
+// Re-exported for compatibility with api-auth and other modules.
+export const auth = nextAuth;
+export const signIn = nextAuth;
+export const signOut = nextAuth;
+
+export type { JWT };

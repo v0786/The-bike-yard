@@ -25,7 +25,7 @@ export function AboutPage() {
               The Bike Yard was established with a single mission: to provide Thane and the
               surrounding communities with premium motorcycles and scooters from trusted brands —
               Suzuki, Honda, and TVS. Located at Shop No A/01, Mount Casa Building, Lal Bahadur
-              Shastri Marg, opposite Amar Gyan Industrial Estate, Khopat Signal, we've been serving
+              Shastri Marg, opposite Amar Gyan Industrial Estate, Khopat Signal, we&rsquo;ve been serving
               the local riding community since our founding.
             </p>
 
@@ -42,8 +42,8 @@ export function AboutPage() {
 
             <blockquote className="pt-8 border-t border-border border-brand-secondary/30 ml-8">
               <p className="text-brand-secondary/60 italic">
-                "The Bike Yard made finding my perfect Honda CB350 effortless. The team was
-                knowledgeable, transparent, and never pressured me. Highly recommended!"
+                &quot;The Bike Yard made finding my perfect Honda CB350 effortless. The team was
+                knowledgeable, transparent, and never pressured me. Highly recommended!&quot;
               </p>
               <cite className="font-medium text-brand-primary mt-2">— Verified Customer</cite>
             </blockquote>

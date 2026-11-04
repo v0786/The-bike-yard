@@ -22,7 +22,7 @@ export function ContactPage() {
               Get in Touch
             </h2>
             <p className="text-brand-secondary/60 text-lg mb-8 leading-relaxed">
-              Visit us at our showroom or send us a message. We'd love to help you find your perfect
+              Visit us at our showroom or send us a message. We&rsquo;d love to help you find your perfect
               motorcycle.
             </p>
 

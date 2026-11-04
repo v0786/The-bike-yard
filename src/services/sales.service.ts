@@ -3,6 +3,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { splitGst } from '@/lib/currency';
+import type { Prisma } from '@prisma/client';
 
 export async function completeSale(data: {
   saleNumber: string;
@@ -51,6 +52,14 @@ export async function completeSale(data: {
     // 3. Compute GST split
     const { cgst, sgst, igst } = splitGst(data.gstAmount, data.placeOfSupply, data.gstRate);
 
+    // 4. Compute on-road price from components (all in paise)
+    const onRoadPrice =
+      data.exShowroomPrice +
+      (data.insurancePrice || 0) +
+      (data.rtoCharges || 0) +
+      (data.accessoriesPrice || 0) -
+      (data.discount || 0);
+
     // 4. Create sale
     const sale = await tx.sale.create({
       data: {
@@ -60,15 +69,22 @@ export async function completeSale(data: {
         staffId: data.staffId || null,
         bookingId: data.bookingId || null,
         exShowroomPrice: data.exShowroomPrice,
+        onRoadPrice,
         insurancePrice: data.insurancePrice || 0,
         rtoCharges: data.rtoCharges || 0,
         accessoriesPrice: data.accessoriesPrice || 0,
         discount: data.discount || 0,
         finalSellingPrice: data.finalSellingPrice,
         gstAmount: data.gstAmount,
+        cgstAmount: BigInt(cgst),
+        sgstAmount: BigInt(sgst),
+        igstAmount: BigInt(igst),
         totalAmount: data.totalAmount,
         amountPaid: data.amountPaid,
         outstandingAmount: data.outstandingAmount,
+        placeOfSupply: data.placeOfSupply,
+        hsnCode: data.hsnCode || null,
+        gstRate: data.gstRate,
         status: data.amountPaid >= data.totalAmount ? 'paid' : 'pending',
       },
     });
@@ -145,12 +161,13 @@ export async function getSales(filters?: {
   status?: string;
   dealershipId?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.customerId) where.customerId = filters.customerId;
+  if (filters?.stockUnitId) where.stockUnitId = filters.stockUnitId;
+  if (filters?.status) where.status = filters.status;
+
   return prisma.sale.findMany({
-    where: {
-      customerId: filters?.customerId || undefined,
-      stockUnitId: filters?.stockUnitId || undefined,
-      status: filters?.status || undefined,
-    },
+    where: where as Prisma.SaleWhereInput,
     include: {
       customer: true,
       stockUnit: { include: { variant: true, colour: true } },

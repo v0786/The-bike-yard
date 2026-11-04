@@ -70,6 +70,32 @@ export const reservationCreateSchema = z.object({
   status: z.enum(['active', 'released', 'expired', 'converted']).default('active'),
 });
 
+// Sale
+export const saleCreateSchema = z.object({
+  saleNumber: z.string().min(1, 'Sale number is required'),
+  customerId: uuidSchema,
+  stockUnitId: uuidSchema,
+  staffId: uuidSchema.optional(),
+  bookingId: uuidSchema.optional(),
+  exShowroomPrice: moneySchema,
+  onRoadPrice: moneySchema,
+  insurancePrice: moneySchema.default(0),
+  rtoCharges: moneySchema.default(0),
+  accessoriesPrice: moneySchema.default(0),
+  discount: moneySchema.default(0),
+  finalSellingPrice: moneySchema,
+  gstAmount: moneySchema.default(0),
+  totalAmount: moneySchema,
+  amountPaid: moneySchema.default(0),
+  outstandingAmount: moneySchema,
+  placeOfSupply: z.string().min(1, 'Place of supply is required'),
+  hsnCode: z.string().max(20).optional(),
+  gstRate: gstRateSchema,
+  paymentMethod: z.enum(['cash', 'upi', 'qr', 'bank_transfer', 'card', 'finance_loan', 'partial']),
+  paymentReferenceId: z.string().max(200).optional(),
+  recordedById: uuidSchema,
+});
+
 // Booking
 export const bookingCreateSchema = z.object({
   bookingNumber: z.string().min(1, 'Booking number is required'),
@@ -82,26 +108,6 @@ export const bookingCreateSchema = z.object({
   onRoadPrice: moneySchema,
   advanceAmount: moneySchema.default(0),
   expectedDeliveryDate: isoDateTimeSchema.optional(),
-});
-
-// Sale
-export const saleCreateSchema = z.object({
-  bookingId: uuidSchema.optional(),
-  customerId: uuidSchema,
-  stockUnitId: uuidSchema,
-  staffId: uuidSchema.optional(),
-  saleNumber: z.string().min(1, 'Sale number is required'),
-  exShowroomPrice: moneySchema,
-  insurancePrice: moneySchema.default(0),
-  rtoCharges: moneySchema.default(0),
-  accessoriesPrice: moneySchema.default(0),
-  discount: moneySchema.default(0),
-  finalSellingPrice: moneySchema,
-  gstAmount: moneySchema.default(0),
-  totalAmount: moneySchema,
-  amountPaid: moneySchema.default(0),
-  outstandingAmount: moneySchema,
-  deliveryDate: isoDateTimeSchema.optional(),
 });
 
 // Payment

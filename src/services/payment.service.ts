@@ -3,7 +3,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { splitGst } from '@/lib/currency';
-
+import type { RefundStatus, Prisma } from '@prisma/client';
 export async function recordPayment(data: {
   paymentNumber: string;
   customerId: string;
@@ -29,7 +29,7 @@ export async function recordPayment(data: {
         customerId: data.customerId,
         saleId: data.saleId || null,
         bookingId: data.bookingId || null,
-        amount: data.amount,
+        amount: BigInt(data.amount),
         method: data.method,
         referenceId: data.referenceId || null,
         status: 'completed',
@@ -45,7 +45,7 @@ export async function recordPayment(data: {
         paymentId: payment.id,
         saleId: data.saleId || null,
         bookingId: data.bookingId || null,
-        amount: data.amount,
+        amount: BigInt(data.amount),
       },
     });
 
@@ -71,12 +71,12 @@ export async function createRefund(data: {
     });
     if (!payment) throw new Error('Payment not found');
 
-    // Calculate unrefunded balance
+    // Calculate unrefunded balance (all amounts are BigInt paise)
     const totalRefunded = payment.refunds
       .filter((r) => r.status === 'completed' || r.status === 'approved')
-      .reduce((sum, r) => sum + r.amount, 0);
+      .reduce((sum, r) => sum + r.amount, 0n);
     const unrefunded = payment.amount - totalRefunded;
-    if (data.amount > unrefunded) {
+    if (BigInt(data.amount) > unrefunded) {
       throw new Error('Refund amount exceeds unrefunded balance');
     }
 
@@ -86,10 +86,10 @@ export async function createRefund(data: {
         paymentId: data.paymentId,
         saleId: data.saleId || null,
         bookingId: data.bookingId || null,
-        amount: data.amount,
+        amount: BigInt(data.amount),
         reason: data.reason,
         status: 'pending',
-        requestedById: data.requestedById,
+        requestedBy: data.requestedById,
       },
     });
 
@@ -109,11 +109,11 @@ export async function updateRefundStatus(
     });
     if (!refund) throw new Error('Refund not found');
 
-    if (refund.requestedById === approvedById && action === 'approve') {
+    if (refund.requestedBy === approvedById && action === 'approve') {
       throw new Error('Requester cannot self-approve refund');
     }
 
-    let newStatus: string;
+    let newStatus: RefundStatus;
     switch (action) {
       case 'approve':
         if (refund.status !== 'pending') throw new Error('Refund is not pending');
@@ -147,13 +147,14 @@ export async function getPayments(filters?: {
   method?: string;
   dealershipId?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.customerId) where.customerId = filters.customerId;
+  if (filters?.saleId) where.saleId = filters.saleId;
+  if (filters?.bookingId) where.bookingId = filters.bookingId;
+  if (filters?.method) where.method = filters.method;
+
   return prisma.payment.findMany({
-    where: {
-      customerId: filters?.customerId || undefined,
-      saleId: filters?.saleId || undefined,
-      bookingId: filters?.bookingId || undefined,
-      method: filters?.method || undefined,
-    },
+    where: where as Prisma.PaymentWhereInput,
     include: {
       customer: true,
       allocations: true,
@@ -168,11 +169,12 @@ export async function computeGstSplit(gstAmount: number, placeOfSupply: string) 
 }
 
 export async function getRefunds(filters?: { paymentId?: string; status?: string }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.paymentId) where.paymentId = filters.paymentId;
+  if (filters?.status) where.status = filters.status;
+
   return prisma.refund.findMany({
-    where: {
-      paymentId: filters?.paymentId || undefined,
-      status: filters?.status || undefined,
-    },
+    where: where as Prisma.RefundWhereInput,
     include: { payment: true },
     orderBy: { createdAt: 'desc' },
   });

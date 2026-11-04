@@ -8,13 +8,7 @@ async function main() {
     data: {
       name: "The Bike Yard",
       address: "Khopat, Thane, Maharashtra, India",
-      city: "Thane",
-      state: "Maharashtra",
-      pincode: "400601",
       phone: "080971 72040",
-      currency: "INR",
-      timezone: "Asia/Kolkata",
-      dateFormat: "DD/MM/YYYY",
     },
   })
 

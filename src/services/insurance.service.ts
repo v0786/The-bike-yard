@@ -1,6 +1,7 @@
 // Insurance service — insurance applications.
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export async function createInsuranceApplication(data: {
   customerId: string;
@@ -16,7 +17,7 @@ export async function createInsuranceApplication(data: {
       saleId: data.saleId || null,
       provider: data.provider || null,
       policyType: data.policyType || null,
-      premium: data.premium || null,
+      premiumAmount: data.premium ? BigInt(data.premium) : null,
       status: 'submitted',
       documentsSubmitted: false,
     },
@@ -28,12 +29,13 @@ export async function getInsuranceApplications(filters?: {
   saleId?: string;
   status?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.customerId) where.customerId = filters.customerId;
+  if (filters?.saleId) where.saleId = filters.saleId;
+  if (filters?.status) where.status = filters.status;
+
   return prisma.insuranceApplication.findMany({
-    where: {
-      customerId: filters?.customerId || undefined,
-      saleId: filters?.saleId || undefined,
-      status: filters?.status || undefined,
-    },
+    where: where as Prisma.InsuranceApplicationWhereInput,
     include: { customer: true, sale: true },
     orderBy: { createdAt: 'desc' },
   });

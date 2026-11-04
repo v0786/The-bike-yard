@@ -3,6 +3,7 @@
 .env
 .env.local
 .env.development.local
+.env.test
 .env.test.local
 .env.production.local
 *.env
@@ -43,3 +44,10 @@ docs.zip
 # Prisma generated/migrations (generated artifacts; schema.prisma is committed)
 prisma/migrations/
 prisma/dev.db
+
+# Test artifacts (generated reports/screenshots — never commit)
+playwright-report/
+test-results/
+blob-report/
+coverage/
+.playwright/

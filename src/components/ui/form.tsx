@@ -12,7 +12,9 @@ type FormProps<T extends ZodSchema<any>> = {
   onSubmit: (data: z.infer<T>) => void | Promise<void>;
   children: (props: {
     register: ReturnType<typeof useReactHookForm<z.infer<T>>>['register'];
-    handleSubmit: ReturnType<typeof useReactHookForm<z.infer<T>>>['handleSubmit'];
+    handleSubmit: (
+      e?: React.BaseSyntheticEvent<object, any, any> | undefined
+    ) => void | Promise<void>;
     formState: ReturnType<typeof useReactHookForm<z.infer<T>>>['formState'];
   }) => React.ReactNode;
 }

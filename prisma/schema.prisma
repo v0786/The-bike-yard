@@ -160,6 +160,9 @@ model User {
   accounts       Account[]
   notifications  Notification[] @relation("UserNotifications")
   createdTasks   StaffTask[] @relation("UserCreatedTasks")
+  staffSales     Sale[] @relation("StaffSales")
+  refundsRequested Refund[] @relation("RefundRequestedBy")
+  refundsApproved Refund[] @relation("RefundApprovedBy")
 }
 
 model StaffTask {
@@ -201,6 +204,7 @@ model Brand {
   description String?
   createdAt   DateTime @default(now())
   updatedAt   DateTime @updatedAt
+  variants    Variant[] @relation("BrandVariants")
 }
 
 model Model {
@@ -212,6 +216,7 @@ model Model {
   updatedAt   DateTime @updatedAt
 
   @@unique([brandId, name])
+  variants Variant[] @relation("ModelVariants")
 }
 
 model Variant {
@@ -222,9 +227,12 @@ model Variant {
   mileage         String?
   createdAt       DateTime @default(now())
   updatedAt       DateTime @updatedAt
+  brandId         String @db.Uuid
 
   @@unique([modelId, engineCC])
   stockUnits StockUnit[]
+  model   Model   @relation("ModelVariants", fields: [modelId], references: [id])
+  brand   Brand   @relation("BrandVariants", fields: [brandId], references: [id])
 }
 
 model Colour {
@@ -249,6 +257,7 @@ model StockUnit {
   dealershipId     String? @db.Uuid
   purchasePrice    BigInt
   purchaseInvoiceNumber String?
+  supplierName     String?
   receivedDate     DateTime?
   currentStatus    StockUnitStatus @default(available)
   location         String?
@@ -259,6 +268,9 @@ model StockUnit {
   variant   Variant   @relation(fields: [variantId], references: [id])
   colour    Colour?   @relation(fields: [colourId], references: [id])
   sales       Sale[]      @relation("StockUnitSales")
+  movements StockMovement[] @relation("StockUnitMovements")
+  reservations Reservation[] @relation("StockUnitReservations")
+  bookings Booking[] @relation("StockUnitBookings")
 }
 
 // -------------------
@@ -274,6 +286,8 @@ model Reservation {
   expiresAt    DateTime?
   releasedAt   DateTime?
   status       ReservationStatus @default(active)
+
+  stockUnit    StockUnit   @relation("StockUnitReservations", fields: [stockUnitId], references: [id])
 
   @@index([stockUnitId, status], name: "reservation_active_unit_idx")
 }
@@ -296,6 +310,9 @@ model Booking {
 
   @@index([customerId])
   @@index([stockUnitId])
+  stockUnit   StockUnit? @relation("StockUnitBookings", fields: [stockUnitId], references: [id])
+  payments    Payment[]  @relation("BookingPayments")
+  sales       Sale[]     @relation("SaleBooking")
 }
 
 // -------------------
@@ -308,26 +325,40 @@ model Sale {
   customerId   String @db.Uuid
   stockUnitId   String @db.Uuid
   bookingId     String? @db.Uuid
+  booking       Booking?   @relation("SaleBooking", fields: [bookingId], references: [id])
   saleNumber    String @unique
   exShowroomPrice BigInt
   onRoadPrice   BigInt
+  insurancePrice BigInt   @default(0)
+  rtoCharges     BigInt   @default(0)
+  accessoriesPrice BigInt @default(0)
   discount      BigInt   @default(0)
   finalSellingPrice BigInt
   gstAmount     BigInt
   cgstAmount    BigInt
   sgstAmount    BigInt
   igstAmount    BigInt
+  totalAmount   BigInt
+  amountPaid    BigInt   @default(0)
+  outstandingAmount BigInt
   placeOfSupply String?
   hsnCode       String?
   gstRate       Int      // basis points (e.g. 2800 = 28.00%)
   status        SaleStatus @default(pending)
   deliveryDate  DateTime?
+  staffId       String?   @db.Uuid
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@index([customerId])
   @@index([stockUnitId])
   stockUnit   StockUnit   @relation("StockUnitSales", fields: [stockUnitId], references: [id])
+  staff       User?       @relation("StaffSales", fields: [staffId], references: [id])
+  payments    Payment[]   @relation("SalePayments")
+  invoice     Invoice[]   @relation("SaleInvoice")
+  financeApplications FinanceApplication[] @relation("SaleFinanceApplications")
+  insuranceApplications InsuranceApplication[] @relation("SaleInsuranceApplications")
+  rtoApplications RTOApplication[] @relation("SaleRTOApplications")
 }
 
 // -------------------
@@ -336,6 +367,7 @@ model Sale {
 
 model Payment {
   id            String @id @default(uuid()) @db.Uuid
+  paymentNumber String?
   customerId    String @db.Uuid
   saleId        String? @db.Uuid
   bookingId     String? @db.Uuid
@@ -344,13 +376,20 @@ model Payment {
   referenceId   String?
   notes         String?
   status        PaymentStatus @default(pending)
+  paidAt        DateTime?
   recordedAt    DateTime @default(now())
+  recordedById  String? @db.Uuid
   createdAt     DateTime @default(now())
   updatedAt     DateTime @updatedAt
 
   @@index([saleId])
   @@index([bookingId])
   @@index([customerId])
+  customer   Customer   @relation("CustomerPayments", fields: [customerId], references: [id])
+  sale       Sale?      @relation("SalePayments", fields: [saleId], references: [id])
+  booking    Booking?   @relation("BookingPayments", fields: [bookingId], references: [id])
+  allocations PaymentAllocation[] @relation("PaymentAllocations")
+  refunds    Refund[]    @relation("RefundPayments")
 }
 
 // -------------------
@@ -364,6 +403,8 @@ model PaymentAllocation {
   bookingId     String? @db.Uuid
   amount        BigInt
   allocatedAt   DateTime @default(now())
+
+  payment       Payment   @relation("PaymentAllocations", fields: [paymentId], references: [id])
 
   @@unique([paymentId])
   @@index([paymentId])
@@ -400,6 +441,8 @@ model Invoice {
   pdfUrl        String?
   createdBy     String @db.Uuid
 
+  sale          Sale     @relation("SaleInvoice", fields: [saleId], references: [id])
+
   @@index([saleId])
   @@index([status])
 
@@ -425,6 +468,10 @@ model Refund {
   approvedBy    String? @db.Uuid
   processedAt   DateTime?
   createdAt     DateTime @default(now())
+
+  payment       Payment   @relation("RefundPayments", fields: [paymentId], references: [id])
+  requestedByUser User   @relation("RefundRequestedBy", fields: [requestedBy], references: [id])
+  approvedByUser  User?   @relation("RefundApprovedBy", fields: [approvedBy], references: [id])
 
   @@index([paymentId])
   @@index([status])
@@ -474,6 +521,8 @@ model FinanceApplication {
   amountRequested   BigInt
   interestRate      Int      // basis points
   tenureMonths      Int
+  emiAmount         BigInt   @default(0)
+  documentsSubmitted Boolean @default(false)
   status            String   @default("submitted") // submitted/under_review/approved/disbursed/rejected
   quotedPremium     BigInt?
   boundAt           DateTime?
@@ -485,6 +534,7 @@ model FinanceApplication {
   @@index([customerId])
   @@index([status])
   customer   Customer   @relation(fields: [customerId], references: [id])
+  sale       Sale?      @relation("SaleFinanceApplications", fields: [saleId], references: [id])
 }
 
 // -------------------
@@ -502,6 +552,7 @@ model InsuranceApplication {
   policyExpiry      DateTime?
   policyNumber      String?
   status            String   @default("submitted") // submitted/quoted/bound/expired/cancelled
+  documentsSubmitted Boolean @default(false)
   quotedAt          DateTime?
   boundAt           DateTime?
   expiredAt         DateTime?
@@ -512,6 +563,7 @@ model InsuranceApplication {
   @@index([customerId])
   @@index([status])
   customer   Customer   @relation(fields: [customerId], references: [id])
+  sale       Sale?      @relation("SaleInsuranceApplications", fields: [saleId], references: [id])
 }
 
 // -------------------
@@ -523,7 +575,9 @@ model RTOApplication {
   applicationNumber String @unique
   customerId        String @db.Uuid
   saleId            String? @db.Uuid
+  vehicleClass      String?
   registrationNumber String?
+  documentsSubmitted Boolean @default(false)
   status            String   @default("submitted") // submitted/under_processing/number_assigned/delivered/rejected
   numberAssignedAt  DateTime?
   deliveredAt       DateTime?
@@ -534,6 +588,7 @@ model RTOApplication {
   @@index([customerId])
   @@index([status])
   customer   Customer   @relation(fields: [customerId], references: [id])
+  sale       Sale?      @relation("SaleRTOApplications", fields: [saleId], references: [id])
 }
 
 // -------------------
@@ -578,6 +633,8 @@ model StockMovement {
   notes         String?
   createdAt     DateTime @default(now())
   createdBy     String? @db.Uuid
+
+  stockUnit     StockUnit   @relation("StockUnitMovements", fields: [stockUnitId], references: [id])
 
   @@index([stockUnitId])
   @@index([createdAt])
@@ -689,6 +746,7 @@ model Customer {
   financeApplications FinanceApplication[]
   insuranceApplications InsuranceApplication[]
   rtoApplications RTOApplication[]
+  payments Payment[] @relation("CustomerPayments")
 }
 
 model Lead {

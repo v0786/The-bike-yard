@@ -116,7 +116,7 @@ describe('Authorization (RBAC) per API.md §9', () => {
         ['Super Admin', 'Insurance Staff'],
         ['Super Admin', 'RTO Staff'],
         ['Super Admin'],
-      ]) {
+      ] as Role[][]) {
         const user = await requireRole(roles);
         expect(user.role).toBe('Super Admin');
       }

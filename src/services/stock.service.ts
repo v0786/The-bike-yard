@@ -3,6 +3,7 @@
 
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
+import type { Prisma } from '@prisma/client';
 import {
   stockUnitCreateSchema,
   stockMovementCreateSchema,
@@ -63,17 +64,18 @@ export async function getStockUnits(filters?: {
   search?: string;
   dealershipId?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.status) where.currentStatus = filters.status;
+  if (filters?.dealershipId) where.dealershipId = filters.dealershipId;
+  if (filters?.search) {
+    where.OR = [
+      { chassisNumber: { contains: filters.search, mode: 'insensitive' } },
+      { engineNumber: { contains: filters.search, mode: 'insensitive' } },
+    ];
+  }
+
   return prisma.stockUnit.findMany({
-    where: {
-      status: filters?.status || undefined,
-      dealershipId: filters?.dealershipId || undefined,
-      OR: filters?.search
-        ? [
-            { chassisNumber: { contains: filters.search, mode: 'insensitive' } },
-            { engineNumber: { contains: filters.search, mode: 'insensitive' } },
-          ]
-        : undefined,
-    },
+    where: where as Prisma.StockUnitWhereInput,
     include: {
       variant: true,
       colour: true,
@@ -197,8 +199,11 @@ export async function releaseReservation(reservationId: string) {
 }
 
 export async function getStockMovements(stockUnitId?: string) {
+  const where: Record<string, unknown> = {};
+  if (stockUnitId) where.stockUnitId = stockUnitId;
+
   return prisma.stockMovement.findMany({
-    where: stockUnitId ? { stockUnitId } : undefined,
+    where: where as Prisma.StockMovementWhereInput,
     include: { stockUnit: true },
     orderBy: { createdAt: 'desc' },
   });

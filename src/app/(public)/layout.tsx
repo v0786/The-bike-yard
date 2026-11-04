@@ -19,6 +19,11 @@ export const metadata: Metadata = {
   title: 'The Bike Yard — Premium Motorcycle Showroom',
   description:
     'Complete motorcycle dealership management and digital showroom for The Bike Yard, Khopat, Thane, Maharashtra, India. Suzuki, Honda, TVS new and second-hand motorcycles.',
+  viewport: {
+    width: 'device-width',
+    initialScale: 1,
+    maximumScale: 1,
+  },
 };
 
 export default function PublicLayout({ children }: { children: React.ReactNode }) {

@@ -12,7 +12,7 @@ export default function StaffDashboardPage() {
           <div className="text-2xl font-bold">0</div>
         </div>
         <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="text-sm text-gray-500">Today's Tasks</div>
+          <div className="text-sm text-gray-500">Today&rsquo;s Tasks</div>
           <div className="text-2xl font-bold">0</div>
         </div>
       </div>

@@ -1,6 +1,7 @@
 // RTO service — registration applications.
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export async function createRTOApplication(data: {
   customerId: string;
@@ -25,12 +26,13 @@ export async function getRTOApplications(filters?: {
   saleId?: string;
   status?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.customerId) where.customerId = filters.customerId;
+  if (filters?.saleId) where.saleId = filters.saleId;
+  if (filters?.status) where.status = filters.status;
+
   return prisma.rTOApplication.findMany({
-    where: {
-      customerId: filters?.customerId || undefined,
-      saleId: filters?.saleId || undefined,
-      status: filters?.status || undefined,
-    },
+    where: where as Prisma.RTOApplicationWhereInput,
     include: { customer: true, sale: true },
     orderBy: { createdAt: 'desc' },
   });

@@ -173,10 +173,10 @@ export default function HomePage() {
                 Why Choose Us
               </span>
               <h2 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-primary">
-                India's Most Trusted Motorcycle Showroom
+                India&rsquo;s Most Trusted Motorcycle Showroom
               </h2>
               <p className="text-brand-secondary/60 text-lg mb-6 leading-relaxed">
-                With 267 verified reviews and a 4.9/5 rating, The Bike Yard has become Thane's most
+                With 267 verified reviews and a 4.9/5 rating, The Bike Yard has become Thane&rsquo;s most
                 trusted motorcycle dealership. We pride ourselves on transparency, quality service,
                 and helping customers find their perfect motorcycle.
               </p>

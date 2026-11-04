@@ -4,11 +4,8 @@ const nextConfig = {
   experimental: {
     // App Router stable in Next.js 16
   },
-  // Ignore TypeScript errors in build for now (will enforce in CI)
-  // TODO: Remove once pre-existing type errors in inherited pages are resolved
-  typescript: {
-    ignoreBuildErrors: true,
-  },
+  // TypeScript errors are enforced in the build (typecheck passes with zero errors).
+  // See tsconfig.json; `ignoreBuildErrors` removed once typecheck is clean.
   // Enable React 19 strict mode
   reactStrictMode: true,
 

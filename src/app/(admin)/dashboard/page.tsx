@@ -15,7 +15,7 @@ export default function DashboardPage() {
 
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-4 mb-8">
         <div className="bg-white p-4 rounded-lg border shadow-sm">
-          <div className="text-sm text-brand-secondary">Today's Sales</div>
+          <div className="text-sm text-brand-secondary">Today&rsquo;s Sales</div>
           <div className="text-2xl font-bold">0</div>
         </div>
         <div className="bg-white p-4 rounded-lg border shadow-sm">

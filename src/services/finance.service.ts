@@ -1,10 +1,12 @@
 // Finance service — loan applications.
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export async function createFinanceApplication(data: {
   customerId: string;
   saleId?: string | null;
+  financeType?: string | null;
   lender?: string | null;
   loanAmount?: number | null;
   downPayment?: number | null;
@@ -18,10 +20,10 @@ export async function createFinanceApplication(data: {
       customerId: data.customerId,
       saleId: data.saleId || null,
       financeType: data.financeType || 'loan',
-      amountRequested: data.loanAmount || 0,
+      amountRequested: BigInt(data.loanAmount || 0),
       interestRate: data.interestRate || 0,
       tenureMonths: data.tenureMonths || 0,
-      emiAmount: data.emiAmount || 0,
+      emiAmount: BigInt(data.emiAmount || 0),
       status: 'submitted',
       documentsSubmitted: false,
     },
@@ -33,12 +35,13 @@ export async function getFinanceApplications(filters?: {
   saleId?: string;
   status?: string;
 }) {
+  const where: Record<string, unknown> = {};
+  if (filters?.customerId) where.customerId = filters.customerId;
+  if (filters?.saleId) where.saleId = filters.saleId;
+  if (filters?.status) where.status = filters.status;
+
   return prisma.financeApplication.findMany({
-      where: {
-        ...(filters?.customerId && { customerId: filters.customerId }),
-        ...(filters?.saleId && { saleId: filters.saleId }),
-        ...(filters?.status && { status: filters.status }),
-      },
+    where: where as Prisma.FinanceApplicationWhereInput,
     include: { customer: true, sale: true },
     orderBy: { createdAt: 'desc' },
   });
