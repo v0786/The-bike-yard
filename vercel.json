@@ -5,13 +5,5 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["bom1"],
-  "env": {
-    "DATABASE_URL": "@thebikeyard-database-url",
-    "NEXTAUTH_SECRET": "@thebikeyard-nextauth-secret",
-    "NEXTAUTH_URL": "@thebikeyard-nextauth-url",
-    "STORAGE_PROVIDER": "s3",
-    "AI_PROVIDER": "stub",
-    "PAYMENT_PROVIDER": "stub"
-  },
   "crons": [{ "path": "/api/admin/reports/daily-closing", "schedule": "0 0 * * *" }]
 }
