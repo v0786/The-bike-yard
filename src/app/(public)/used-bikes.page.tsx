@@ -34,7 +34,7 @@ export function UsedBikesPage() {
       kmDriven: 15000,
       price: 1150000,
       colour: 'Black',
-      image: '/placeholder-used.svg',
+      image: '/images/bikes/suzuki-intruder.svg',
       available: true,
     },
     {
@@ -46,7 +46,7 @@ export function UsedBikesPage() {
       kmDriven: 8500,
       price: 1750000,
       colour: 'Silver',
-      image: '/placeholder-used.svg',
+      image: '/images/bikes/honda-cb350.svg',
       available: true,
     },
     {
@@ -58,7 +58,7 @@ export function UsedBikesPage() {
       kmDriven: 22000,
       price: 75000,
       colour: 'White',
-      image: '/placeholder-used.svg',
+      image: '/images/scooters/tvs-jupiter.svg',
       available: false,
     },
     {
@@ -70,7 +70,7 @@ export function UsedBikesPage() {
       kmDriven: 30000,
       price: 65000,
       colour: 'Red',
-      image: '/placeholder-used.svg',
+      image: '/images/scooters/honda-activa.svg',
       available: true,
     },
   ];

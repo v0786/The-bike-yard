@@ -32,7 +32,7 @@ export function NewBikesPage() {
       colour: 'Black',
       price: 1250000,
       exShowroom: 1100000,
-      image: '/placeholder-new.svg',
+      image: '/images/bikes/suzuki-intruder.svg',
       available: true,
     },
     {
@@ -43,7 +43,7 @@ export function NewBikesPage() {
       colour: 'Silver',
       price: 1850000,
       exShowroom: 1650000,
-      image: '/placeholder-new.svg',
+      image: '/images/bikes/honda-cb350.svg',
       available: true,
     },
     {
@@ -54,7 +54,7 @@ export function NewBikesPage() {
       colour: 'White',
       price: 95000,
       exShowroom: 85000,
-      image: '/placeholder-new.svg',
+      image: '/images/scooters/tvs-jupiter.svg',
       available: true,
     },
     {
@@ -65,7 +65,7 @@ export function NewBikesPage() {
       colour: 'Red',
       price: 105000,
       exShowroom: 95000,
-      image: '/placeholder-new.svg',
+      image: '/images/scooters/suzuki-access-125.svg',
       available: true,
     },
     {
@@ -76,7 +76,7 @@ export function NewBikesPage() {
       colour: 'Blue',
       price: 85000,
       exShowroom: 75000,
-      image: '/placeholder-new.svg',
+      image: '/images/bikes/tvs-rider.svg',
       available: false,
     },
   ];

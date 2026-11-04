@@ -55,12 +55,108 @@ export default function HomePage() {
           </div>
 
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
-            {/* Bikes will be populated by API data via client-side fetch */}
-            <div id="bike-grid" className="col-span-3">
-              <p className="text-brand-secondary/60 text-center py-8">
-                Loading available bikes…
-              </p>
-            </div>
+            {/* Featured bikes with images */}
+            <article
+              className="border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow group"
+            >
+              <div className="relative h-64">
+                <img
+                  src="/images/bikes/suzuki-intruder.svg"
+                  alt="Suzuki Intruder 150cc"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute top-2 right-2 bg-brand-success text-xs font-medium px-2 py-1">
+                  Available
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 bg-brand-secondary/20 text-xs font-medium text-brand-secondary rounded">
+                    New
+                  </span>
+                </div>
+                <h3 className="font-semibold text-brand-primary group-hover:text-brand-accent transition-colors">
+                  Suzuki Intruder
+                </h3>
+                <p className="text-sm text-brand-secondary/60 mb-2">150cc · Standard · Black</p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="font-bold text-brand-primary">₹ 1,25,000</span>
+                  <span className="text-xs text-brand-secondary/60">Ex-showroom</span>
+                </div>
+                <button className="w-full py-2 rounded-md border border-brand-secondary text-brand-primary text-sm font-medium hover:bg-brand-secondary/10 transition-colors">
+                  Enquire Now
+                </button>
+              </div>
+            </article>
+
+            <article
+              className="border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow group"
+            >
+              <div className="relative h-64">
+                <img
+                  src="/images/bikes/honda-cb350.svg"
+                  alt="Honda CB350 motorcycle"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute top-2 right-2 bg-brand-success text-xs font-medium px-2 py-1">
+                  Available
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 bg-brand-secondary/20 text-xs font-medium text-brand-secondary rounded">
+                    New
+                  </span>
+                </div>
+                <h3 className="font-semibold text-brand-primary group-hover:text-brand-accent transition-colors">
+                  Honda CB350
+                </h3>
+                <p className="text-sm text-brand-secondary/60 mb-2">350cc · Standard · Silver</p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="font-bold text-brand-primary">₹ 1,85,000</span>
+                  <span className="text-xs text-brand-secondary/60">Ex-showroom</span>
+                </div>
+                <button className="w-full py-2 rounded-md border border-brand-secondary text-brand-primary text-sm font-medium hover:bg-brand-secondary/10 transition-colors">
+                  Enquire Now
+                </button>
+              </div>
+            </article>
+
+            <article
+              className="border rounded-2xl overflow-hidden bg-white hover:shadow-lg transition-shadow group"
+            >
+              <div className="relative h-64">
+                <img
+                  src="/images/scooters/tvs-jupiter.svg"
+                  alt="TVS Jupiter scooter"
+                  className="w-full h-full object-cover"
+                  loading="lazy"
+                />
+                <div className="absolute top-2 right-2 bg-brand-success text-xs font-medium px-2 py-1">
+                  Available
+                </div>
+              </div>
+              <div className="p-4">
+                <div className="flex items-center gap-2 mb-2">
+                  <span className="px-2 py-1 bg-brand-secondary/20 text-xs font-medium text-brand-secondary rounded">
+                    New
+                  </span>
+                </div>
+                <h3 className="font-semibold text-brand-primary group-hover:text-brand-accent transition-colors">
+                  TVS Jupiter
+                </h3>
+                <p className="text-sm text-brand-secondary/60 mb-2">110cc · SmartXONCE · White</p>
+                <div className="flex items-baseline gap-2 mb-3">
+                  <span className="font-bold text-brand-primary">₹ 95,000</span>
+                  <span className="text-xs text-brand-secondary/60">Ex-showroom</span>
+                </div>
+                <button className="w-full py-2 rounded-md border border-brand-secondary text-brand-primary text-sm font-medium hover:bg-brand-secondary/10 transition-colors">
+                  Enquire Now
+                </button>
+              </div>
+            </article>
           </div>
         </div>
       </section>

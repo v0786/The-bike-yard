@@ -49,17 +49,15 @@ export function HeroSection() {
           </div>
         </div>
 
-        {/* Hero motorcycle imagery - using placeholder with actual business context */}
+        {/* Hero motorcycle imagery */}
         <div className="relative">
-          {/* Motorcycle silhouette / hero image placeholder */}
           <div className="relative aspect-[3/4] rounded-lg overflow-hidden bg-gradient-to-br from-brand-secondary/30 to-brand-primary/30">
-            <svg
-              className="absolute inset-0 w-full h-full object-cover"
-              viewBox="0 0 800 600"
-              fill="currentColor"
-            >
-              <path d="M100 100 C 200 50, 300 150, 400 100 C 500 50, 600 150, 700 100 L 700 500 L 100 500 Z" />
-            </svg>
+            <img
+              src="/images/bikes/suzuki-intruder.svg"
+              alt="Suzuki Intruder motorcycle showroom"
+              className="w-full h-full object-cover"
+              loading="lazy"
+            />
           </div>
           <div className="absolute -bottom-4 -right-4 bg-gradient-to-t from-brand-primary/80 to-transparent rounded-2xl p-4 shadow-xl">
             <h3 className="font-bold text-white">4.9⭐ | 267 reviews</h3>
