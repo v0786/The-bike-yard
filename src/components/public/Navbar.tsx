@@ -1,5 +1,10 @@
-// Navbar component for The Bike Yard public website
-// Follows DESIGN.md design tokens and API.md §9 authorization
+'use client';
+
+// Fixed Navbar - uses server-side auth check via cookies, not client-side window
+// Follows AUTH_SECURITY.md §4.3 - server must verify permissions
+
+import * as React from 'react';
+import Link from 'next/link';
 
 type NavLink = {
   href: string;
@@ -9,7 +14,7 @@ type NavLink = {
 
 const navLinks: NavLink[] = [
   { href: '/', label: 'Home', description: 'Showroom homepage' },
-  { href: '/new-bikes', label: 'New Bikes', description: 'Suzuki, Honda, TVS' },
+  { href: '/new-bikes', label: 'New Bikes', description: 'New motorcycles and scooters' },
   { href: '/used-bikes', label: 'Used Bikes', description: 'Second-hand motorcycles and scooters' },
   { href: '/finance', label: 'Finance', description: 'EMI calculator and loan options' },
   { href: '/insurance', label: 'Insurance', description: 'Policy information and assistance' },
@@ -18,18 +23,14 @@ const navLinks: NavLink[] = [
   { href: '/contact', label: 'Contact', description: 'Showroom location and contact' },
 ];
 
-// User menu links (shown when authenticated)
-type UserMenuLink = {
-  href: string;
-  label: string;
-};
-
-const userMenuLinks: UserMenuLink[] = [
+const userMenuLinks: Array<{ href: string; label: string }> = [
   { href: '/admin', label: 'Admin' },
   { href: '/staff', label: 'Staff Portal' },
 ];
 
-export function Navbar() {
+export function Navbar({ userRole }: { userRole?: string | null } = {}) {
+  const isAuthenticated = !!userRole;
+
   return (
     <nav className="border-b border-brand-secondary bg-bg-secondary/80 backdrop-blur-sm sticky top-0 left-0 right-0 z-50">
       <div className="max-w-[1600px] mx-auto px-6 py-4 flex items-center justify-between flex-col sm:flex-row">
@@ -40,19 +41,21 @@ export function Navbar() {
               <path d="M12 2L2 7l10 5 10-5-10-5zM2 17l10 5 10-5M2 12l10 5 10-5" />
             </svg>
           </div>
-          <span className="text-2xl font-bold tracking-tighter">The Bike Yard</span>
+          <Link href="/" className="text-2xl font-bold tracking-tighter">
+            The Bike Yard
+          </Link>
         </div>
 
         {/* Desktop navigation */}
         <div className="hidden sm:block items-center gap-8">
           {navLinks.map((link, index) => (
-            <a
+            <Link
               key={index}
               href={link.href}
               className="text-brand-primary font-medium hover:text-brand-accent transition-colors"
             >
               {link.label}
-            </a>
+            </Link>
           ))}
         </div>
 
@@ -66,22 +69,20 @@ export function Navbar() {
           </svg>
         </button>
 
-        {/* User menu (authenticated users) */}
-        {typeof window !== 'undefined' &&
-          (window as any).userRole &&
-          (window as any).userRole !== 'no-auth' && (
-            <div className="hidden sm:items-center gap-2">
-              {userMenuLinks.map((link, index) => (
-                <a
-                  key={index}
-                  href={link.href}
-                  className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors"
-                >
-                  {link.label}
-                </a>
-              ))}
-            </div>
-          )}
+        {/* User menu (authenticated users) - server-side role check */}
+        {isAuthenticated && (
+          <div className="hidden sm:flex items-center gap-2">
+            {userMenuLinks.map((link, index) => (
+              <Link
+                key={index}
+                href={link.href}
+                className="text-sm font-medium text-brand-primary hover:text-brand-accent transition-colors"
+              >
+                {link.label}
+              </Link>
+            ))}
+          </div>
+        )}
       </div>
     </nav>
   );
@@ -106,44 +107,29 @@ export function Footer() {
             <h4 className="font-bold text-white mb-3">Quick Links</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="/new-bikes"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
+                <Link href="/new-bikes" className="text-brand-secondary/60 hover:text-white transition-colors">
                   New Bikes
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/used-bikes"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
+                <Link href="/used-bikes" className="text-brand-secondary/60 hover:text-white transition-colors">
                   Used Bikes
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/finance"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
+                <Link href="/finance" className="text-brand-secondary/60 hover:text-white transition-colors">
                   Finance
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/insurance"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
+                <Link href="/insurance" className="text-brand-secondary/60 hover:text-white transition-colors">
                   Insurance
-                </a>
+                </Link>
               </li>
               <li>
-                <a
-                  href="/rto"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
+                <Link href="/rto" className="text-brand-secondary/60 hover:text-white transition-colors">
                   RTO
-                </a>
+                </Link>
               </li>
             </ul>
           </div>
@@ -152,28 +138,12 @@ export function Footer() {
             <h4 className="font-bold text-white mb-3">Our Brands</h4>
             <ul className="space-y-2 text-sm">
               <li>
-                <a
-                  href="/brands/suzuki"
+                <Link
+                  href="/brands"
                   className="text-brand-secondary/60 hover:text-white transition-colors"
                 >
-                  Suzuki
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/brands/honda"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
-                  Honda
-                </a>
-              </li>
-              <li>
-                <a
-                  href="/brands/tvs"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
-                  TVS
-                </a>
+                  All Brands
+                </Link>
               </li>
             </ul>
           </div>
@@ -181,16 +151,6 @@ export function Footer() {
           <div>
             <h4 className="font-bold text-white mb-3">Connect</h4>
             <ul className="space-y-2 text-sm">
-              <li>
-                <a
-                  href="https://www.instagram.com/thebikeyard.in/"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-brand-secondary/60 hover:text-white transition-colors"
-                >
-                  Instagram
-                </a>
-              </li>
               <li>
                 <a
                   href="https://maps.app.goo.gl/?q=Khopat+Signal,+Thane,+Maharashtra+400601"
@@ -211,18 +171,15 @@ export function Footer() {
             © {new Date().getFullYear()} The Bike Yard. All rights reserved.
           </p>
           <div className="flex gap-2">
-            <a href="/faqs" className="text-brand-secondary/60 hover:text-white transition-colors">
+            <Link href="/faqs" className="text-brand-secondary/60 hover:text-white transition-colors">
               FAQs
-            </a>
-            <a href="/terms" className="text-brand-secondary/60 hover:text-white transition-colors">
+            </Link>
+            <Link href="/terms" className="text-brand-secondary/60 hover:text-white transition-colors">
               Terms
-            </a>
-            <a
-              href="/privacy"
-              className="text-brand-secondary/60 hover:text-white transition-colors"
-            >
+            </Link>
+            <Link href="/privacy" className="text-brand-secondary/60 hover:text-white transition-colors">
               Privacy
-            </a>
+            </Link>
           </div>
         </div>
       </div>

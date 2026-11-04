@@ -26,7 +26,7 @@ Each task follows: `DOC-<doc>`, `PHASE-<n>-<task>`, or `TRACKER-<id>`.
 | TRACKER-02 | Verify documentation pipeline completeness | CO     | All 15 docs present and v1.1 synced; see DOCUMENTATION_STATUS.md                                                                                          |
 | TRACKER-03 | Confirm Prisma schema generation           | CO     | schema.prisma fixed v1.1 (UUID→String @db.Uuid, provider string, generator=prisma-client-js); `prisma generate` succeeds; Prisma Client v6.12.0 generated |
 | TRACKER-04 | Set up git repo and initial commit         | CO     | Git repo initialized; initial commit saved                                                                                                                |
-| TRACKER-05 | Document baseline environment setup        | IP     | .env.example present; Node 22, npm 10 available                                                                                                           |
+| TRACKER-05 | Document baseline environment setup        | CO     | .env.example present with all required variables; Node 22, npm 10 available; app builds and tests pass                                                    |
 
 ---
 
