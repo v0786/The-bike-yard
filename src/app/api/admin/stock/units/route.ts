@@ -11,7 +11,7 @@ export async function GET() {
 
   try {
     const units = await prisma.stockUnit.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { inwardDate: 'desc' },
     });
     return NextResponse.json({ data: units });
   } catch (error: unknown) {
@@ -34,15 +34,10 @@ export async function POST(request: Request) {
         chassisNumber: validated.chassisNumber,
         engineNumber: validated.engineNumber,
         variantId: validated.variantId,
-        colourId: validated.colourId || null,
-        dealershipId: validated.dealershipId || null,
-        purchasePrice: validated.purchasePrice,
-        purchaseInvoiceNumber: validated.purchaseInvoiceNumber || null,
-        supplierName: validated.supplierName || null,
-        receivedDate: validated.receivedDate,
-        currentStatus: validated.currentStatus,
-        location: validated.location || null,
-        notes: validated.notes || null,
+        colorName: validated.colorName || '',
+        dealershipId: validated.dealershipId || '00000000-0000-0000-0000-000000000000',
+        purchasePricePaise: validated.purchasePricePaise,
+        status: validated.status as any,
       },
     });
 

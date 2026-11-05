@@ -9,7 +9,7 @@ export async function GET() {
 
   try {
     const refunds = await prisma.refund.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { requestedAt: 'desc' },
     });
     return NextResponse.json({ data: refunds });
   } catch (error: unknown) {

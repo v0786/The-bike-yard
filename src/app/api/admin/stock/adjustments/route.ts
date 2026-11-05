@@ -5,8 +5,7 @@ import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
 const adjustmentSchema = z.object({
   stockUnitId: z.string().uuid(),
-  type: z.enum(['adjustment', 'return']),
-  quantity: z.number().int().positive().default(1),
+  type: z.enum(['INWARD', 'RESERVATION_LOCK', 'YARD_TRANSFER', 'PDI_PASS', 'DISPATCH_DELIVERY']),
   notes: z.string().optional(),
 });
 
@@ -22,10 +21,11 @@ export async function POST(request: Request) {
     const movement = await prisma.stockMovement.create({
       data: {
         stockUnitId: validated.stockUnitId,
-        type: validated.type,
-        quantity: validated.quantity,
-        referenceType: 'manual',
+        type: validated.type as any,
+        fromLoc: '',
+        toLoc: '',
         notes: validated.notes || null,
+        recordedBy: '',
       },
     });
 

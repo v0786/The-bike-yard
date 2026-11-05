@@ -13,11 +13,10 @@ export async function POST(request: Request) {
     // Create a customer from test ride booking
     const customer = await prisma.customer.create({
       data: {
-        firstName: validated.name.split(' ')[0] || '',
-        lastName: validated.name.split(' ').slice(1).join(' ') || '',
+        fullName: validated.name,
         phone: validated.phone,
         email: validated.email || null,
-        dealershipId: '00000000-0000-0000-0000-000000000000',
+        addressLine1: '',
       },
     });
 
@@ -25,9 +24,13 @@ export async function POST(request: Request) {
     const lead = await prisma.lead.create({
       data: {
         customerId: customer.id,
-        source: 'website',
-        status: 'new',
-        notes: `Test ride interest: ${validated.bikeInterest}. ${validated.message || ''}`,
+        customerName: validated.name,
+        phone: validated.phone,
+        email: validated.email || null,
+        bikeOfInterest: validated.bikeInterest,
+        source: 'WEBSITE',
+        stage: 'TEST_RIDE',
+        notes: `Test ride requested for ${validated.preferredDate}. ${validated.message || ''}`,
       },
     });
 

@@ -52,3 +52,6 @@ blob-report/
 coverage/
 .playwright/
 .vercel
+
+# Local build archives — never commit large zip bundles
+*.zip

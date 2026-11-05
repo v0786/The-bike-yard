@@ -17,8 +17,11 @@ describe('currency', () => {
 
   describe('toPaise', () => {
     it('converts rupees to paise', () => {
-      expect(toPaise(100)).toBe(10000);
-      expect(toPaise(99.99)).toBe(9999);
+      expect(toPaise(100)).toBe(10000n);
+      expect(toPaise(99.99)).toBe(9999n);
+    });
+    it('converts comma-formatted rupee strings', () => {
+      expect(toPaise('1,49,900')).toBe(14990000n);
     });
   });
 
@@ -30,22 +33,27 @@ describe('currency', () => {
   });
 
   describe('splitGst', () => {
+    const TAXABLE = 100000n; // ₹1,000
+
     it('splits intra-state (MH) equally between CGST and SGST', () => {
-      const result = splitGst(1000, '27', 2800);
-      expect(result.cgst).toBe(500);
-      expect(result.sgst).toBe(500);
-      expect(result.igst).toBe(0);
+      const result = splitGst(TAXABLE, 2800, false);
+      expect(result.gstAmountPaise).toBe(28000n);
+      expect(result.cgstPaise).toBe(14000n);
+      expect(result.sgstPaise).toBe(14000n);
+      expect(result.igstPaise).toBe(0n);
+      expect(result.totalWithGstPaise).toBe(128000n);
     });
     it('assigns all GST to IGST for inter-state', () => {
-      const result = splitGst(1000, '29', 2800);
-      expect(result.cgst).toBe(0);
-      expect(result.sgst).toBe(0);
-      expect(result.igst).toBe(1000);
+      const result = splitGst(TAXABLE, 2800, true);
+      expect(result.cgstPaise).toBe(0n);
+      expect(result.sgstPaise).toBe(0n);
+      expect(result.igstPaise).toBe(28000n);
     });
     it('preserves total GST amount', () => {
-      const gstAmount = 1960000;
-      const result = splitGst(gstAmount, '27', 2800);
-      expect(result.cgst + result.sgst + result.igst).toBe(gstAmount);
+      const result = splitGst(7000000n, 2800, false);
+      expect(result.cgstPaise + result.sgstPaise + result.igstPaise).toBe(
+        result.gstAmountPaise,
+      );
     });
   });
 

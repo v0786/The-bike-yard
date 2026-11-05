@@ -9,7 +9,7 @@ export async function GET() {
 
   try {
     const movements = await prisma.stockMovement.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { timestamp: 'desc' },
     });
     return NextResponse.json({ data: movements });
   } catch (error: unknown) {

@@ -16,7 +16,7 @@ export default function LeadsPage() {
       <div className="max-w-[1600px] mx-auto px-6">
         <div className="mb-12">
           <span className="inline-block px-4 py-1.5 bg-gradient-to-r from-brand-primary to-brand-accent text-xs font-medium text-white uppercase tracking-wider mb-6">
-            Leads & CRM
+            Leads &amp; CRM
           </span>
           <h1 className="text-4xl md:text-5xl lg:text-6xl font-extrabold tracking-tight text-brand-primary">
             Customer Leads
@@ -48,17 +48,17 @@ async function LeadsList() {
               <th className="text-left text-sm font-medium text-brand-primary pb-3">Customer</th>
               <th className="text-left text-sm font-medium text-brand-primary pb-3">Phone</th>
               <th className="text-left text-sm font-medium text-brand-primary pb-3">Source</th>
-              <th className="text-left text-sm font-medium text-brand-primary pb-3">Status</th>
+              <th className="text-left text-sm font-medium text-brand-primary pb-3">Stage</th>
               <th className="text-right text-sm font-medium text-brand-primary pb-3">Date</th>
             </tr>
           </thead>
           <tbody>
             {leads.map((lead) => (
               <tr key={lead.id} className="text-left">
-                <td className="py-4 text-sm">{lead.customer?.firstName} {lead.customer?.lastName}</td>
-                <td className="py-4 text-sm text-brand-secondary">{lead.customer?.phone}</td>
+                <td className="py-4 text-sm">{lead.customer?.fullName ?? lead.customerName}</td>
+                <td className="py-4 text-sm text-brand-secondary">{lead.customer?.phone ?? lead.phone}</td>
                 <td className="py-4 text-sm text-brand-secondary">{lead.source}</td>
-                <td className="py-4 text-sm"><StatusChip status={lead.status} /></td>
+                <td className="py-4 text-sm"><StatusChip status={lead.stage} /></td>
                 <td className="py-4 text-sm text-brand-secondary/60">{new Date(lead.createdAt).toLocaleDateString('en-IN')}</td>
               </tr>
             ))}

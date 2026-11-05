@@ -18,21 +18,23 @@ export async function POST(request: Request) {
     }
 
     const payload = JSON.parse(body);
-    const { eventId, paymentId, status, amount, referenceId } = payload;
+    const { paymentId, status, referenceId } = payload;
 
     // Idempotency: check if event already processed
-    const existing = await prisma.payment.findFirst({
-      where: { referenceId },
-    });
-    if (existing && existing.status === status) {
-      return NextResponse.json({ data: { processed: false, reason: 'duplicate' } });
+    if (referenceId) {
+      const existing = await prisma.payment.findFirst({
+        where: { transactionRef: referenceId },
+      });
+      if (existing && existing.status === status) {
+        return NextResponse.json({ data: { processed: false, reason: 'duplicate' } });
+      }
     }
 
     // Update payment status
     if (paymentId) {
       await prisma.payment.update({
         where: { id: paymentId },
-        data: { status: status as any, paidAt: new Date() },
+        data: { status: status as any, paymentDate: new Date() },
       });
     }
 

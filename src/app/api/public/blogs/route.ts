@@ -11,12 +11,12 @@ export async function GET(request: Request) {
 
     const [blogs, total] = await Promise.all([
       prisma.blog.findMany({
-        where: { status: 'published' },
-        orderBy: { publishedAt: 'desc' },
+        where: { published: true },
+        orderBy: { createdAt: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
-      prisma.blog.count({ where: { status: 'published' } }),
+      prisma.blog.count({ where: { published: true } }),
     ]);
 
     return NextResponse.json({

@@ -22,23 +22,23 @@ export async function GET() {
     ] = await Promise.all([
       prisma.sale.count({
         where: {
-          createdAt: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
+          saleDate: { gte: new Date(new Date().setHours(0, 0, 0, 0)) },
         },
       }),
-      prisma.sale.aggregate({ _sum: { finalSellingPrice: true } }),
-      prisma.stockUnit.count({ where: { currentStatus: 'available' } }),
-      prisma.booking.count({ where: { advanceStatus: 'pending' } }),
-      prisma.stockUnit.count({ where: { currentStatus: 'available' } }),
-      prisma.stockUnit.count({ where: { currentStatus: 'sold' } }),
-      prisma.payment.count({ where: { status: 'pending' } }),
-      prisma.financeApplication.count({ where: { status: 'submitted' } }),
-      prisma.insuranceApplication.count({ where: { status: 'submitted' } }),
-      prisma.rTOApplication.count({ where: { status: 'submitted' } }),
+      prisma.sale.aggregate({ _sum: { totalOnRoadPaise: true } }),
+      prisma.stockUnit.count({ where: { status: 'IN_STOCK' } }),
+      prisma.booking.count({ where: { status: 'ACTIVE' } }),
+      prisma.stockUnit.count({ where: { status: 'IN_STOCK' } }),
+      prisma.stockUnit.count({ where: { status: 'SOLD' } }),
+      prisma.payment.count({ where: { status: 'PENDING' } }),
+      prisma.financeApplication.count({ where: { status: 'SUBMITTED' } }),
+      prisma.insuranceApplication.count({ where: { status: 'SUBMITTED' } }),
+      prisma.rTOApplication.count({ where: { status: 'SUBMITTED' } }),
     ]);
 
     const data = [
       { label: "Today's Sales", value: todaySales, trend: 'up' },
-      { label: 'Total Revenue', value: totalRevenue._sum.finalSellingPrice || 0, trend: 'up' },
+      { label: 'Total Revenue', value: Number(totalRevenue._sum.totalOnRoadPaise || 0n), trend: 'up' },
       { label: 'Available Stock', value: availableStock, trend: 'neutral' },
       { label: 'Bookings', value: bookings, trend: 'neutral' },
       { label: 'Stock Inward', value: stockInward, trend: 'neutral' },

@@ -15,12 +15,12 @@ export async function GET(request: Request) {
     const q = searchParams.get('q');
 
     const where: any = {};
-    if (status) where.status = status;
+    if (status) where.status = status as any;
 
     const [stockUnits, total] = await Promise.all([
       prisma.stockUnit.findMany({
         where,
-        orderBy: { createdAt: 'desc' },
+        orderBy: { inwardDate: 'desc' },
         skip: (page - 1) * pageSize,
         take: pageSize,
       }),
@@ -30,12 +30,12 @@ export async function GET(request: Request) {
     const data = stockUnits.map((unit) => ({
       id: unit.id,
       variantId: unit.variantId,
-      colourId: unit.colourId,
+      colorName: unit.colorName,
       chassisNumber: unit.chassisNumber,
       engineNumber: unit.engineNumber,
-      exShowroomPrice: unit.purchasePrice,
-      onRoadPrice: unit.purchasePrice,
-      availabilityStatus: unit.currentStatus,
+      exShowroomPrice: unit.purchasePricePaise,
+      onRoadPrice: unit.purchasePricePaise,
+      availabilityStatus: unit.status,
     }));
 
     return NextResponse.json({

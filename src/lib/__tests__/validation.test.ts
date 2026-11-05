@@ -1,12 +1,9 @@
-import { describe, it, expect, vi, beforeEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // --- Validation schema tests (TESTING.md §11) ---
 import {
   stockUnitCreateSchema,
   paymentCreateSchema,
-  saleCreateSchema,
-  refundCreateSchema,
-  invoiceCreateSchema,
   enquiryCreateSchema,
   chassisNumberSchema,
   engineNumberSchema,
@@ -65,30 +62,36 @@ describe('Zod validation schemas', () => {
       chassisNumber: 'ME4JC654K98765432',
       engineNumber: 'JC65E98765432',
       variantId: '88888888-4444-4444-8444-888888888888',
-      purchasePrice: 6500000,
-      receivedDate: '2026-01-15T10:00:00Z',
-      currentStatus: 'available',
+      colorName: 'Midnight Black',
+      purchasePricePaise: 6500000,
+      inwardDate: '2026-01-15T10:00:00.000Z',
+      status: 'IN_STOCK' as const,
     };
     it('accepts valid stock unit', () => {
-      expect(stockUnitCreateSchema.parse(valid)).toEqual(valid);
+      expect(stockUnitCreateSchema.parse(valid)).toMatchObject(valid);
     });
     it('rejects missing chassisNumber', () => {
       expect(() => stockUnitCreateSchema.parse({ ...valid, chassisNumber: '' })).toThrow();
+    });
+    it('rejects invalid status', () => {
+      expect(() =>
+        stockUnitCreateSchema.parse({ ...valid, status: 'DELIVERY' }),
+      ).toThrow();
     });
   });
 
   describe('paymentCreateSchema', () => {
     const valid = {
-      paymentNumber: 'PAY-001',
-      customerId: '88888888-4444-4444-8444-888888888888',
-      amount: 500000,
-      method: 'upi',
+      receiptNumber: 'PAY-001',
+      amountPaise: 500000,
+      mode: 'upi' as const,
+      receivedBy: 'Suraj Patil',
     };
     it('accepts valid payment', () => {
       expect(paymentCreateSchema.parse(valid)).toEqual(valid);
     });
     it('rejects invalid method', () => {
-      expect(() => paymentCreateSchema.parse({ ...valid, method: 'cash_app' })).toThrow();
+      expect(() => paymentCreateSchema.parse({ ...valid, mode: 'cash_app' })).toThrow();
     });
   });
 

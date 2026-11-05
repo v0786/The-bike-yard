@@ -9,12 +9,8 @@ export async function GET() {
     const publicSettings = settings
       ? {
           theme: settings.theme,
-          primaryColour: settings.primaryColour,
-          secondaryColour: settings.secondaryColour,
-          fontFamily: settings.fontFamily,
-          fontSize: settings.fontSize,
-          invoicePrefix: settings.invoicePrefix,
-          language: settings.language,
+          gstRateBps: settings.gstRateBps,
+          autoLockMinutes: settings.autoLockMinutes,
         }
       : null;
     return NextResponse.json({ data: publicSettings });

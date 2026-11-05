@@ -1,39 +1,39 @@
 // RTO service — registration applications.
+// Uses new schema: rTOApplication model.
 
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
 export async function createRTOApplication(data: {
   customerId: string;
-  saleId?: string | null;
-  vehicleClass?: string | null;
+  rtoLocation?: string | null;
+  chassisNumber: string;
+  engineNumber: string;
+  applicationNum?: string | null;
 }) {
   return prisma.rTOApplication.create({
     data: {
-      applicationNumber: `RTO-${Date.now()}`,
       customerId: data.customerId,
-      saleId: data.saleId || null,
-      vehicleClass: data.vehicleClass || null,
-      registrationNumber: null,
-      status: 'submitted',
-      documentsSubmitted: false,
+      ...(data.rtoLocation ? { rtoLocation: data.rtoLocation } : {}),
+      chassisNumber: data.chassisNumber,
+      engineNumber: data.engineNumber,
+      applicationNum: data.applicationNum ?? null,
+      status: 'SUBMITTED',
     },
   });
 }
 
 export async function getRTOApplications(filters?: {
   customerId?: string;
-  saleId?: string;
   status?: string;
 }) {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.RTOApplicationWhereInput = {};
   if (filters?.customerId) where.customerId = filters.customerId;
-  if (filters?.saleId) where.saleId = filters.saleId;
   if (filters?.status) where.status = filters.status;
 
   return prisma.rTOApplication.findMany({
-    where: where as Prisma.RTOApplicationWhereInput,
-    include: { customer: true, sale: true },
+    where,
+    include: { customer: true },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -41,15 +41,15 @@ export async function getRTOApplications(filters?: {
 export async function updateRTOApplication(
   id: string,
   data: Partial<{
-    vehicleClass: string | null;
-    registrationNumber: string | null;
+    rtoLocation: string;
+    hsrpStatus: string;
+    applicationNum: string;
     status: string;
-    documentsSubmitted: boolean;
   }>
 ) {
   return prisma.rTOApplication.update({
     where: { id },
     data,
-    include: { customer: true, sale: true },
+    include: { customer: true },
   });
 }

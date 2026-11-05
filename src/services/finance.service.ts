@@ -1,48 +1,43 @@
 // Finance service — loan applications.
+// Uses new schema: loanAmountPaise, downPaymentPaise, bankPartner, tenureMonths.
 
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
 export async function createFinanceApplication(data: {
   customerId: string;
-  saleId?: string | null;
-  financeType?: string | null;
-  lender?: string | null;
-  loanAmount?: number | null;
-  downPayment?: number | null;
-  interestRate?: number | null;
-  tenureMonths?: number | null;
-  emiAmount?: number | null;
+  bikeModel: string;
+  loanAmountPaise: number | bigint;
+  downPaymentPaise: number | bigint;
+  tenureMonths: number;
+  cibilBand: string;
+  bankPartner?: string | null;
 }) {
   return prisma.financeApplication.create({
     data: {
-      applicationNumber: `FIN-${Date.now()}`,
       customerId: data.customerId,
-      saleId: data.saleId || null,
-      financeType: data.financeType || 'loan',
-      amountRequested: BigInt(data.loanAmount || 0),
-      interestRate: data.interestRate || 0,
-      tenureMonths: data.tenureMonths || 0,
-      emiAmount: BigInt(data.emiAmount || 0),
-      status: 'submitted',
-      documentsSubmitted: false,
+      bikeModel: data.bikeModel,
+      loanAmountPaise: BigInt(data.loanAmountPaise),
+      downPaymentPaise: BigInt(data.downPaymentPaise),
+      tenureMonths: data.tenureMonths,
+      cibilBand: data.cibilBand,
+      ...(data.bankPartner ? { bankPartner: data.bankPartner } : {}),
+      status: 'SUBMITTED',
     },
   });
 }
 
 export async function getFinanceApplications(filters?: {
   customerId?: string;
-  saleId?: string;
   status?: string;
 }) {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.FinanceApplicationWhereInput = {};
   if (filters?.customerId) where.customerId = filters.customerId;
-  if (filters?.saleId) where.saleId = filters.saleId;
   if (filters?.status) where.status = filters.status;
 
   return prisma.financeApplication.findMany({
-    where: where as Prisma.FinanceApplicationWhereInput,
-    include: { customer: true, sale: true },
+    where,
+    include: { customer: true },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -50,19 +45,22 @@ export async function getFinanceApplications(filters?: {
 export async function updateFinanceApplication(
   id: string,
   data: Partial<{
-    lender: string | null;
-    loanAmount: number | null;
-    downPayment: number | null;
-    interestRate: number | null;
-    tenureMonths: number | null;
-    emiAmount: number | null;
+    bankPartner: string;
+    loanAmountPaise: number | bigint;
+    downPaymentPaise: number | bigint;
+    tenureMonths: number;
+    cibilBand: string;
     status: string;
-    documentsSubmitted: boolean;
   }>
 ) {
+  const update: Prisma.FinanceApplicationUncheckedUpdateInput = { ...data };
+  if (data.loanAmountPaise !== undefined) update.loanAmountPaise = BigInt(data.loanAmountPaise);
+  if (data.downPaymentPaise !== undefined)
+    update.downPaymentPaise = BigInt(data.downPaymentPaise);
+
   return prisma.financeApplication.update({
     where: { id },
-    data: data as Prisma.FinanceApplicationUncheckedUpdateInput,
-    include: { customer: true, sale: true },
+    data: update,
+    include: { customer: true },
   });
 }

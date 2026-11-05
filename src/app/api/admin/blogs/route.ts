@@ -9,7 +9,7 @@ export async function GET() {
 
   try {
     const blogs = await prisma.blog.findMany({
-      where: { status: 'published' },
+      where: { published: true },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json({ data: blogs });

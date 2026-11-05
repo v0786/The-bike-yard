@@ -4,7 +4,6 @@
 
 import type { Metadata } from '@/types/metadata';
 import { prisma } from '@/lib/prisma';
-import { Button } from '@/components/ui/button';
 import { StatusChip } from '@/components/ui/status-chip';
 import { formatInr } from '@/lib/currency';
 
@@ -38,22 +37,21 @@ export default function InventoryPage() {
 async function InventoryDashboard() {
   const units = await prisma.stockUnit.findMany({
     include: {
-      variant: { include: { brand: true } },
-      colour: true,
+      variant: { include: { model: { include: { brand: true } } } },
     },
-    orderBy: { createdAt: 'desc' },
+    orderBy: { inwardDate: 'desc' },
   });
 
   return (
     <div className="space-y-8">
       <div className="grid grid-cols-1 lg:grid-cols-4 gap-6">
         {[
-          ['available', 'Available', 'bg-green-100 text-green-800'],
-          ['reserved', 'Reserved', 'bg-amber-100 text-amber-800'],
-          ['sold', 'Sold', 'bg-red-100 text-red-800'],
-          ['delivered', 'Delivered', 'bg-blue-100 text-blue-800'],
+          ['IN_STOCK', 'Available', 'bg-green-100 text-green-800'],
+          ['RESERVED', 'Reserved', 'bg-amber-100 text-amber-800'],
+          ['SOLD', 'Sold', 'bg-red-100 text-red-800'],
+          ['DISPLAY', 'Showroom Display', 'bg-blue-100 text-blue-800'],
         ].map(([status, label, tw]) => {
-          const count = units.filter((u) => u.currentStatus === status).length;
+          const count = units.filter((u) => u.status === status).length;
           return (
             <div key={status} className={`border rounded-2xl p-6 ${tw}`}>
               <h3 className="font-medium mb-1">{label}</h3>
@@ -71,7 +69,7 @@ async function InventoryDashboard() {
               <tr className="border-b border-brand-secondary">
                 <th className="text-left text-sm font-medium text-brand-primary pb-3">Chassis Number</th>
                 <th className="text-left text-sm font-medium text-brand-primary pb-3">Engine Number</th>
-                <th className="text-left text-sm font-medium text-brand-primary pb-3">Model & Colour</th>
+                <th className="text-left text-sm font-medium text-brand-primary pb-3">Model &amp; Colour</th>
                 <th className="text-center text-sm font-medium text-brand-primary pb-3">Purchase Price</th>
                 <th className="text-center text-sm font-medium text-brand-primary pb-3">Status</th>
               </tr>
@@ -84,11 +82,11 @@ async function InventoryDashboard() {
                   </td>
                   <td className="py-4 text-sm text-brand-secondary">{unit.engineNumber}</td>
                   <td className="py-4 text-sm">
-                    {(unit.variant as any)?.brand?.name} {(unit.variant as any)?.name} - {unit.colour?.name || 'N/A'}
+                    {unit.variant?.model?.brand?.name} {unit.variant?.model?.name} {unit.variant?.name} - {unit.colorName || 'N/A'}
                   </td>
-                  <td className="py-4 text-sm text-center">{formatInr(Number(unit.purchasePrice))}</td>
+                  <td className="py-4 text-sm text-center">{formatInr(unit.purchasePricePaise)}</td>
                   <td className="py-4 text-center">
-                    <StatusChip status={unit.currentStatus} />
+                    <StatusChip status={unit.status} />
                   </td>
                 </tr>
               ))}
@@ -123,17 +121,15 @@ async function InventoryDashboard() {
           </div>
           <div>
             <label className="block text-sm text-brand-primary mb-2">Colour</label>
-            <select name="colourId" className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary">
-              <option value="">Select colour</option>
-            </select>
+            <input type="text" name="colorName" required className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary" />
           </div>
           <div>
             <label className="block text-sm text-brand-primary mb-2">Purchase Price (paise)</label>
-            <input type="number" name="purchasePrice" required className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary" />
+            <input type="number" name="purchasePricePaise" required className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary" />
           </div>
           <div>
-            <label className="block text-sm text-brand-primary mb-2">Received Date</label>
-            <input type="datetime-local" name="receivedDate" required className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary" />
+            <label className="block text-sm text-brand-primary mb-2">Inward Date</label>
+            <input type="datetime-local" name="inwardDate" required className="w-full px-3 py-2 rounded-md border border-brand-secondary bg-brand-secondary/10 text-brand-primary focus:border-brand-primary" />
           </div>
           <div className="sm:col-span-2">
             <label className="block text-sm text-brand-primary mb-2">Supplier Name</label>

@@ -4,24 +4,18 @@ import { prisma } from '@/lib/prisma';
 import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
 const uploadSchema = z.object({
-  customerId: z.string().uuid(),
-  documentType: z.enum([
-    'customer_id',
-    'finance',
-    'insurance',
-    'rto',
-    'invoice',
-    'receipt',
-    'other',
+  entityType: z.enum(['Customer', 'Sale', 'Booking']),
+  entityId: z.string().uuid(),
+  docType: z.enum([
+    'Aadhaar',
+    'PAN',
+    'Form20',
+    'InsuranceCopy',
+    'Invoice',
+    'Receipt',
+    'Other',
   ]),
-  fileName: z.string().min(1),
-  storageKey: z.string().min(1),
-  mimeType: z.string().min(1),
-  sizeBytes: z.number().int().positive(),
-  accessLevel: z
-    .enum(['restricted', 'finance', 'rto', 'insurance', 'admin_only'])
-    .default('restricted'),
-  uploadedBy: z.string().uuid(),
+  fileUrl: z.string().min(1),
 });
 
 export const dynamic = 'force-dynamic';
@@ -35,14 +29,10 @@ export async function POST(request: Request) {
 
     const document = await prisma.document.create({
       data: {
-        customerId: validated.customerId,
-        documentType: validated.documentType,
-        fileName: validated.fileName,
-        storageKey: validated.storageKey,
-        mimeType: validated.mimeType,
-        sizeBytes: validated.sizeBytes,
-        accessLevel: validated.accessLevel,
-        uploadedBy: validated.uploadedBy,
+        entityType: validated.entityType,
+        entityId: validated.entityId,
+        docType: validated.docType,
+        fileUrl: validated.fileUrl,
       },
     });
 

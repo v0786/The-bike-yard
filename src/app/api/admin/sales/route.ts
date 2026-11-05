@@ -2,6 +2,7 @@ import { NextResponse } from 'next/server';
 import { prisma } from '@/lib/prisma';
 import { z } from 'zod';
 import { saleCreateSchema } from '@/lib/validations';
+import { splitGst } from '@/lib/currency';
 import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 
 export const dynamic = 'force-dynamic';
@@ -11,7 +12,7 @@ export async function GET() {
 
   try {
     const sales = await prisma.sale.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { saleDate: 'desc' },
     });
     return NextResponse.json({ data: sales });
   } catch (error: unknown) {
@@ -29,38 +30,45 @@ export async function POST(request: Request) {
     const body = await request.json();
     const validated = saleCreateSchema.parse(body);
 
+    const exShowroomPaise = BigInt(validated.exShowroomPrice);
+
+    const stockUnit = await prisma.stockUnit.findUnique({
+      where: { id: validated.stockUnitId },
+      select: { dealershipId: true },
+    });
+    if (!stockUnit) {
+      return NextResponse.json(
+        { error: { code: 'NOT_FOUND', message: 'Stock unit not found' } },
+        { status: 404 }
+      );
+    }
+
+    const gstSplit = splitGst(exShowroomPaise, validated.gstRate, false);
+    const gstAmountPaise =
+      validated.gstAmount > 0 ? BigInt(validated.gstAmount) : gstSplit.gstAmountPaise;
+    const amountPaidPaise = BigInt(validated.amountPaid);
+    const outstandingPaise = BigInt(validated.outstandingAmount);
+
     const sale = await prisma.sale.create({
       data: {
         saleNumber: validated.saleNumber,
+        dealershipId: stockUnit.dealershipId,
         customerId: validated.customerId,
         stockUnitId: validated.stockUnitId,
-        staffId: validated.staffId || null,
-        bookingId: validated.bookingId || null,
-        exShowroomPrice: validated.exShowroomPrice,
-        onRoadPrice: validated.onRoadPrice,
-        insurancePrice: validated.insurancePrice,
-        rtoCharges: validated.rtoCharges,
-        accessoriesPrice: validated.accessoriesPrice,
-        discount: validated.discount,
-        finalSellingPrice: validated.finalSellingPrice,
-        gstAmount: validated.gstAmount,
-        cgstAmount: BigInt(0),
-        sgstAmount: BigInt(0),
-        igstAmount: BigInt(0),
-        totalAmount: validated.totalAmount,
-        amountPaid: validated.amountPaid,
-        outstandingAmount: validated.outstandingAmount,
-        placeOfSupply: validated.placeOfSupply,
-        hsnCode: validated.hsnCode || null,
-        gstRate: validated.gstRate,
-        status: validated.amountPaid >= validated.totalAmount ? 'paid' : 'pending',
+        exShowroomPaise,
+        gstAmountPaise,
+        cgstPaise: gstSplit.cgstPaise,
+        sgstPaise: gstSplit.sgstPaise,
+        igstPaise: gstSplit.igstPaise,
+        rtoPaise: BigInt(validated.rtoCharges),
+        insurancePaise: BigInt(validated.insurancePrice),
+        accessoriesPaise: BigInt(validated.accessoriesPrice),
+        totalOnRoadPaise: BigInt(validated.totalAmount),
+        advanceCarriedPaise: BigInt(validated.advanceAmount),
+        amountPaidPaise,
+        outstandingPaise,
+        status: amountPaidPaise >= BigInt(validated.totalAmount) ? 'INVOICED' : 'DRAFT',
       },
-    });
-
-    // Mark unit as sold
-    await prisma.stockUnit.update({
-      where: { id: validated.stockUnitId },
-      data: { currentStatus: 'sold' },
     });
 
     return NextResponse.json({ data: sale }, { status: 201 });

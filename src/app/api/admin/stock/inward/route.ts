@@ -7,11 +7,12 @@ const inwardSchema = z.object({
   chassisNumber: z.string().min(1),
   engineNumber: z.string().min(1),
   variantId: z.string().uuid(),
-  colourId: z.string().uuid().optional(),
-  purchasePrice: z.number().int().nonnegative(),
-  purchaseInvoiceNumber: z.string().optional(),
-  supplierName: z.string().optional(),
-  receivedDate: z.string().datetime(),
+  colorName: z.string().min(1),
+  purchasePricePaise: z.number().int().nonnegative(),
+  dealershipId: z.string().uuid().optional(),
+  location: z.string().optional(),
+  notes: z.string().optional(),
+  inwardDate: z.string().datetime(),
 });
 
 export const dynamic = 'force-dynamic';
@@ -28,22 +29,22 @@ export async function POST(request: Request) {
         chassisNumber: validated.chassisNumber,
         engineNumber: validated.engineNumber,
         variantId: validated.variantId,
-        colourId: validated.colourId || null,
-        purchasePrice: validated.purchasePrice,
-        purchaseInvoiceNumber: validated.purchaseInvoiceNumber || null,
-        supplierName: validated.supplierName || null,
-        receivedDate: validated.receivedDate,
-        currentStatus: 'available',
+        colorName: validated.colorName,
+        dealershipId: validated.dealershipId || '00000000-0000-0000-0000-000000000000',
+        purchasePricePaise: validated.purchasePricePaise,
+        status: 'IN_STOCK',
+        inwardDate: validated.inwardDate,
       },
     });
 
     await prisma.stockMovement.create({
       data: {
         stockUnitId: unit.id,
-        type: 'inward',
-        quantity: 1,
-        referenceType: 'inward',
+        type: 'INWARD',
+        fromLoc: '',
+        toLoc: '',
         notes: 'Stock inward',
+        recordedBy: '',
       },
     });
 

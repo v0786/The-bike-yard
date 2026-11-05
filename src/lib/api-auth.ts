@@ -26,7 +26,7 @@ export async function getAuthUser(): Promise<SessionUser | null> {
   return (session?.user as SessionUser) ?? null;
 }
 
-/** Require authentication; return user or throw a 401 response. */
+/** Require authentication; return user or throw a 401 error. */
 export async function requireAuth(): Promise<SessionUser> {
   const user = await getAuthUser();
   if (!user) {
@@ -36,9 +36,9 @@ export async function requireAuth(): Promise<SessionUser> {
 }
 
 /** Require one of the allowed roles; return user or throw 403. */
-export async function requireRole(allowedRoles: Role[]): Promise<SessionUser> {
+export async function requireRole(allowedRoles: Role[] | string[]): Promise<SessionUser> {
   const user = await requireAuth();
-  if (!user.role || !allowedRoles.includes(user.role as Role)) {
+  if (!user.role || !(allowedRoles as string[]).includes(user.role)) {
     throw new AuthError('FORBIDDEN', 'Insufficient permissions for this action', 403);
   }
   return user;
@@ -50,6 +50,7 @@ export class AuthError extends Error {
 
   constructor(code: string, message: string, status: number) {
     super(message);
+    this.name = 'AuthError';
     this.code = code;
     this.status = status;
   }

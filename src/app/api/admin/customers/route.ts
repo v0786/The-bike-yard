@@ -1,8 +1,9 @@
+// Admin route — Manage customers
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import { prisma } from '@/lib/prisma';
+import { z } from 'zod';
 import { customerCreateSchema } from '@/lib/validations';
-import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
+import { requireAuth } from '@/lib/api-auth';
 
 export const dynamic = 'force-dynamic';
 
@@ -32,21 +33,17 @@ export async function POST(request: Request) {
 
     const customer = await prisma.customer.create({
       data: {
-        firstName: validated.firstName,
-        lastName: validated.lastName,
+        fullName: validated.fullName,
         phone: validated.phone,
         email: validated.email || null,
-        address: validated.address || null,
-        city: validated.city || null,
-        state: validated.state || null,
-        pincode: validated.pincode || null,
-        gstin: validated.gstin || null,
-        dealershipId: '00000000-0000-0000-0000-000000000000', // TODO: resolve from auth context
+        addressLine1: validated.address || '',
+        city: validated.city || 'Thane',
+        pincode: validated.pincode || '400601',
       },
     });
 
     return NextResponse.json({ data: customer }, { status: 201 });
-  } catch (error) {
+  } catch (error: unknown) {
     if (error instanceof z.ZodError) {
       return NextResponse.json(
         {

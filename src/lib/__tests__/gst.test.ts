@@ -1,30 +1,32 @@
-import { describe, it, expect, vi, beforeEach, afterEach } from 'vitest';
+import { describe, it, expect } from 'vitest';
 
 // --- GST calculation tests (TESTING.md §2) ---
 import { splitGst, isValidGstRate, toPaise, toRupees, formatInr } from '@/lib/currency';
 
 describe('GST calculation (CGST/SGST/IGST split)', () => {
   it('splits intra-state (MH=27) equally between CGST and SGST', () => {
-    const result = splitGst(1000, '27', 2800);
-    expect(result.cgst).toBe(500);
-    expect(result.sgst).toBe(500);
-    expect(result.igst).toBe(0);
-    expect(result.cgst + result.sgst + result.igst).toBe(1000);
+    const result = splitGst(100000n, 2800, false);
+    expect(result.cgstPaise).toBe(14000n);
+    expect(result.sgstPaise).toBe(14000n);
+    expect(result.igstPaise).toBe(0n);
+    expect(result.totalWithGstPaise).toBe(128000n);
   });
 
   it('assigns all GST to IGST for inter-state', () => {
-    const result = splitGst(1000, '29', 2800);
-    expect(result.cgst).toBe(0);
-    expect(result.sgst).toBe(0);
-    expect(result.igst).toBe(1000);
+    const result = splitGst(100000n, 2800, true);
+    expect(result.cgstPaise).toBe(0n);
+    expect(result.sgstPaise).toBe(0n);
+    expect(result.igstPaise).toBe(28000n);
   });
 
   it('handles odd GST amounts (sum preserved)', () => {
-    const result = splitGst(1001, '27', 2800);
-    expect(result.cgst + result.sgst + result.igst).toBe(1001);
-    expect(result.cgst).toBe(500);
-    expect(result.sgst).toBe(501);
-    expect(result.igst).toBe(0);
+    const result = splitGst(100100n, 2800, false);
+    expect(result.cgstPaise + result.sgstPaise + result.igstPaise).toBe(
+      result.gstAmountPaise,
+    );
+    expect(result.cgstPaise).toBe(14014n);
+    expect(result.sgstPaise).toBe(14014n);
+    expect(result.igstPaise).toBe(0n);
   });
 
   it('valid GST rate in basis points', () => {
@@ -40,8 +42,8 @@ describe('GST calculation (CGST/SGST/IGST split)', () => {
 
 describe('Money handling (integer paise)', () => {
   it('toPaise converts rupees to paise', () => {
-    expect(toPaise(100)).toBe(10000);
-    expect(toPaise(99.99)).toBe(9999);
+    expect(toPaise(100)).toBe(10000n);
+    expect(toPaise(99.99)).toBe(9999n);
   });
   it('toRupees converts paise to rupees', () => {
     expect(toRupees(10000)).toBe(100);

@@ -34,7 +34,7 @@ export default function TestRidesPage() {
 
 async function TestRidesList() {
   const testRides = await prisma.testRide.findMany({
-    include: { lead: { include: { customer: true } }, stockUnit: true },
+    include: { customer: true },
     orderBy: { createdAt: 'desc' },
   });
 
@@ -54,10 +54,10 @@ async function TestRidesList() {
           <tbody>
             {testRides.map((tr) => (
               <tr key={tr.id} className="text-left">
-                <td className="py-4 text-sm">{tr.lead?.customer?.firstName} {tr.lead?.customer?.lastName}</td>
-                <td className="py-4 text-sm text-brand-secondary">{tr.stockUnit?.chassisNumber || 'N/A'}</td>
+                <td className="py-4 text-sm">{tr.customer?.fullName ?? tr.customerName}</td>
+                <td className="py-4 text-sm text-brand-secondary">{tr.bikeModel}</td>
                 <td className="py-4 text-sm"><StatusChip status={tr.status} /></td>
-                <td className="py-4 text-sm text-brand-secondary/60">{new Date(tr.scheduledAt).toLocaleDateString('en-IN')}</td>
+                <td className="py-4 text-sm text-brand-secondary/60">{new Date(tr.preferredDate).toLocaleDateString('en-IN')}</td>
               </tr>
             ))}
             {testRides.length === 0 && (

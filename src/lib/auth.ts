@@ -4,20 +4,14 @@
 // Session strategy: database-backed sessions (AUTH_SECURITY §2, §3).
 // JWT is explicitly NOT used. Sessions are stored in PostgreSQL via the
 // Prisma adapter and validated against the Session table on every request.
-//
-// NextAuth v4 returns a single route-handler function from NextAuth(options),
-// which handles both GET and POST for the App Router route. We expose it as
-// `handlers` (with GET/POST) and re-export `auth`, `signIn`, `signOut` for
-// compatibility with the rest of the codebase.
 
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
-import NextAuth from 'next-auth';
+import NextAuth, { getServerSession, type NextAuthOptions } from 'next-auth';
 import Credentials from 'next-auth/providers/credentials';
-import { JWT } from 'next-auth/jwt';
 import { prisma } from '@/lib/prisma';
 import { compare } from 'bcryptjs';
 
-const nextAuth = NextAuth({
+export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   providers: [
     Credentials({
@@ -33,9 +27,10 @@ const nextAuth = NextAuth({
 
         const user = await prisma.user.findUnique({
           where: { email: credentials.email as string },
+          include: { role: true },
         });
 
-        if (!user || !user.passwordHash || !user.isActive) {
+        if (!user || !user.passwordHash || !user.isActive || user.deletedAt) {
           return null;
         }
 
@@ -44,17 +39,11 @@ const nextAuth = NextAuth({
           return null;
         }
 
-        // Record last login
-        await prisma.user.update({
-          where: { id: user.id },
-          data: { lastLoginAt: new Date() },
-        });
-
         return {
           id: user.id,
           email: user.email,
-          name: user.name ?? `${user.firstName ?? ''} ${user.lastName ?? ''}`.trim(),
-          role: user.roleId,
+          name: user.name,
+          role: user.role.name,
           roleId: user.roleId,
           dealershipId: user.dealershipId,
         };
@@ -70,36 +59,24 @@ const nextAuth = NextAuth({
 
   // Callbacks per AUTH_SECURITY §4
   callbacks: {
-    async jwt({ token, user, account }) {
-      // Initial sign-in: populate token from user account
-      if (user) {
-        token.role = (user as any).role;
-        token.roleId = (user as any).roleId;
-        token.dealershipId = (user as any).dealershipId;
-      }
-      // On subsequent requests, refresh role from DB to reflect deactivation/role changes
-      if (token.sub) {
+    async session({ session, user }) {
+      if (session.user) {
         const dbUser = await prisma.user.findUnique({
-          where: { id: token.sub as string },
+          where: { id: user.id },
+          include: { role: true },
         });
-        if (!dbUser || !dbUser.isActive) {
-          // User deactivated — invalidate token
-          token.role = '';
-          token.roleId = '';
-          token.dealershipId = '';
+
+        if (dbUser && dbUser.isActive && !dbUser.deletedAt) {
+          (session.user as any).id = dbUser.id;
+          (session.user as any).role = dbUser.role.name;
+          (session.user as any).roleId = dbUser.roleId;
+          (session.user as any).dealershipId = dbUser.dealershipId;
         } else {
-          token.role = dbUser.roleId;
-          token.roleId = dbUser.roleId;
-          token.dealershipId = dbUser.dealershipId;
+          // User deactivated or deleted — strip all privileges.
+          (session.user as any).role = '';
+          (session.user as any).roleId = '';
+          (session.user as any).dealershipId = '';
         }
-      }
-      return token as JWT;
-    },
-    async session({ session, token }) {
-      if (token && session.user) {
-        (session.user as any).role = token.role as string;
-        (session.user as any).roleId = token.roleId as string;
-        (session.user as any).dealershipId = token.dealershipId as string;
       }
       return session;
     },
@@ -114,7 +91,9 @@ const nextAuth = NextAuth({
 
   // Debug: enable in development only
   debug: process.env.NODE_ENV === 'development',
-});
+};
+
+const nextAuth = NextAuth(authOptions);
 
 // `handlers` exposes GET/POST route handlers for the App Router route.
 export const handlers = {
@@ -122,9 +101,11 @@ export const handlers = {
   POST: nextAuth,
 };
 
-// Re-exported for compatibility with api-auth and other modules.
-export const auth = nextAuth;
+/** Resolve the current session server-side (database session). */
+export async function auth() {
+  return getServerSession(authOptions);
+}
+
+// Re-exported for compatibility with the rest of the codebase.
 export const signIn = nextAuth;
 export const signOut = nextAuth;
-
-export type { JWT };

@@ -17,10 +17,6 @@ export async function GET() {
 
   try {
     const testRides = await prisma.testRide.findMany({
-      include: {
-        lead: { include: { customer: true } },
-        stockUnit: true,
-      },
       orderBy: { createdAt: 'desc' },
     });
     return NextResponse.json({ data: testRides });
@@ -30,12 +26,7 @@ export async function GET() {
 }
 
 export async function POST(request: Request) {
-  const user = await requireRole([
-    'Super Admin',
-    'Owner',
-    'Manager',
-    'Sales Exec',
-  ]);
+  const user = await requireRole(['Super Admin', 'Owner', 'Manager', 'Sales Exec']);
 
   try {
     const body = await request.json();
@@ -43,15 +34,15 @@ export async function POST(request: Request) {
 
     const testRide = await prisma.testRide.create({
       data: {
-        leadId: validated.leadId,
-        stockUnitId: validated.stockUnitId || null,
-        staffId: user.id as string,
-        scheduledAt: validated.scheduledAt,
-        status: 'scheduled',
-      },
-      include: {
-        lead: { include: { customer: true } },
-        stockUnit: true,
+        customerName: validated.customerName,
+        phone: validated.phone,
+        bikeModel: validated.bikeModel,
+        preferredDate: new Date(validated.preferredDate),
+        preferredTimeSlot: validated.preferredTimeSlot,
+        hasValidLicense: validated.hasValidLicense,
+        ...(validated.assignedStaff ? { assignedStaff: validated.assignedStaff } : {}),
+        status: validated.status,
+        ...(validated.customerId ? { customerId: validated.customerId } : {}),
       },
     });
 

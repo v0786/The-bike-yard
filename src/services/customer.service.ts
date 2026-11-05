@@ -1,49 +1,45 @@
 // Customer service — CRM customer management.
+// Uses new schema: fullName instead of firstName/lastName.
 
 import { prisma } from '@/lib/prisma';
+import type { Prisma } from '@prisma/client';
 
 export async function createCustomer(data: {
-  firstName: string;
-  lastName: string;
+  fullName: string;
   phone: string;
   email?: string | null;
-  address?: string | null;
+  addressLine1?: string | null;
   city?: string | null;
-  state?: string | null;
   pincode?: string | null;
-  gstin?: string | null;
-  dealershipId: string;
+  panNumber?: string | null;
+  aadhaarNumber?: string | null;
 }) {
   return prisma.customer.create({
     data: {
-      firstName: data.firstName,
-      lastName: data.lastName,
+      fullName: data.fullName,
       phone: data.phone,
-      email: data.email || null,
-      address: data.address || null,
-      city: data.city || null,
-      state: data.state || null,
-      pincode: data.pincode || null,
-      gstin: data.gstin || null,
-      dealershipId: data.dealershipId,
+      email: data.email ?? null,
+      addressLine1: data.addressLine1 ?? '',
+      city: data.city ?? 'Thane',
+      pincode: data.pincode ?? '400601',
+      panNumber: data.panNumber ?? null,
+      aadhaarNumber: data.aadhaarNumber ?? null,
     },
   });
 }
 
-export async function getCustomers(filters?: { dealershipId?: string; search?: string }) {
+export async function getCustomers(filters?: { search?: string }) {
+  const where: Prisma.CustomerWhereInput = { deletedAt: null };
+  if (filters?.search) {
+    where.OR = [
+      { fullName: { contains: filters.search, mode: 'insensitive' } },
+      { phone: { contains: filters.search } },
+      { email: { contains: filters.search, mode: 'insensitive' } },
+    ];
+  }
+
   return prisma.customer.findMany({
-    where: {
-      ...(filters?.search
-        ? {
-            OR: [
-              { firstName: { contains: filters.search, mode: 'insensitive' } },
-              { lastName: { contains: filters.search, mode: 'insensitive' } },
-              { phone: { contains: filters.search } },
-              { email: { contains: filters.search, mode: 'insensitive' } },
-            ],
-          }
-        : {}),
-    },
+    where,
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -53,9 +49,13 @@ export async function getCustomerById(id: string) {
     where: { id },
     include: {
       leads: true,
-      bookings: { include: { stockUnit: true } },
+      bookings: true,
       sales: true,
-      serviceRequests: true,
+      testRides: true,
+      financeApps: true,
+      insuranceApps: true,
+      rtoApps: true,
+      services: true,
     },
   });
 }
@@ -63,15 +63,14 @@ export async function getCustomerById(id: string) {
 export async function updateCustomer(
   id: string,
   data: Partial<{
-    firstName: string;
-    lastName: string;
+    fullName: string;
     phone: string;
     email: string | null;
-    address: string | null;
-    city: string | null;
-    state: string | null;
-    pincode: string | null;
-    gstin: string | null;
+    addressLine1: string;
+    city: string;
+    pincode: string;
+    panNumber: string | null;
+    aadhaarNumber: string | null;
   }>
 ) {
   return prisma.customer.update({

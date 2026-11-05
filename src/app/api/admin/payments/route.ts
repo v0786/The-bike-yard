@@ -11,7 +11,7 @@ export async function GET() {
 
   try {
     const payments = await prisma.payment.findMany({
-      orderBy: { createdAt: 'desc' },
+      orderBy: { paymentDate: 'desc' },
     });
     return NextResponse.json({ data: payments });
   } catch (error: unknown) {
@@ -31,26 +31,14 @@ export async function POST(request: Request) {
 
     const payment = await prisma.payment.create({
       data: {
-        paymentNumber: validated.paymentNumber,
-        customerId: validated.customerId,
+        receiptNumber: validated.receiptNumber,
         saleId: validated.saleId || null,
         bookingId: validated.bookingId || null,
-        amount: validated.amount,
-        method: validated.method,
-        referenceId: validated.referenceId || null,
-        status: 'completed',
-        paidAt: new Date(),
-        notes: validated.notes || null,
-      },
-    });
-
-    // Create allocation
-    await prisma.paymentAllocation.create({
-      data: {
-        paymentId: payment.id,
-        saleId: validated.saleId || null,
-        bookingId: validated.bookingId || null,
-        amount: validated.amount,
+        amountPaise: BigInt(validated.amountPaise),
+        mode: validated.mode,
+        transactionRef: validated.transactionRef || null,
+        receivedBy: validated.receivedBy,
+        status: 'SUCCESS',
       },
     });
 

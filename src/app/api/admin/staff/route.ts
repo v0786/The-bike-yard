@@ -6,8 +6,7 @@ import { requireAuth, requireRole, authErrorResponse } from '@/lib/api-auth';
 const staffCreateSchema = z.object({
   email: z.string().email('Invalid email address'),
   password: z.string().min(8, 'Password must be at least 8 characters'),
-  firstName: z.string().min(1, 'First name is required'),
-  lastName: z.string().min(1, 'Last name is required'),
+  fullName: z.string().min(1, 'Full name is required'),
   phone: z.string().optional(),
   roleId: z.string().uuid('Invalid role ID'),
 });
@@ -38,8 +37,8 @@ export async function POST(request: Request) {
     // Only Super Admin/Owner can create Owner/Super Admin roles
     if (
       (validated.roleId === 'super-admin' || validated.roleId === 'owner') &&
-      user.role !== 'Super Admin' &&
-      user.role !== 'Owner'
+      (user as any).role !== 'Super Admin' &&
+      (user as any).role !== 'Owner'
     ) {
       return NextResponse.json(
         { error: { code: 'FORBIDDEN', message: 'Only Super Admin or Owner can create privileged roles' } },
@@ -54,11 +53,10 @@ export async function POST(request: Request) {
       data: {
         email: validated.email,
         passwordHash,
-        firstName: validated.firstName,
-        lastName: validated.lastName,
+        name: validated.fullName,
         phone: validated.phone || null,
         roleId: validated.roleId,
-        dealershipId: user.dealershipId || null,
+        dealershipId: (user as any).dealershipId || null,
         isActive: true,
       },
     });

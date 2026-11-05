@@ -22,7 +22,7 @@ export async function GET(request: Request) {
       where: { id },
     });
 
-    if (!document) {
+    if (!document || document.deletedAt) {
       return NextResponse.json(
         { error: { code: 'NOT_FOUND', message: 'Document not found' } },
         { status: 404 }
@@ -33,10 +33,11 @@ export async function GET(request: Request) {
     return NextResponse.json({
       data: {
         id: document.id,
-        fileName: document.fileName,
-        mimeType: document.mimeType,
-        sizeBytes: document.sizeBytes,
-        accessLevel: document.accessLevel,
+        entityType: document.entityType,
+        entityId: document.entityId,
+        docType: document.docType,
+        fileUrl: document.fileUrl,
+        uploadedAt: document.uploadedAt,
         signedUrl: `/api/download/document/${id}`, // placeholder
       },
     });

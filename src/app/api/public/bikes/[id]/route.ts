@@ -33,12 +33,12 @@ export async function GET(request: Request) {
       data: {
         id: unit.id,
         variantId: unit.variantId,
-        colourId: unit.colourId,
+        colorName: unit.colorName,
         chassisNumber: unit.chassisNumber,
         engineNumber: unit.engineNumber,
-        exShowroomPrice: unit.purchasePrice,
-        onRoadPrice: unit.purchasePrice,
-        availabilityStatus: unit.currentStatus,
+        exShowroomPrice: unit.purchasePricePaise,
+        onRoadPrice: unit.purchasePricePaise,
+        availabilityStatus: unit.status,
       },
     });
   } catch (error: unknown) {

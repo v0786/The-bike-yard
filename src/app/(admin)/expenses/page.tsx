@@ -34,9 +34,9 @@ export default function ExpensesPage() {
 
 async function ExpensesList() {
   const expenses = await prisma.expense.findMany({
-    orderBy: { date: 'desc' },
+    orderBy: { paymentDate: 'desc' },
   });
-  const total = expenses.reduce((sum, e) => sum + Number(e.amount), 0);
+  const total = expenses.reduce((sum, e) => sum + e.amountPaise, 0n);
 
   return (
     <div className="space-y-6">
@@ -56,6 +56,7 @@ async function ExpensesList() {
                 <th className="text-left text-sm font-medium text-brand-primary pb-3">Category</th>
                 <th className="text-left text-sm font-medium text-brand-primary pb-3">Description</th>
                 <th className="text-right text-sm font-medium text-brand-primary pb-3">Amount</th>
+                <th className="text-left text-sm font-medium text-brand-primary pb-3">Paid To</th>
                 <th className="text-left text-sm font-medium text-brand-primary pb-3">Date</th>
               </tr>
             </thead>
@@ -64,13 +65,14 @@ async function ExpensesList() {
                 <tr key={e.id} className="text-left">
                   <td className="py-4 text-sm">{e.category}</td>
                   <td className="py-4 text-sm text-brand-secondary">{e.description || '-'}</td>
-                  <td className="py-4 text-sm text-right">{formatInr(Number(e.amount))}</td>
-                  <td className="py-4 text-sm text-brand-secondary/60">{new Date(e.date).toLocaleDateString('en-IN')}</td>
+                  <td className="py-4 text-sm text-right">{formatInr(e.amountPaise)}</td>
+                  <td className="py-4 text-sm text-brand-secondary">{e.paidTo}</td>
+                  <td className="py-4 text-sm text-brand-secondary/60">{new Date(e.paymentDate).toLocaleDateString('en-IN')}</td>
                 </tr>
               ))}
               {expenses.length === 0 && (
                 <tr>
-                  <td colSpan={4} className="py-8 text-center text-brand-secondary/60">No expenses found.</td>
+                  <td colSpan={5} className="py-8 text-center text-brand-secondary/60">No expenses found.</td>
                 </tr>
               )}
             </tbody>

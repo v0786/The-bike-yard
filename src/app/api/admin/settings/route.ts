@@ -23,7 +23,7 @@ export async function GET() {
   const user = await requireRole(['Super Admin', 'Owner']);
 
   try {
-    const dealershipId = user.dealershipId || '00000000-0000-0000-0000-000000000000';
+    const dealershipId = (user as any).dealershipId || '00000000-0000-0000-0000-000000000000';
     const settings = await prisma.settings.findFirst({
       where: { dealershipId },
     });
@@ -40,7 +40,7 @@ export async function PUT(request: Request) {
     const body = await request.json();
     const validated = settingsUpdateSchema.parse(body);
 
-    const dealershipId = user.dealershipId || '00000000-0000-0000-0000-000000000000';
+    const dealershipId = (user as any).dealershipId || '00000000-0000-0000-0000-000000000000';
 
     const settings = await prisma.settings.upsert({
       where: { id: dealershipId },

@@ -9,7 +9,6 @@ export async function GET() {
 
   try {
     const social = await prisma.socialLink.findMany({
-      where: { isActive: true },
       orderBy: { platform: 'asc' },
     });
     return NextResponse.json({ data: social });

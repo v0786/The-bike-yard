@@ -1,42 +1,41 @@
 // Insurance service — insurance applications.
+// Uses new schema: premiumPaise instead of premiumAmount, bikeModel required.
 
 import { prisma } from '@/lib/prisma';
 import type { Prisma } from '@prisma/client';
 
 export async function createInsuranceApplication(data: {
   customerId: string;
-  saleId?: string | null;
+  bikeModel: string;
   provider?: string | null;
   policyType?: string | null;
-  premium?: number | null;
+  zeroDepIncluded?: boolean;
+  premiumPaise: number | bigint;
 }) {
   return prisma.insuranceApplication.create({
     data: {
-      applicationNumber: `INS-${Date.now()}`,
       customerId: data.customerId,
-      saleId: data.saleId || null,
-      provider: data.provider || null,
-      policyType: data.policyType || null,
-      premiumAmount: data.premium ? BigInt(data.premium) : null,
-      status: 'submitted',
-      documentsSubmitted: false,
+      bikeModel: data.bikeModel,
+      ...(data.provider ? { provider: data.provider } : {}),
+      ...(data.policyType ? { policyType: data.policyType } : {}),
+      zeroDepIncluded: data.zeroDepIncluded ?? true,
+      premiumPaise: BigInt(data.premiumPaise),
+      status: 'SUBMITTED',
     },
   });
 }
 
 export async function getInsuranceApplications(filters?: {
   customerId?: string;
-  saleId?: string;
   status?: string;
 }) {
-  const where: Record<string, unknown> = {};
+  const where: Prisma.InsuranceApplicationWhereInput = {};
   if (filters?.customerId) where.customerId = filters.customerId;
-  if (filters?.saleId) where.saleId = filters.saleId;
   if (filters?.status) where.status = filters.status;
 
   return prisma.insuranceApplication.findMany({
-    where: where as Prisma.InsuranceApplicationWhereInput,
-    include: { customer: true, sale: true },
+    where,
+    include: { customer: true },
     orderBy: { createdAt: 'desc' },
   });
 }
@@ -44,18 +43,19 @@ export async function getInsuranceApplications(filters?: {
 export async function updateInsuranceApplication(
   id: string,
   data: Partial<{
-    provider: string | null;
-    policyType: string | null;
-    premium: number | null;
-    policyNumber: string | null;
-    expiryDate: Date | null;
+    provider: string;
+    policyType: string;
+    zeroDepIncluded: boolean;
+    premiumPaise: number | bigint;
     status: string;
-    documentsSubmitted: boolean;
   }>
 ) {
+  const update: Prisma.InsuranceApplicationUncheckedUpdateInput = { ...data };
+  if (data.premiumPaise !== undefined) update.premiumPaise = BigInt(data.premiumPaise);
+
   return prisma.insuranceApplication.update({
     where: { id },
-    data,
-    include: { customer: true, sale: true },
+    data: update,
+    include: { customer: true },
   });
 }

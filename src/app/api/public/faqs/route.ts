@@ -9,8 +9,7 @@ export async function GET() {
 
   try {
     const faqs = await prisma.faq.findMany({
-      where: { isActive: true },
-      orderBy: { order: 'asc' },
+      orderBy: { sortOrder: 'asc' },
     });
     return NextResponse.json({ data: faqs });
   } catch (error: unknown) {

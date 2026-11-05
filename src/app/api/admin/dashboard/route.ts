@@ -11,17 +11,17 @@ export async function GET() {
     const [totalSales, totalRevenue, pendingBookings, availableStock, soldStock, pendingPayments] =
       await Promise.all([
         prisma.sale.count(),
-        prisma.sale.aggregate({ _sum: { finalSellingPrice: true } }),
-        prisma.booking.count({ where: { advanceStatus: 'pending' } }),
-        prisma.stockUnit.count({ where: { currentStatus: 'available' } }),
-        prisma.stockUnit.count({ where: { currentStatus: 'sold' } }),
-        prisma.payment.count({ where: { status: 'pending' } }),
+        prisma.sale.aggregate({ _sum: { totalOnRoadPaise: true } }),
+        prisma.booking.count({ where: { status: 'ACTIVE' } }),
+        prisma.stockUnit.count({ where: { status: 'IN_STOCK' } }),
+        prisma.stockUnit.count({ where: { status: 'SOLD' } }),
+        prisma.payment.count({ where: { status: 'PENDING' } }),
       ]);
 
     return NextResponse.json({
       data: {
         totalSales,
-        totalRevenue: totalRevenue._sum.finalSellingPrice || 0,
+        totalRevenue: totalRevenue._sum.totalOnRoadPaise || 0n,
         pendingBookings,
         availableStock,
         soldStock,

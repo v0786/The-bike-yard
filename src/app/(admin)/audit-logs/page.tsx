@@ -33,7 +33,7 @@ export default function AuditLogsPage() {
 
 async function AuditLogsList() {
   const logs = await prisma.auditLog.findMany({
-    include: { user: { select: { email: true, firstName: true, lastName: true } } },
+    include: { user: { select: { name: true, email: true } } },
     orderBy: { timestamp: 'desc' },
     take: 50,
   });
@@ -47,16 +47,18 @@ async function AuditLogsList() {
             <tr className="border-b border-brand-secondary">
               <th className="text-left text-sm font-medium text-brand-primary pb-3">User</th>
               <th className="text-left text-sm font-medium text-brand-primary pb-3">Action</th>
-              <th className="text-left text-sm font-medium text-brand-primary pb-3">Entity Type</th>
+              <th className="text-left text-sm font-medium text-brand-primary pb-3">Details</th>
               <th className="text-left text-sm font-medium text-brand-primary pb-3">Time</th>
             </tr>
           </thead>
           <tbody>
             {logs.map((log) => (
               <tr key={log.id} className="text-left">
-                <td className="py-4 text-sm">{log.user?.firstName} {log.user?.lastName} ({log.user?.email})</td>
+                <td className="py-4 text-sm">
+                  {log.user?.name ?? log.performedBy} {log.user?.email ? `(${log.user.email})` : ''}
+                </td>
                 <td className="py-4 text-sm text-brand-secondary">{log.action}</td>
-                <td className="py-4 text-sm text-brand-secondary">{log.entityType}</td>
+                <td className="py-4 text-sm text-brand-secondary">{log.details}</td>
                 <td className="py-4 text-sm text-brand-secondary/60">{new Date(log.timestamp).toLocaleString('en-IN')}</td>
               </tr>
             ))}

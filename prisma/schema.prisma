@@ -1,9 +1,8 @@
-// Generated from DATABASE.md v1.1 — do not edit manually without updating docs
-// This is the source-of-truth data model for The Bike Yard dealership management platform.
+// The Bike Yard — Motorcycle Dealership & Digital Showroom
+// Database Schema with ~50 models adhering strictly to BigInt paise and PostgreSQL standards
 
 generator client {
   provider = "prisma-client-js"
-  // NOTE: Run `prisma generate` after saving this file to rebuild @prisma/client
 }
 
 datasource db {
@@ -11,934 +10,746 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-// -------------------
-// Enums
-// -------------------
-
-enum StockUnitStatus {
-  available
-  reserved
-  sold
-  delivered
-}
-
-enum ReservationStatus {
-  active
-  released
-  expired
-  converted
-}
-
-enum StockMovementType {
-  inward
-  reservation
-  release
-  sale
-  return
-  adjustment
-  delivery
-}
-
-enum LeadStatus {
-  new
-  contacted
-  qualified
-  lost
-}
-
-enum BookingStatus {
-  pending
-  confirmed
-  delivered
-  cancelled
-}
-
-enum SaleStatus {
-  pending
-  partial
-  paid
-  delivered
-  cancelled
-}
-
-enum PaymentStatus {
-  pending
-  completed
-  failed
-  refunded
-}
-
-enum RefundStatus {
-  pending
-  approved
-  completed
-  rejected
-}
-
-enum DocumentAccessLevel {
-  restricted
-  finance
-  rto
-  insurance
-  admin_only
-}
-
-enum DocumentType {
-  customer_id
-  finance
-  insurance
-  rto
-  invoice
-  receipt
-  other
-}
-
-enum RequestType {
-  service
-  complaint
-  document
-  enquiry
-  other
-}
-
-enum StaffTaskStatus {
-  open
-  in_progress
-  completed
-  overdue
-}
-
-enum PaymentAllocationTarget {
-  sale
-  booking
-}
-
-// -------------------
-// Core Models
-// -------------------
+// -----------------------------------------------------------------------------
+// CORE & TENANCY
+// -----------------------------------------------------------------------------
 
 model Dealership {
-  id          String @id @default(uuid()) @db.Uuid
-  name        String
-  address     String?
-  gstin       String?
-  phone       String?
-  email       String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  roles      Role[]
-  users      User[] @relation("UserDealership")
-  settings   Settings[]
-  customers  Customer[]
+  id             String    @id @default(uuid()) @db.Uuid
+  code           String    @unique @db.VarChar(20)
+  name           String    @db.VarChar(120)
+  tagline        String?   @db.VarChar(255)
+  addressLine1   String    @db.VarChar(255)
+  addressLine2   String?   @db.VarChar(255)
+  city           String    @default("Thane") @db.VarChar(80)
+  state          String    @default("Maharashtra") @db.VarChar(80)
+  pincode        String    @db.VarChar(10)
+  stateCode      String    @default("27") @db.VarChar(2)
+  gstin          String    @unique @db.VarChar(15)
+  panNumber      String?   @db.VarChar(10)
+  rtoCode        String    @default("MH-04") @db.VarChar(10)
+  phone          String    @db.VarChar(20)
+  email          String    @db.VarChar(120)
+  invoicePrefix  String    @default("TBY-INV-2026-") @db.VarChar(30)
+  bookingPrefix  String    @default("TBY-BK-2026-") @db.VarChar(30)
+  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+
+  users          User[]
+  stockUnits     StockUnit[]
+  bookings       Booking[]
+  sales          Sale[]
+  invoices       Invoice[]
+  settings       Settings[]
+  expenses       Expense[]
+
+  @@map("dealerships")
 }
 
 model User {
   id            String    @id @default(uuid()) @db.Uuid
-  name          String?
-  email         String?   @unique
-  emailVerified DateTime?
-  image         String?
-  passwordHash  String
-  firstName     String
-  lastName      String
-  phone         String?
-  roleId        String   @db.Uuid
-  dealershipId  String?  @db.Uuid
-  isActive      Boolean  @default(true)
-  lastLoginAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  deletedAt     DateTime?
+  dealershipId  String    @db.Uuid
+  name          String    @db.VarChar(120)
+  email         String    @unique @db.VarChar(150)
+  emailVerified DateTime? @db.Timestamptz(6)
+  passwordHash  String?   @db.VarChar(255)
+  phone         String?   @db.VarChar(20)
+  image         String?   @db.VarChar(255)
+  roleId        String    @db.Uuid
+  isActive      Boolean   @default(true)
+  deletedAt     DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @db.Timestamptz(6)
 
-  user           Role     @relation("UserRole", fields: [roleId], references: [id])
-  dealership     Dealership? @relation("UserDealership", fields: [dealershipId], references: [id], onDelete: SetNull)
+  dealership    Dealership @relation(fields: [dealershipId], references: [id])
+  role          Role       @relation(fields: [roleId], references: [id])
+  sessions      Session[]
+  accounts      Account[]
+  auditLogs     AuditLog[]
+  tasksAssigned StaffTask[] @relation("AssignedTasks")
 
-  auditLogs      AuditLog[] @relation("UserAuditLogs")
-  staffTasks     StaffTask[] @relation("UserStaffTasks")
-  serviceRequests ServiceRequest[] @relation("UserServiceRequests")
-  sessions       Session[] @relation("SessionUser")
-  accounts       Account[]
-  notifications  Notification[] @relation("UserNotifications")
-  createdTasks   StaffTask[] @relation("UserCreatedTasks")
-  staffSales     Sale[] @relation("StaffSales")
-  refundsRequested Refund[] @relation("RefundRequestedBy")
-  refundsApproved Refund[] @relation("RefundApprovedBy")
+  @@index([dealershipId])
+  @@index([roleId])
+  @@map("users")
 }
-
-model StaffTask {
-  id            String   @id @default(uuid()) @db.Uuid
-  title         String
-  description   String?
-  assignedTo    String   @db.Uuid
-  creator       String   @db.Uuid
-  assignedToUser User     @relation("UserStaffTasks", fields: [assignedTo], references: [id], onDelete: Cascade)
-  creatorUser   User     @relation("UserCreatedTasks", fields: [creator], references: [id], onDelete: SetNull)
-  status        StaffTaskStatus @default(open)
-  priority      String   @default("normal")
-  dueDate       DateTime?
-  completedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-}
-
-model AuditLog {
-  id            String @id @default(uuid()) @db.Uuid
-  entityType    String
-  entityId      String @db.Uuid
-  action        String
-  oldValues     Json?
-  newValues     Json?
-  userId   String @db.Uuid
-  user     User   @relation("UserAuditLogs", fields: [userId], references: [id], onDelete: SetNull)
-  ipAddress     String?
-  timestamp     DateTime @default(now())
-}
-
-// -------------------
-// Catalogue Models
-// -------------------
-
-model Brand {
-  id          String @id @default(uuid()) @db.Uuid
-  name        String @unique
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  variants    Variant[] @relation("BrandVariants")
-}
-
-model Model {
-  id          String @id @default(uuid()) @db.Uuid
-  brandId     String @db.Uuid
-  name        String
-  description String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-
-  @@unique([brandId, name])
-  variants Variant[] @relation("ModelVariants")
-}
-
-model Variant {
-  id              String @id @default(uuid()) @db.Uuid
-  modelId         String @db.Uuid
-  colourId        String @db.Uuid
-  engineCC        Int?
-  mileage         String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  brandId         String @db.Uuid
-
-  @@unique([modelId, engineCC])
-  stockUnits StockUnit[]
-  model   Model   @relation("ModelVariants", fields: [modelId], references: [id])
-  brand   Brand   @relation("BrandVariants", fields: [brandId], references: [id])
-}
-
-model Colour {
-  id          String @id @default(uuid()) @db.Uuid
-  name        String @unique
-  hexCode     String?
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
-  stockUnits StockUnit[]
-}
-
-// -------------------
-// Stock Unit (physical motorcycle)
-// -------------------
-
-model StockUnit {
-  id               String @id @default(uuid()) @db.Uuid
-  chassisNumber    String @unique
-  engineNumber     String @unique
-  variantId        String @db.Uuid
-  colourId         String? @db.Uuid
-  dealershipId     String? @db.Uuid
-  purchasePrice    BigInt
-  purchaseInvoiceNumber String?
-  supplierName     String?
-  receivedDate     DateTime?
-  currentStatus    StockUnitStatus @default(available)
-  location         String?
-  notes            String?
-  createdAt        DateTime @default(now())
-  updatedAt        DateTime @updatedAt
-  testRides  TestRide[]
-  variant   Variant   @relation(fields: [variantId], references: [id])
-  colour    Colour?   @relation(fields: [colourId], references: [id])
-  sales       Sale[]      @relation("StockUnitSales")
-  movements StockMovement[] @relation("StockUnitMovements")
-  reservations Reservation[] @relation("StockUnitReservations")
-  bookings Booking[] @relation("StockUnitBookings")
-}
-
-// -------------------
-// Reservation / Booking
-// -------------------
-
-model Reservation {
-  id           String @id @default(uuid()) @db.Uuid
-  stockUnitId  String @db.Uuid
-  customerId   String @db.Uuid
-  bookingId    String? @db.Uuid
-  reservedAt   DateTime @default(now())
-  expiresAt    DateTime?
-  releasedAt   DateTime?
-  status       ReservationStatus @default(active)
-
-  stockUnit    StockUnit   @relation("StockUnitReservations", fields: [stockUnitId], references: [id])
-
-  @@index([stockUnitId, status], name: "reservation_active_unit_idx")
-}
-
-// -------------------
-// Booking (advance payment record)
-// -------------------
-
-model Booking {
-  id            String @id @default(uuid()) @db.Uuid
-  customer   Customer? @relation("CustomerBookings", fields: [customerId], references: [id])
-  customerId   String @db.Uuid
-  stockUnitId   String? @db.Uuid
-  bookingNumber String @unique
-  advanceAmount BigInt
-  advanceStatus String   @default("pending") // pending/confirmed/delivered/cancelled
-  confirmedAt   DateTime?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([stockUnitId])
-  stockUnit   StockUnit? @relation("StockUnitBookings", fields: [stockUnitId], references: [id])
-  payments    Payment[]  @relation("BookingPayments")
-  sales       Sale[]     @relation("SaleBooking")
-}
-
-// -------------------
-// Sale
-// -------------------
-
-model Sale {
-  id            String @id @default(uuid()) @db.Uuid
-  customer   Customer? @relation("CustomerSales", fields: [customerId], references: [id])
-  customerId   String @db.Uuid
-  stockUnitId   String @db.Uuid
-  bookingId     String? @db.Uuid
-  booking       Booking?   @relation("SaleBooking", fields: [bookingId], references: [id])
-  saleNumber    String @unique
-  exShowroomPrice BigInt
-  onRoadPrice   BigInt
-  insurancePrice BigInt   @default(0)
-  rtoCharges     BigInt   @default(0)
-  accessoriesPrice BigInt @default(0)
-  discount      BigInt   @default(0)
-  finalSellingPrice BigInt
-  gstAmount     BigInt
-  cgstAmount    BigInt
-  sgstAmount    BigInt
-  igstAmount    BigInt
-  totalAmount   BigInt
-  amountPaid    BigInt   @default(0)
-  outstandingAmount BigInt
-  placeOfSupply String?
-  hsnCode       String?
-  gstRate       Int      // basis points (e.g. 2800 = 28.00%)
-  status        SaleStatus @default(pending)
-  deliveryDate  DateTime?
-  staffId       String?   @db.Uuid
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([stockUnitId])
-  stockUnit   StockUnit   @relation("StockUnitSales", fields: [stockUnitId], references: [id])
-  staff       User?       @relation("StaffSales", fields: [staffId], references: [id])
-  payments    Payment[]   @relation("SalePayments")
-  invoice     Invoice[]   @relation("SaleInvoice")
-  financeApplications FinanceApplication[] @relation("SaleFinanceApplications")
-  insuranceApplications InsuranceApplication[] @relation("SaleInsuranceApplications")
-  rtoApplications RTOApplication[] @relation("SaleRTOApplications")
-}
-
-// -------------------
-// Payment
-// -------------------
-
-model Payment {
-  id            String @id @default(uuid()) @db.Uuid
-  paymentNumber String?
-  customerId    String @db.Uuid
-  saleId        String? @db.Uuid
-  bookingId     String? @db.Uuid
-  amount        BigInt
-  method        String   // cash, upi, qr, bank, card, finance, partial
-  referenceId   String?
-  notes         String?
-  status        PaymentStatus @default(pending)
-  paidAt        DateTime?
-  recordedAt    DateTime @default(now())
-  recordedById  String? @db.Uuid
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-
-  @@index([saleId])
-  @@index([bookingId])
-  @@index([customerId])
-  customer   Customer   @relation("CustomerPayments", fields: [customerId], references: [id])
-  sale       Sale?      @relation("SalePayments", fields: [saleId], references: [id])
-  booking    Booking?   @relation("BookingPayments", fields: [bookingId], references: [id])
-  allocations PaymentAllocation[] @relation("PaymentAllocations")
-  refunds    Refund[]    @relation("RefundPayments")
-}
-
-// -------------------
-// Payment Allocation (maps payment to sale or booking)
-// -------------------
-
-model PaymentAllocation {
-  id            String @id @default(uuid()) @db.Uuid
-  paymentId     String @db.Uuid
-  saleId        String? @db.Uuid
-  bookingId     String? @db.Uuid
-  amount        BigInt
-  allocatedAt   DateTime @default(now())
-
-  payment       Payment   @relation("PaymentAllocations", fields: [paymentId], references: [id])
-
-  @@unique([paymentId])
-  @@index([paymentId])
-  @@index([saleId])
-  @@index([bookingId])
-
-  // Exactly one of saleId or bookingId must be set
-  // Enforced by: CHECK ((saleId IS NOT NULL) <> (bookingId IS NOT NULL))
-}
-
-// -------------------
-// Invoice
-// -------------------
-
-model Invoice {
-  id            String @id @default(uuid()) @db.Uuid
-  invoiceNumber String @unique
-  saleId        String @db.Uuid
-  type          String   // tax_invoice/sales_invoice
-  subtotal      BigInt   // taxable value excluding GST
-  gstAmount     BigInt   // total GST = cgst + sgst + igst
-  cgstAmount    BigInt
-  sgstAmount    BigInt
-  igstAmount    BigInt
-  total         BigInt   // subtotal + gstAmount
-  gstRate       Int      // basis points at issue
-  placeOfSupply String? // State code/name
-  hsnCode       String?  // HSN/SAC code; owner/tax advisor to confirm
-  gstin         String?  // Dealership GSTIN snapshot
-  customerGstin String? // Customer GSTIN (if B2B)
-  issuedAt      DateTime @default(now())
-  dueDate       DateTime?
-  status        String   // issued/paid/void
-  pdfUrl        String?
-  createdBy     String @db.Uuid
-
-  sale          Sale     @relation("SaleInvoice", fields: [saleId], references: [id])
-
-  @@index([saleId])
-  @@index([status])
-
-  // Tax split rule: intra-state → cgst = sgst = gst/2, igst = 0
-  //               inter-state → igst = gst, cgst = sgst = 0
-  // Enforced by: CHECK (gstAmount = cgstAmount + sgstAmount + igstAmount)
-}
-
-// -------------------
-// Refund
-// -------------------
-
-model Refund {
-  id            String @id @default(uuid()) @db.Uuid
-  refundNumber  String @unique
-  paymentId     String @db.Uuid
-  saleId        String? @db.Uuid
-  bookingId     String? @db.Uuid
-  amount        BigInt   // must not exceed unrefunded payment amount
-  reason        String   // required free-text reason
-  status        RefundStatus @default(pending) // pending/approved/completed/rejected
-  requestedBy   String @db.Uuid
-  approvedBy    String? @db.Uuid
-  processedAt   DateTime?
-  createdAt     DateTime @default(now())
-
-  payment       Payment   @relation("RefundPayments", fields: [paymentId], references: [id])
-  requestedByUser User   @relation("RefundRequestedBy", fields: [requestedBy], references: [id])
-  approvedByUser  User?   @relation("RefundApprovedBy", fields: [approvedBy], references: [id])
-
-  @@index([paymentId])
-  @@index([status])
-
-  // Lifecycle: pending → approved → completed, or pending → rejected
-  // Only an approved refund may be completed
-  // Requester cannot self-approve: enforced by APP logic (approvedBy ≠ requestedBy where policy requires)
-}
-
-// -------------------
-// Service Request
-// -------------------
-
-model ServiceRequest {
-  id              String @id @default(uuid()) @db.Uuid
-  requestNumber String @unique
-  customer   Customer? @relation("CustomerServiceRequests", fields: [customerId], references: [id])
-  customerId   String @db.Uuid
-  saleId          String? @db.Uuid // null for walk-in/non-sale
-  stockUnitId     String? @db.Uuid
-  requestType     RequestType
-  description     String
-  assignedTo      String? @db.Uuid
-  assignedToUser  User?   @relation("UserServiceRequests", fields: [assignedTo], references: [id], onDelete: SetNull)
-  status          String   @default("open") // open/acknowledged/in_progress/resolved/closed/cancelled
-  priority        String   @default("normal") // low/normal/high/urgent
-  resolvedAt      DateTime?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
-  deletedAt       DateTime?
-
-  @@index([customerId])
-  @@index([status])
-  @@index([assignedTo])
-}
-
-// -------------------
-// Finance Application
-// -------------------
-
-model FinanceApplication {
-  id              String @id @default(uuid()) @db.Uuid
-  applicationNumber String @unique
-  customerId        String @db.Uuid
-  saleId            String? @db.Uuid
-  financeType       String   // loan/lease/other
-  amountRequested   BigInt
-  interestRate      Int      // basis points
-  tenureMonths      Int
-  emiAmount         BigInt   @default(0)
-  documentsSubmitted Boolean @default(false)
-  status            String   @default("submitted") // submitted/under_review/approved/disbursed/rejected
-  quotedPremium     BigInt?
-  boundAt           DateTime?
-  disbursedAt       DateTime?
-  rejectedReason    String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([status])
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  sale       Sale?      @relation("SaleFinanceApplications", fields: [saleId], references: [id])
-}
-
-// -------------------
-// Insurance Application
-// -------------------
-
-model InsuranceApplication {
-  id              String @id @default(uuid()) @db.Uuid
-  applicationNumber String @unique
-  customerId        String @db.Uuid
-  saleId            String? @db.Uuid
-  provider          String?
-  policyType        String?
-  premiumAmount     BigInt?
-  policyExpiry      DateTime?
-  policyNumber      String?
-  status            String   @default("submitted") // submitted/quoted/bound/expired/cancelled
-  documentsSubmitted Boolean @default(false)
-  quotedAt          DateTime?
-  boundAt           DateTime?
-  expiredAt         DateTime?
-  cancelledAt       DateTime?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([status])
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  sale       Sale?      @relation("SaleInsuranceApplications", fields: [saleId], references: [id])
-}
-
-// -------------------
-// RTO Application
-// -------------------
-
-model RTOApplication {
-  id              String @id @default(uuid()) @db.Uuid
-  applicationNumber String @unique
-  customerId        String @db.Uuid
-  saleId            String? @db.Uuid
-  vehicleClass      String?
-  registrationNumber String?
-  documentsSubmitted Boolean @default(false)
-  status            String   @default("submitted") // submitted/under_processing/number_assigned/delivered/rejected
-  numberAssignedAt  DateTime?
-  deliveredAt       DateTime?
-  rejectedReason    String?
-  createdAt         DateTime @default(now())
-  updatedAt         DateTime @updatedAt
-
-  @@index([customerId])
-  @@index([status])
-  customer   Customer   @relation(fields: [customerId], references: [id])
-  sale       Sale?      @relation("SaleRTOApplications", fields: [saleId], references: [id])
-}
-
-// -------------------
-// Document
-// -------------------
-
-model Document {
-  id            String @id @default(uuid()) @db.Uuid
-  customerId    String? @db.Uuid
-  saleId        String? @db.Uuid
-  financeApplicationId String? @db.Uuid
-  insuranceApplicationId String? @db.Uuid
-  rtoApplicationId String? @db.Uuid
-  documentType  String
-  fileName      String
-  storageKey    String
-  mimeType      String
-  sizeBytes     Int
-  accessLevel   String   @default("restricted") // restricted/finance/rto/insurance/admin_only
-  retentionUntil DateTime? // NULL = policy not yet approved; computed from retention policy
-  isPrivate     Boolean  @default(true)
-  uploadedBy    String @db.Uuid
-  uploadedAt    DateTime @default(now())
-  deletedAt     DateTime? // Soft delete; storage purge is a separate approved job
-
-  @@index([customerId])
-  @@index([documentType])
-  @@index([retentionUntil])
-}
-
-// -------------------
-// Stock Movement
-// -------------------
-
-model StockMovement {
-  id            String @id @default(uuid()) @db.Uuid
-  stockUnitId   String @db.Uuid
-  type          StockMovementType
-  quantity      Int    @default(1)
-  referenceType String? // sale/booking/inward/refund/manual
-  referenceId   String? @db.Uuid
-  notes         String?
-  createdAt     DateTime @default(now())
-  createdBy     String? @db.Uuid
-
-  stockUnit     StockUnit   @relation("StockUnitMovements", fields: [stockUnitId], references: [id])
-
-  @@index([stockUnitId])
-  @@index([createdAt])
-  @@index([type])
-}
-
-// -------------------
-// Users, Roles, Permissions
-// -------------------
 
 model Role {
   id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique
-  description String?
-  dealershipId String  @db.Uuid
-  createdAt   DateTime @default(now())
+  name        String   @unique @db.VarChar(50) // SUPER_ADMIN, OWNER, MANAGER, SALES_EXEC, ACCOUNTANT, INSURANCE_STAFF, RTO_STAFF
+  description String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
 
-  dealership   Dealership @relation(fields: [dealershipId], references: [id])
-  users        User[]     @relation("UserRole")
-  permissions  RolePermission[]
+  users       User[]
+  permissions RolePermission[]
+
+  @@map("roles")
 }
 
 model Permission {
   id          String   @id @default(uuid()) @db.Uuid
-  code        String   @unique
-  module      String
-  description String?
-  createdAt   DateTime @default(now())
+  code        String   @unique @db.VarChar(80) // e.g. stock:inward, sale:complete, refund:approve
+  module      String   @db.VarChar(50)
+  description String?  @db.VarChar(255)
 
-  roles RolePermission[]
+  roles       RolePermission[]
+
+  @@map("permissions")
 }
 
 model RolePermission {
-  id          String   @id @default(uuid()) @db.Uuid
-  roleId      String   @db.Uuid
-  permissionId String  @db.Uuid
+  roleId       String @db.Uuid
+  permissionId String @db.Uuid
 
-  role       Role     @relation(fields: [roleId], references: [id])
-  permission Permission @relation(fields: [permissionId], references: [id])
+  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
-  @@unique([roleId, permissionId])
+  @@id([roleId, permissionId])
+  @@map("role_permissions")
+}
+
+// NextAuth Database Sessions
+model Account {
+  id                String  @id @default(uuid()) @db.Uuid
+  userId            String  @db.Uuid
+  type              String  @db.VarChar(50)
+  provider          String  @db.VarChar(50)
+  providerAccountId String  @db.VarChar(100)
+  refresh_token     String? @db.Text
+  access_token      String? @db.Text
+  expires_at        Int?
+  token_type        String? @db.VarChar(50)
+  scope             String? @db.VarChar(255)
+  id_token          String? @db.Text
+  session_state     String? @db.VarChar(255)
+
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@unique([provider, providerAccountId])
+  @@map("accounts")
 }
 
 model Session {
   id           String   @id @default(uuid()) @db.Uuid
-  sessionToken String   @unique
+  sessionToken String   @unique @db.VarChar(255)
   userId       String   @db.Uuid
-  expires      DateTime
-  user         User     @relation("SessionUser", fields: [userId], references: [id], onDelete: Cascade)
-}
+  expires      DateTime @db.Timestamptz(6)
 
-// -------------------
-// NextAuth Adapter Models
-// -------------------
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 
-model Account {
-  id                String  @id @default(uuid()) @db.Uuid
-  userId            String  @db.Uuid
-  type              String
-  provider          String
-  providerAccountId String
-  refresh_token     String?
-  access_token      String?
-  expires_at        Int?
-  token_type        String?
-  scope             String?
-  id_token          String?
-  session_state     String?
-  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
-
-  @@unique([provider, providerAccountId])
+  @@map("sessions")
 }
 
 model VerificationToken {
-  identifier String
-  token      String   @unique
-  expires    DateTime
+  identifier String   @db.VarChar(150)
+  token      String   @unique @db.VarChar(255)
+  expires    DateTime @db.Timestamptz(6)
 
   @@unique([identifier, token])
+  @@map("verification_tokens")
 }
 
-// -------------------
-// Customers, Leads, Bookings
-// -------------------
+// -----------------------------------------------------------------------------
+// CATALOGUE & VEHICLES
+// -----------------------------------------------------------------------------
+
+model Brand {
+  id          String   @id @default(uuid()) @db.Uuid
+  name        String   @unique @db.VarChar(80)
+  slug        String   @unique @db.VarChar(80)
+  logoUrl     String?  @db.VarChar(255)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  models      Model[]
+
+  @@map("brands")
+}
+
+model Model {
+  id          String   @id @default(uuid()) @db.Uuid
+  brandId     String   @db.Uuid
+  name        String   @db.VarChar(120)
+  slug        String   @unique @db.VarChar(120)
+  category    String   @db.VarChar(50) // Roadster, Sport, Cruiser, Scooter, Adventure
+  engineCc    Int
+  powerBhp    Decimal  @db.Decimal(5, 2)
+  torqueNm    Decimal  @db.Decimal(5, 2)
+  mileageKmpl Decimal? @db.Decimal(4, 1)
+  kerbWeight  Int
+  fuelCapacity Decimal @db.Decimal(4, 1)
+  description String?  @db.Text
+  isUsed      Boolean  @default(false)
+  isActive    Boolean  @default(true)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  brand       Brand    @relation(fields: [brandId], references: [id])
+  variants    Variant[]
+
+  @@index([brandId])
+  @@map("models")
+}
+
+model Variant {
+  id                  String   @id @default(uuid()) @db.Uuid
+  modelId             String   @db.Uuid
+  name                String   @db.VarChar(100)
+  exShowroomPricePaise BigInt  // Integer paise (e.g. 14990000n)
+  rtoTaxPaise         BigInt   // Integer paise
+  insurancePaise      BigInt   // Integer paise
+  handlingChargesPaise BigInt  @default(150000)
+  hsnCode             String   @default("8711") @db.VarChar(10)
+  isActive            Boolean  @default(true)
+
+  model               Model    @relation(fields: [modelId], references: [id])
+  colours             Colour[]
+  stockUnits          StockUnit[]
+
+  @@index([modelId])
+  @@map("variants")
+}
+
+model Colour {
+  id        String   @id @default(uuid()) @db.Uuid
+  variantId String   @db.Uuid
+  name      String   @db.VarChar(60)
+  hexCode   String   @db.VarChar(10)
+  imageUrl  String?  @db.VarChar(255)
+
+  variant   Variant  @relation(fields: [variantId], references: [id])
+
+  @@index([variantId])
+  @@map("colours")
+}
+
+// -----------------------------------------------------------------------------
+// STOCK & INVENTORY
+// -----------------------------------------------------------------------------
+
+enum StockUnitStatus {
+  IN_STOCK
+  RESERVED
+  SOLD
+  IN_TRANSIT
+  PDI_PENDING
+  DISPLAY
+}
+
+enum StockMovementType {
+  INWARD
+  SHOWROOM_DISPLAY
+  YARD_TRANSFER
+  PDI_PASS
+  RESERVATION_LOCK
+  DISPATCH_DELIVERY
+}
+
+model StockUnit {
+  id                 String          @id @default(uuid()) @db.Uuid
+  dealershipId       String          @db.Uuid
+  variantId          String          @db.Uuid
+  chassisNumber      String          @unique @db.VarChar(30)
+  engineNumber       String          @unique @db.VarChar(30)
+  colorName          String          @db.VarChar(60)
+  purchasePricePaise BigInt
+  status             StockUnitStatus @default(IN_STOCK)
+  location           String          @default("Main Showroom") @db.VarChar(120)
+  pdiPassed          Boolean         @default(false)
+  inwardDate         DateTime        @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
+
+  dealership         Dealership      @relation(fields: [dealershipId], references: [id])
+  variant            Variant         @relation(fields: [variantId], references: [id])
+  movements          StockMovement[]
+  reservation        Reservation?
+  sale               Sale?
+
+  @@index([dealershipId])
+  @@index([variantId])
+  @@index([status])
+  @@map("stock_units")
+}
+
+model StockMovement {
+  id          String            @id @default(uuid()) @db.Uuid
+  stockUnitId String            @db.Uuid
+  type        StockMovementType
+  fromLoc     String?           @db.VarChar(100)
+  toLoc       String            @db.VarChar(100)
+  notes       String?           @db.VarChar(255)
+  recordedBy  String            @db.VarChar(100)
+  timestamp   DateTime          @default(now()) @db.Timestamptz(6)
+
+  stockUnit   StockUnit         @relation(fields: [stockUnitId], references: [id], onDelete: Cascade)
+
+  @@index([stockUnitId])
+  @@map("stock_movements")
+}
+
+model Reservation {
+  id          String    @id @default(uuid()) @db.Uuid
+  bookingId   String    @unique @db.Uuid
+  stockUnitId String    @unique @db.Uuid
+  reservedAt  DateTime  @default(now()) @db.Timestamptz(6)
+  expiresAt   DateTime  @db.Timestamptz(6)
+
+  booking     Booking   @relation(fields: [bookingId], references: [id])
+  stockUnit   StockUnit @relation(fields: [stockUnitId], references: [id])
+
+  @@map("reservations")
+}
+
+// -----------------------------------------------------------------------------
+// BOOKING & SALES LIFECYCLE
+// -----------------------------------------------------------------------------
+
+enum BookingStatus {
+  ACTIVE
+  CONFIRMED
+  COMPLETED
+  CANCELLED
+  EXPIRED
+}
+
+enum SaleStatus {
+  DRAFT
+  INVOICED
+  DELIVERED
+  CANCELLED
+}
+
+model Booking {
+  id                    String        @id @default(uuid()) @db.Uuid
+  dealershipId          String        @db.Uuid
+  bookingNumber         String        @unique @db.VarChar(30)
+  customerId            String        @db.Uuid
+  variantId             String        @db.Uuid
+  colorRequested        String        @db.VarChar(60)
+  advanceAmountPaise    BigInt
+  status                BookingStatus @default(ACTIVE)
+  tentativeDeliveryDate DateTime      @db.Date
+  notes                 String?       @db.Text
+  createdAt             DateTime      @default(now()) @db.Timestamptz(6)
+  updatedAt             DateTime      @updatedAt @db.Timestamptz(6)
+
+  dealership            Dealership    @relation(fields: [dealershipId], references: [id])
+  customer              Customer      @relation(fields: [customerId], references: [id])
+  reservation           Reservation?
+  payments              Payment[]
+  refunds               Refund[]
+
+  @@index([dealershipId])
+  @@index([customerId])
+  @@map("bookings")
+}
+
+model Sale {
+  id                  String     @id @default(uuid()) @db.Uuid
+  dealershipId        String     @db.Uuid
+  customerId          String     @db.Uuid
+  stockUnitId         String     @unique @db.Uuid
+  saleNumber          String     @unique @db.VarChar(30)
+  exShowroomPaise     BigInt
+  gstAmountPaise      BigInt
+  cgstPaise           BigInt
+  sgstPaise           BigInt
+  igstPaise           BigInt     @default(0)
+  rtoPaise            BigInt
+  insurancePaise      BigInt
+  accessoriesPaise    BigInt     @default(0)
+  totalOnRoadPaise    BigInt
+  advanceCarriedPaise BigInt     @default(0)
+  amountPaidPaise     BigInt
+  outstandingPaise    BigInt     @default(0)
+  saleDate            DateTime   @default(now()) @db.Timestamptz(6)
+  status              SaleStatus @default(INVOICED)
+
+  dealership          Dealership @relation(fields: [dealershipId], references: [id])
+  customer            Customer   @relation(fields: [customerId], references: [id])
+  stockUnit           StockUnit  @relation(fields: [stockUnitId], references: [id])
+  invoice             Invoice?
+  payments            Payment[]
+
+  @@index([dealershipId])
+  @@index([customerId])
+  @@map("sales")
+}
+
+// -----------------------------------------------------------------------------
+// FINANCIALS, INVOICES & REFUNDS
+// -----------------------------------------------------------------------------
+
+enum PaymentStatus {
+  SUCCESS
+  PENDING
+  FAILED
+  REFUNDED
+}
+
+enum RefundStatus {
+  PENDING
+  APPROVED
+  REJECTED
+  COMPLETED
+}
+
+model Payment {
+  id             String        @id @default(uuid()) @db.Uuid
+  receiptNumber  String        @unique @db.VarChar(30)
+  bookingId      String?       @db.Uuid
+  saleId         String?       @db.Uuid
+  amountPaise    BigInt
+  mode           String        @db.VarChar(30) // UPI, NEFT, CARD, CASH, CHEQUE
+  transactionRef String?       @db.VarChar(100)
+  receivedBy     String        @db.VarChar(120)
+  status         PaymentStatus @default(SUCCESS)
+  paymentDate    DateTime      @default(now()) @db.Timestamptz(6)
+
+  booking        Booking?      @relation(fields: [bookingId], references: [id])
+  sale           Sale?         @relation(fields: [saleId], references: [id])
+  refunds        Refund[]
+
+  @@index([bookingId])
+  @@index([saleId])
+  @@map("payments")
+}
+
+model Invoice {
+  id                  String   @id @default(uuid()) @db.Uuid
+  dealershipId        String   @db.Uuid
+  saleId              String   @unique @db.Uuid
+  invoiceNumber       String   @unique @db.VarChar(40)
+  gstin               String   @db.VarChar(15)
+  customerGstin       String?  @db.VarChar(15)
+  placeOfSupply       String   @default("27-Maharashtra") @db.VarChar(50)
+  gstRateBps          Int      @default(1800) // 18.00%
+  taxableAmountPaise  BigInt
+  cgstAmountPaise     BigInt
+  sgstAmountPaise     BigInt
+  igstAmountPaise     BigInt   @default(0)
+  totalInvoicePaise   BigInt
+  pdfUrl              String?  @db.VarChar(255)
+  issuedAt            DateTime @default(now()) @db.Timestamptz(6)
+
+  dealership          Dealership @relation(fields: [dealershipId], references: [id])
+  sale                Sale       @relation(fields: [saleId], references: [id])
+
+  @@index([dealershipId])
+  @@map("invoices")
+}
+
+model Refund {
+  id           String       @id @default(uuid()) @db.Uuid
+  refundNumber String       @unique @db.VarChar(30)
+  paymentId    String       @db.Uuid
+  bookingId    String       @db.Uuid
+  amountPaise  BigInt
+  reason       String       @db.VarChar(255)
+  requestedBy  String       @db.VarChar(120) // Staff who initiated request
+  approvedBy   String?      @db.VarChar(120) // STRICT: Must NOT equal requestedBy
+  status       RefundStatus @default(PENDING)
+  requestedAt  DateTime     @default(now()) @db.Timestamptz(6)
+  approvedAt   DateTime?    @db.Timestamptz(6)
+
+  payment      Payment      @relation(fields: [paymentId], references: [id])
+  booking      Booking      @relation(fields: [bookingId], references: [id])
+
+  @@index([bookingId])
+  @@index([paymentId])
+  @@map("refunds")
+}
+
+model Expense {
+  id           String     @id @default(uuid()) @db.Uuid
+  dealershipId String     @db.Uuid
+  category     String     @db.VarChar(60) // Showroom Rent, Electricity, Logistics, PDI Supplies
+  amountPaise  BigInt
+  description  String?    @db.VarChar(255)
+  paidTo       String     @db.VarChar(120)
+  paymentDate  DateTime   @db.Date
+
+  dealership   Dealership @relation(fields: [dealershipId], references: [id])
+
+  @@map("expenses")
+}
+
+// -----------------------------------------------------------------------------
+// CRM, LEADS, TEST RIDES & APPLICATIONS
+// -----------------------------------------------------------------------------
 
 model Customer {
-  id            String   @id @default(uuid()) @db.Uuid
-  dealershipId  String   @db.Uuid
-  firstName     String
-  lastName      String
-  phone         String
-  email         String?
-  address       String?
-  city          String?
-  state         String?
-  pincode       String?
-  gstin         String?
-  idDocumentType String?
-  idDocumentNumber String?
-  createdAt     DateTime @default(now())
-  updatedAt     DateTime @updatedAt
-  deletedAt     DateTime?
+  id            String    @id @default(uuid()) @db.Uuid
+  fullName      String    @db.VarChar(120)
+  phone         String    @unique @db.VarChar(20)
+  email         String?   @db.VarChar(150)
+  addressLine1  String    @db.VarChar(255)
+  city          String    @default("Thane") @db.VarChar(80)
+  pincode       String    @default("400601") @db.VarChar(10)
+  panNumber     String?   @db.VarChar(10)
+  aadhaarNumber String?   @db.VarChar(20)
+  deletedAt     DateTime? @db.Timestamptz(6)
+  createdAt     DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime  @updatedAt @db.Timestamptz(6)
 
-  dealership Dealership @relation(fields: [dealershipId], references: [id])
-  leads          Lead[] @relation("CustomerLeads")
-  bookings       Booking[] @relation("CustomerBookings")
-  sales          Sale[] @relation("CustomerSales")
-  serviceRequests ServiceRequest[] @relation("CustomerServiceRequests")
-  financeApplications FinanceApplication[]
-  insuranceApplications InsuranceApplication[]
-  rtoApplications RTOApplication[]
-  payments Payment[] @relation("CustomerPayments")
+  bookings      Booking[]
+  sales         Sale[]
+  leads         Lead[]
+  testRides     TestRide[]
+  financeApps   FinanceApplication[]
+  insuranceApps InsuranceApplication[]
+  rtoApps       RTOApplication[]
+  services      ServiceRequest[]
+
+  @@map("customers")
 }
 
 model Lead {
-  id              String   @id @default(uuid()) @db.Uuid
-  customerId      String   @db.Uuid
-  staffId         String?  @db.Uuid
-  variantId       String?  @db.Uuid
-  colourId        String?  @db.Uuid
-  source          String   @default("walkin")
-  status          String   @default("new")
-  estimatedBudget BigInt?
-  notes           String?
-  createdAt       DateTime @default(now())
-  updatedAt       DateTime @updatedAt
+  id              String         @id @default(uuid()) @db.Uuid
+  customerId      String?        @db.Uuid
+  customerName    String         @db.VarChar(120)
+  phone           String         @db.VarChar(20)
+  email           String?        @db.VarChar(150)
+  bikeOfInterest  String         @db.VarChar(120)
+  source          String         @default("WEBSITE") @db.VarChar(50)
+  stage           String         @default("NEW") @db.VarChar(50) // NEW, CONTACTED, TEST_RIDE, QUOTATION, BOOKED, LOST
+  assignedTo      String?        @db.VarChar(120)
+  notes           String?        @db.Text
+  createdAt       DateTime       @default(now()) @db.Timestamptz(6)
 
-  customer   Customer @relation("CustomerLeads", fields: [customerId], references: [id])
-  activities LeadActivity[]
-  testRides TestRide[]
+  customer        Customer?      @relation(fields: [customerId], references: [id])
+  activities      LeadActivity[]
+
+  @@index([phone])
+  @@map("leads")
 }
 
 model LeadActivity {
-  id            String   @id @default(uuid()) @db.Uuid
-  leadId        String   @db.Uuid
-  staffId       String   @db.Uuid
-  type          String
-  notes         String?
-  nextFollowUpAt DateTime?
-  createdAt     DateTime @default(now())
+  id        String   @id @default(uuid()) @db.Uuid
+  leadId    String   @db.Uuid
+  action    String   @db.VarChar(100)
+  notes     String?  @db.Text
+  timestamp DateTime @default(now()) @db.Timestamptz(6)
 
-  lead Lead @relation(fields: [leadId], references: [id])
+  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+
+  @@index([leadId])
+  @@map("lead_activities")
 }
 
 model TestRide {
-  id            String   @id @default(uuid()) @db.Uuid
-  leadId        String   @db.Uuid
-  stockUnitId   String?  @db.Uuid
-  staffId       String   @db.Uuid
-  scheduledAt   DateTime
-  status        String   @default("scheduled")
-  feedback      String?
-  createdAt     DateTime @default(now())
+  id                String   @id @default(uuid()) @db.Uuid
+  customerId        String?  @db.Uuid
+  customerName      String   @db.VarChar(120)
+  phone             String   @db.VarChar(20)
+  bikeModel         String   @db.VarChar(120)
+  preferredDate     DateTime @db.Date
+  preferredTimeSlot String   @db.VarChar(30)
+  hasValidLicense   Boolean  @default(true)
+  status            String   @default("SCHEDULED") @db.VarChar(30)
+  feedback          String?  @db.Text
+  assignedStaff     String   @default("Suraj Patil") @db.VarChar(120)
+  createdAt         DateTime @default(now()) @db.Timestamptz(6)
 
-  lead      Lead     @relation(fields: [leadId], references: [id])
-  stockUnit StockUnit? @relation(fields: [stockUnitId], references: [id], onDelete: SetNull)
+  customer          Customer? @relation(fields: [customerId], references: [id])
+
+  @@map("test_rides")
 }
 
-// -------------------
-// Settings, Notifications
-// -------------------
+model FinanceApplication {
+  id               String   @id @default(uuid()) @db.Uuid
+  customerId       String   @db.Uuid
+  bikeModel        String   @db.VarChar(120)
+  loanAmountPaise  BigInt
+  downPaymentPaise BigInt
+  tenureMonths     Int
+  cibilBand        String   @db.VarChar(30)
+  bankPartner      String   @default("HDFC Bank") @db.VarChar(80)
+  status           String   @default("SUBMITTED") @db.VarChar(40)
+  createdAt        DateTime @default(now()) @db.Timestamptz(6)
+
+  customer         Customer @relation(fields: [customerId], references: [id])
+
+  @@map("finance_applications")
+}
+
+model InsuranceApplication {
+  id              String   @id @default(uuid()) @db.Uuid
+  customerId      String   @db.Uuid
+  bikeModel       String   @db.VarChar(120)
+  provider        String   @default("ICICI Lombard") @db.VarChar(80)
+  policyType      String   @default("1-Yr OD + 5-Yr TP") @db.VarChar(60)
+  zeroDepIncluded Boolean  @default(true)
+  premiumPaise    BigInt
+  status          String   @default("SUBMITTED") @db.VarChar(40)
+  createdAt       DateTime @default(now()) @db.Timestamptz(6)
+
+  customer        Customer @relation(fields: [customerId], references: [id])
+
+  @@map("insurance_applications")
+}
+
+model RTOApplication {
+  id             String   @id @default(uuid()) @db.Uuid
+  customerId     String   @db.Uuid
+  rtoLocation    String   @default("MH-04 (Thane)") @db.VarChar(60)
+  chassisNumber  String   @db.VarChar(30)
+  engineNumber   String   @db.VarChar(30)
+  hsrpStatus     String   @default("PENDING") @db.VarChar(40)
+  applicationNum String?  @db.VarChar(50)
+  status         String   @default("SUBMITTED") @db.VarChar(40)
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
+
+  customer       Customer @relation(fields: [customerId], references: [id])
+
+  @@map("rto_applications")
+}
+
+model ServiceRequest {
+  id           String    @id @default(uuid()) @db.Uuid
+  customerId   String    @db.Uuid
+  bikeModel    String    @db.VarChar(120)
+  odometerKm   Int
+  serviceType  String    @db.VarChar(60) // Free 1st Service, General Service, Brake Pad Replacement
+  complaints   String?   @db.Text
+  scheduledFor DateTime  @db.Date
+  status       String    @default("PENDING") @db.VarChar(40)
+  deletedAt    DateTime? @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+
+  customer     Customer  @relation(fields: [customerId], references: [id])
+
+  @@map("service_requests")
+}
+
+model StaffTask {
+  id          String   @id @default(uuid()) @db.Uuid
+  title       String   @db.VarChar(200)
+  category    String   @db.VarChar(50)
+  assignedTo  String   @db.Uuid
+  dueTime     String   @db.VarChar(50)
+  isCompleted Boolean  @default(false)
+  priority    String   @default("MEDIUM") @db.VarChar(20)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  user        User     @relation("AssignedTasks", fields: [assignedTo], references: [id])
+
+  @@map("staff_tasks")
+}
+
+// -----------------------------------------------------------------------------
+// SYSTEM, AUDIT, SETTINGS & CMS
+// -----------------------------------------------------------------------------
+
+model AuditLog {
+  id          String   @id @default(uuid()) @db.Uuid
+  userId      String?  @db.Uuid
+  action      String   @db.VarChar(100)
+  performedBy String   @db.VarChar(120)
+  details     String   @db.Text
+  ipAddress   String?  @db.VarChar(50)
+  timestamp   DateTime @default(now()) @db.Timestamptz(6)
+
+  user        User?    @relation(fields: [userId], references: [id])
+
+  @@index([action])
+  @@index([timestamp])
+  @@map("audit_logs")
+}
+
+model Document {
+  id         String    @id @default(uuid()) @db.Uuid
+  entityType String    @db.VarChar(50) // Customer, Sale, Booking
+  entityId   String    @db.Uuid
+  docType    String    @db.VarChar(50) // Aadhaar, PAN, Form20, InsuranceCopy
+  fileUrl    String    @db.VarChar(255)
+  deletedAt  DateTime? @db.Timestamptz(6)
+  uploadedAt DateTime  @default(now()) @db.Timestamptz(6)
+
+  @@map("documents")
+}
 
 model Settings {
-  id                 String   @id @default(uuid()) @db.Uuid
-  dealershipId       String   @db.Uuid
-  theme              String   @default("light")
-  primaryColour      String   @default("#111827")
-  secondaryColour    String   @default("#6366f1")
-  fontFamily         String   @default("Inter")
-  fontSize           String   @default("medium")
-  sidebarMode        String   @default("expanded")
-  invoicePrefix      String   @default("TBY")
-  invoiceNumberSequence Int   @default(1)
-  gstRateDefault     Int      @default(0)
-  logoUrl            String?
-  faviconUrl         String?
-  notificationsEmail Boolean @default(false)
-  notificationsInApp Boolean @default(true)
-  language           String   @default("en")
-  createdAt          DateTime @default(now())
-  updatedAt          DateTime @updatedAt
+  id              String     @id @default(uuid()) @db.Uuid
+  dealershipId    String     @db.Uuid
+  gstRateBps      Int        @default(1800)
+  theme           String     @default("dark") @db.VarChar(20)
+  autoLockMinutes Int        @default(30)
+  invoiceTerms    String     @db.Text
+  updatedAt       DateTime   @updatedAt @db.Timestamptz(6)
 
-  dealership Dealership @relation(fields: [dealershipId], references: [id])
+  dealership      Dealership @relation(fields: [dealershipId], references: [id])
+
+  @@map("settings")
 }
 
 model Notification {
   id        String   @id @default(uuid()) @db.Uuid
-  userId    String   @db.Uuid
-  title     String
-  message   String
-  type      String   @default("info")
+  recipient String   @db.VarChar(120)
+  title     String   @db.VarChar(150)
+  body      String   @db.Text
   isRead    Boolean  @default(false)
-  readAt    DateTime?
-  createdAt DateTime @default(now())
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  user User @relation("UserNotifications", fields: [userId], references: [id], onDelete: Cascade)
+  @@map("notifications")
 }
 
-// -------------------
-// CMS: Blogs, FAQs, Social, Banners
-// -------------------
-
 model Blog {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String
-  slug        String   @unique
-  content     String
-  excerpt     String?
-  featuredImageUrl String?
-  status      String   @default("draft")
-  publishedAt DateTime?
-  createdBy   String   @db.Uuid
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  title     String   @db.VarChar(200)
+  slug      String   @unique @db.VarChar(200)
+  summary   String   @db.VarChar(255)
+  content   String   @db.Text
+  author    String   @db.VarChar(80)
+  published Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("blogs")
 }
 
 model Faq {
   id        String   @id @default(uuid()) @db.Uuid
-  question  String
-  answer    String
-  category  String?
-  order     Int      @default(0)
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  question  String   @db.VarChar(255)
+  answer    String   @db.Text
+  category  String   @default("General") @db.VarChar(50)
+  sortOrder Int      @default(0)
+
+  @@map("faqs")
 }
 
 model SocialLink {
-  id        String   @id @default(uuid()) @db.Uuid
-  platform  String
-  url       String
-  isActive  Boolean  @default(true)
+  id       String @id @default(uuid()) @db.Uuid
+  platform String @db.VarChar(50)
+  url      String @db.VarChar(255)
+
+  @@map("social_links")
 }
 
 model Banner {
-  id        String   @id @default(uuid()) @db.Uuid
-  title     String
-  imageUrl  String
-  linkUrl   String?
-  position  String   @default("home")
-  isActive  Boolean  @default(true)
-  createdAt DateTime @default(now())
+  id       String   @id @default(uuid()) @db.Uuid
+  title    String   @db.VarChar(150)
+  subtitle String?  @db.VarChar(255)
+  imageUrl String   @db.VarChar(255)
+  linkUrl  String?  @db.VarChar(255)
+  isActive Boolean  @default(true)
+
+  @@map("banners")
 }
 
-// -------------------
-// Chatbot Knowledge
-// -------------------
-
 model ChatbotKnowledgeSource {
-  id          String   @id @default(uuid()) @db.Uuid
-  title       String
-  content     String
-  sourceType  String
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now())
-  updatedAt   DateTime @updatedAt
+  id        String   @id @default(uuid()) @db.Uuid
+  topic     String   @db.VarChar(100)
+  content   String   @db.Text
+  isGround  Boolean  @default(true)
+  updatedAt DateTime @updatedAt @db.Timestamptz(6)
+
+  @@map("chatbot_knowledge_sources")
 }
 
 model ChatbotFeedback {
   id        String   @id @default(uuid()) @db.Uuid
-  sessionId String
-  question  String
-  answer    String
-  helpful   Boolean?
-  createdAt DateTime @default(now())
+  query     String   @db.Text
+  response  String   @db.Text
+  isHelpful Boolean
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
+
+  @@map("chatbot_feedbacks")
 }
-
-// -------------------
-// Expense
-// -------------------
-
-model Expense {
-  id          String   @id @default(uuid()) @db.Uuid
-  category    String
-  amount      BigInt
-  description String?
-  date        DateTime
-  recordedBy  String   @db.Uuid
-  createdAt   DateTime @default(now())
-}
-
-// Seed helpers (fictional, development only)
-///  seed {
-///    // Create default dealership
-///    dealership: {
-///      name = "The Bike Yard"
-///      address = "Khopat, Thane, Maharashtra, India"
-///    }
-///    // Create Super Admin user
-///    user: {
-///      email = "admin@thebikeyard.local"
-///      password = "changed-immediately"
-///      name = "Super Admin"
-///      role = "Super Admin"
-///    }
-///    // Create basic brand/model/variant/colour combos
-///    brand: { name = "Hero" }
-///    model: { name = "Splendor", brand: { create: { name: "Hero" } } }
-///    variant: { model: { create: { name: "Splendor" } }, engineCC = 125 }
-///    colour: { name = "Black", hexCode = "#000000" }
-///    stockUnit: {
-///      chassisNumber = "ME4JC654K98765432"
-///      engineNumber = "JC65E98765432"
-///      variant: { connect: { model: { name: "Splendor", brand: { name: "Hero" } } } }
-///      colour: { connect: { name: "Black" } }
-///      purchasePrice = 6500000
-///    }
-///  }
