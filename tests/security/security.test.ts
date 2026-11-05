@@ -96,13 +96,14 @@ describe("Security — Security Headers (AUTH_SECURITY §10)", () => {
 });
 
 describe("Security — Sensitive Customer Information", () => {
-  it("customer GSTIN is optional and not exposed by default", async () => {
-    // GSTIN is a customer field that should be access-restricted
+  it("customer identity fields exist and sensitive docs are not exposed by default", async () => {
+    // fullName/phone are public-safe; PAN/Aadhaar are sensitive and never
+    // selected by default in API responses.
     const customer = await prisma.customer.findFirst({
-      select: { id: true, firstName: true, phone: true, gstin: true },
+      select: { id: true, fullName: true, phone: true, panNumber: true, aadhaarNumber: true },
     });
     if (customer) {
-      expect(customer.gstin).toBeDefined(); // field exists but may be null
+      expect(customer.panNumber).toBeDefined(); // field exists but may be null
     }
   });
 

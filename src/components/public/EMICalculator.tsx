@@ -40,8 +40,9 @@ export function EMICalculator({
       </p>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
         <div>
-          <label className="block text-xs text-brand-secondary/60 mb-1">Loan Amount (₹)</label>
+          <label htmlFor="emi-loan-amount" className="block text-xs text-brand-secondary/60 mb-1">Loan Amount (₹)</label>
           <input
+            id="emi-loan-amount"
             type="number"
             value={loanAmount}
             onChange={(e) => setLoanAmount(parseInt(e.target.value) || 0)}
@@ -49,8 +50,9 @@ export function EMICalculator({
           />
         </div>
         <div>
-          <label className="block text-xs text-brand-secondary/60 mb-1">Interest Rate (% p.a.)</label>
+          <label htmlFor="emi-interest-rate" className="block text-xs text-brand-secondary/60 mb-1">Interest Rate (% p.a.)</label>
           <input
+            id="emi-interest-rate"
             type="number"
             value={interestRate}
             onChange={(e) => setInterestRate(parseFloat(e.target.value) || 0)}
@@ -58,8 +60,9 @@ export function EMICalculator({
           />
         </div>
         <div>
-          <label className="block text-xs text-brand-secondary/60 mb-1">Tenure (months)</label>
+          <label htmlFor="emi-tenure-months" className="block text-xs text-brand-secondary/60 mb-1">Tenure (months)</label>
           <input
+            id="emi-tenure-months"
             type="number"
             value={tenureMonths}
             onChange={(e) => setTenureMonths(parseInt(e.target.value) || 0)}

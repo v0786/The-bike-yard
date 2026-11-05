@@ -31,8 +31,8 @@ export default function FinancePage() {
           <TableBody>
             <TableRow>
               <TableCell>FIN-001</TableCell>
-              <TableCell>Rahul Sharma</TableCell>
-              <TableCell>HDFC Bank</TableCell>
+              <TableCell>Demo Customer</TableCell>
+              <TableCell>Not assigned</TableCell>
               <TableCell>₹5,00,000</TableCell>
               <TableCell>
                 <StatusChip status="submitted" />

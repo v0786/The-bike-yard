@@ -562,7 +562,7 @@ model FinanceApplication {
   downPaymentPaise BigInt
   tenureMonths     Int
   cibilBand        String   @db.VarChar(30)
-  bankPartner      String   @default("HDFC Bank") @db.VarChar(80)
+  bankPartner      String   @default("") @db.VarChar(80)
   status           String   @default("SUBMITTED") @db.VarChar(40)
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 
@@ -575,7 +575,7 @@ model InsuranceApplication {
   id              String   @id @default(uuid()) @db.Uuid
   customerId      String   @db.Uuid
   bikeModel       String   @db.VarChar(120)
-  provider        String   @default("ICICI Lombard") @db.VarChar(80)
+  provider        String   @default("") @db.VarChar(80)
   policyType      String   @default("1-Yr OD + 5-Yr TP") @db.VarChar(60)
   zeroDepIncluded Boolean  @default(true)
   premiumPaise    BigInt

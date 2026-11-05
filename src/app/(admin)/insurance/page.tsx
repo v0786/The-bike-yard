@@ -31,8 +31,8 @@ export default function InsurancePage() {
           <TableBody>
             <TableRow>
               <TableCell>INS-001</TableCell>
-              <TableCell>Rahul Sharma</TableCell>
-              <TableCell>ICICI Lombard</TableCell>
+              <TableCell>Demo Customer</TableCell>
+              <TableCell>Not assigned</TableCell>
               <TableCell>Comprehensive</TableCell>
               <TableCell>₹25,000</TableCell>
               <TableCell>
