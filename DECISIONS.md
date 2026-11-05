@@ -43,6 +43,34 @@
 **Rationale:** Prisma 7 removed `url` from datasource and changed index rules; schema authored for v6 compatibility.
 **Status:** `prisma generate` succeeds.
 
+### D8: Motorcycle Data Integration Engine — information/pricing separation
+
+**Decision:** External providers manage motorcycle information through dedicated
+`BikeModel` / `BikeVariant` / `BikeColour` / `BikeImage` entities, while authorised backend
+staff exclusively manage `BikePricing` with an immutable `BikePriceHistory` audit trail. The
+sync engine has no code path to pricing. Providers are pluggable via `MotorcycleDataProvider`.
+**Rationale:** Business rule — external APIs must never create or overwrite staff-managed
+prices; the admin pricing interface must not be able to edit API-managed specifications.
+**Status:** Implemented in `prisma/schema.prisma`, `src/services/bike-*.ts`,
+`src/services/bike-provider/`. Documented in `docs/BIKE_DATA_INTEGRATION.md`.
+
+### D9: Migration generation and repair of the local migration baseline
+
+**Decision:** Treat `prisma/schema.prisma` as the committed source of truth (the repo
+gitignores `prisma/migrations/` as generated artefacts). For the local/test database the
+baseline migration was regenerated from the schema and the new
+`20261105215510_bike_data_integration` migration was created and applied via
+`prisma migrate dev`.
+**Rationale:** The pre-existing local `20261103000000_init/migration.sql` did not match the
+schema (PascalCase table names with no `@@map` targets, and an orphan `PaymentAllocation`
+model absent from `schema.prisma`), so a database migrated from it could not satisfy the
+Prisma client — 18 baseline tests failed. The schema is authoritative per ARCHITECTURE/
+DATABASE; the local migration was demonstrably non-functional.
+**Impact:** A local database previously migrated with the old baseline must be rebuilt
+(`prisma migrate reset`) before `prisma migrate deploy`. The project is pre-launch (all docs
+"Pending Dealership Owner Review"), so no production data is affected.
+**Status:** Implemented; `prisma migrate deploy` + full test suite pass.
+
 ### Open Owner Decisions (unresolved, blocking live payments/invoices)
 
 - GSTIN and applicable GST rate(s) — needed for invoice generation

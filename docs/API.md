@@ -440,3 +440,26 @@ Audit `entityType` values include: `user`, `role`, `staff`, `customer`, `stockUn
 **Verification:** API.md v1.1 is complete and consistent with PRD.md, DESIGN.md, ARCHITECTURE.md, and DATABASE.md v1.1. All endpoints map to defined entities and workflows. Response envelope, role rules, refund lifecycle, booking-advance allocation, GST basis points and document access are aligned with §9 and DATABASE.md. No new features invented. No dealership information, prices, GST details, or finance partners invented.
 
 **Next:** Proceed to 06_AGENTS_PROMPT.md to generate AGENTS.md (then reconcile with API.md v1.1).
+---
+
+## Addendum v1.2 — Motorcycle Data Integration Engine endpoints
+
+| Method | Endpoint | Auth | Notes |
+|--------|----------|------|-------|
+| GET | `/api/admin/bike-catalogue` | staff read | search by brand/model/variant; returns provider + sync metadata |
+| GET | `/api/admin/bike-catalogue/[id]` | staff read | specs, colours, images, provider, pricing + history |
+| GET | `/api/admin/bike-pricing` | staff read | staff-managed pricing list |
+| PUT | `/api/admin/bike-pricing` | Super Admin / Owner / Manager | create/update price; Zod-validated; audited |
+| POST | `/api/admin/bike-pricing/publish` | Super Admin / Owner / Manager | approve/unpublish price; audited |
+| GET | `/api/admin/bike-pricing/[variantId]/history` | staff read | immutable price history |
+| POST | `/api/admin/bike-sync` | Super Admin / Owner / Manager | manual synchronisation |
+| GET | `/api/admin/bike-sync/runs` | staff read | sync run history |
+| GET | `/api/admin/bike-sync/errors` | staff read | synchronisation error log |
+| GET | `/api/admin/data-providers` | staff read | provider registry + credential status |
+| GET | `/api/cron/bike-sync` | `CRON_SECRET` bearer | scheduled synchronisation (Vercel Cron) |
+| GET | `/api/public/bike-catalogue` | none | published catalogue (read-only) |
+| GET | `/api/public/bike-catalogue/[slug]` | none | published detail (read-only) |
+
+The pricing endpoints only accept pricing fields; specification fields are stripped by the
+shared Zod schema. Public endpoints expose only `isPublished` (staff-approved) pricing.
+All responses follow the canonical `{ data }` / `{ error }` envelope in §2.

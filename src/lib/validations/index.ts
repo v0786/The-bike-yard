@@ -303,3 +303,6 @@ export const refundApprovalSchema = z
       path: ['approverName'],
     },
   );
+
+// Motorcycle Data Integration Engine schemas (pricing, sync, catalogue search).
+export * from './bike';

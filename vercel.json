@@ -5,5 +5,8 @@
   "installCommand": "npm install",
   "framework": "nextjs",
   "regions": ["bom1"],
-  "crons": [{ "path": "/api/admin/reports/daily-closing", "schedule": "0 0 * * *" }]
+  "crons": [
+    { "path": "/api/admin/reports/daily-closing", "schedule": "0 0 * * *" },
+    { "path": "/api/cron/bike-sync", "schedule": "0 2 * * *" }
+  ]
 }

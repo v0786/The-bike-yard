@@ -1,5 +1,35 @@
 # CHANGELOG — The Bike Yard
 
+## [1.2.0] — 2026-11-05
+
+### Added
+
+- Motorcycle Data Integration Engine with a pluggable `MotorcycleDataProvider` interface
+  (`src/services/bike-provider/`), registry, rate limiter, and error taxonomy.
+- Official `BikeWaleProvider` (interface ready; refuses to run until authorised credentials
+  are supplied — no invented endpoints, no scraping) and a development/test `MockBikeProvider`.
+- New Prisma entities: `DataProvider`, `BikeModel`, `BikeVariant`, `BikeColour`, `BikeImage`,
+  `BikePricing`, `BikePriceHistory`, `BikeSyncRun`, `BikeSyncLog`, `BikeProviderRequest`
+  (migration `20261105215510_bike_data_integration`).
+- Synchronisation engine: scheduled (cron) + manual triggers, duplicate detection,
+  field-level updates, per-model transactions, retry with backoff, request logging, rate
+  limiting, provider attribution + last-sync timestamps. Never deletes and never touches pricing.
+- Staff-exclusive pricing service with server-side role checks, Zod validation, and immutable
+  `BikePriceHistory` audit trail (staff id, previous/new values, reason, IP, timestamp).
+- Admin dashboard pages: Bike Catalogue, Bike Catalogue detail, Bike Pricing (with history and
+  publish), Data Sync (providers, manual trigger, runs, errors) + sidebar links.
+- API routes: admin catalogue/pricing/sync/providers, public read-only catalogue, cron sync.
+- Tests: provider auth gate, pricing role guard, validation, route-level 401/403/400, and
+  DB-backed integration (import, mapping, duplicate detection, updates, price protection,
+  permissions, history, retry/recovery, failed-run isolation, public pricing exposure).
+
+### Fixed
+
+- Regenerated the stale `20261103000000_init` migration so it matches `schema.prisma`
+  (previously created PascalCase tables and an orphan `PaymentAllocation` model, causing 18
+  baseline test failures). Added `migration_lock.toml`.
+- Excluded the standalone `frontend/` Vite app and generated artefacts from ESLint.
+
 ## [1.1.0] — 2026-11-03
 
 ### Added

@@ -830,3 +830,37 @@ erDiagram
 **Verification:** DATABASE.md v1.1 is complete and consistent with PRD.md, DESIGN.md, and ARCHITECTURE.md. Chassis/engine uniqueness, money as integer paise, UTC storage, soft deletes, and transaction boundaries are all defined. Reservation history is preserved via a partial unique index on active reservations. Booking advances are allocatable. Invoice GST is split into CGST/SGST/IGST with basis-point rates. Document retention metadata exists but retention durations and GST rates remain Pending Owner Approval. No dealership information, prices, GST details, or finance partners invented.
 
 **Next:** Proceed to 05_API_PROMPT.md to generate API.md (then reconcile with DATABASE.md v1.1).
+---
+
+## Addendum v1.2 — Motorcycle Data Integration Engine
+
+The integration engine adds a formal separation between **provider-managed motorcycle
+information** and **staff-managed pricing**, using dedicated entities (see
+`docs/BIKE_DATA_INTEGRATION.md` for full detail):
+
+| Entity | Owner | Notes |
+|--------|-------|-------|
+| `DataProvider` | admin | provider registry, enablement, attribution, rate limit, last sync status; credentials live in env vars only |
+| `BikeModel` | provider sync | brand link, category, descriptions, images, `sourceAttribution`, `lastSyncedAt` |
+| `BikeVariant` | provider sync | engine/power/torque/mileage, transmission, brakes/ABS, dimensions/weight, features, specifications |
+| `BikeColour` | provider sync | colour name/hex/image per variant |
+| `BikeImage` | provider sync | licensed image URL, licence + attribution |
+| `BikePricing` | **staff only** | ex-showroom, on-road, insurance, RTO, accessories, dealer offer, final selling price, approval state |
+| `BikePriceHistory` | **staff only** | immutable audit: staff id/name, previous + new values, changed fields, reason, IP, timestamp |
+| `BikeSyncRun` / `BikeSyncLog` / `BikeProviderRequest` | system | sync status/summary, structured logs, provider request log (also used for rate limiting) |
+
+Rules enforced at the database/service boundary:
+
+- Model/variant identity is unique via `(providerId, externalId)` plus a canonical slug
+  fallback; `(modelId, name)` is unique per variant.
+- The sync engine never issues deletes and never writes `BikePricing` / `BikePriceHistory`.
+- `BikePriceHistory` rows are append-only from application code.
+- Money remains integer paise (BIGINT); timestamps remain UTC (`Timestamptz(6)`).
+
+### Migration note (v1.2)
+
+`prisma/schema.prisma` is the committed source of truth; `prisma/migrations/` is gitignored
+and regenerated per environment. The pre-existing local baseline migration did not match the
+schema (PascalCase tables and an orphan `PaymentAllocation` model), so a database migrated
+from it could not satisfy the Prisma client. The baseline was regenerated from the schema and
+the new `bike_data_integration` migration adds the integration entities. See `DECISIONS.md` D9.

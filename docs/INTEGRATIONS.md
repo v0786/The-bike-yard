@@ -258,3 +258,19 @@ sequenceDiagram
 **Verification:** INTEGRATIONS.md v1.1 is complete and consistent with all previous documents. No provider is claimed to be selected until owner approval. Payment status verified server-side only. No card CVV stored. EMI labeled as estimate. Retention is an owner decision. No dealership information, prices, GST details, or finance partners invented.
 
 **Next:** Proceed to 14_TESTING_PROMPT.md to generate TESTING.md.
+---
+
+## Addendum v1.2 — Motorcycle Data Provider Integration
+
+The platform integrates authorised motorcycle-information providers through the
+`MotorcycleDataProvider` interface (`src/services/bike-provider/`). See
+`docs/BIKE_DATA_INTEGRATION.md`.
+
+- Providers registered: `bikewale` (official — **awaiting authorised credentials**) and
+  `mock` (development/test fixture, disabled unless `BIKE_PROVIDER_MOCK_ENABLED=true`).
+- No endpoint is hard-coded and no scraping is performed. The BikeWale adapter refuses to run
+  until `BIKEWALE_API_BASE_URL`, `BIKEWALE_API_KEY` and `BIKEWALE_API_CATALOG_PATH` are supplied
+  from an official agreement.
+- Provider DTOs contain no pricing fields; synchronisation can never create or alter prices.
+- Credentials are read from environment variables only and are never stored in the database.
+- Every provider HTTP request is logged (`BikeProviderRequest`) and rate limited.

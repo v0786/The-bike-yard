@@ -50,7 +50,7 @@ const TableRow = React.forwardRef<HTMLTableRowElement, TableRowProps>(
 );
 TableRow.displayName = 'TableRow';
 
-interface TableHeadProps extends React.HTMLAttributes<HTMLTableCellElement> {}
+interface TableHeadProps extends React.ThHTMLAttributes<HTMLTableCellElement> {}
 const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
   ({ className, ...props }, ref) => (
     <th
@@ -65,7 +65,7 @@ const TableHead = React.forwardRef<HTMLTableCellElement, TableHeadProps>(
 );
 TableHead.displayName = 'TableHead';
 
-interface TableCellProps extends React.HTMLAttributes<HTMLTableCellElement> {}
+interface TableCellProps extends React.TdHTMLAttributes<HTMLTableCellElement> {}
 const TableCell = React.forwardRef<HTMLTableCellElement, TableCellProps>(
   ({ className, ...props }, ref) => (
     <td ref={ref} className={cn('p-4 align-middle [&_td]:border-b', className)} {...props} />

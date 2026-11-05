@@ -34,6 +34,27 @@ const sidebarItems: NavItem[] = [
     roles: ['Super Admin', 'Owner', 'Manager'],
   },
   {
+    id: 'bike-catalogue',
+    label: 'Bike Catalogue',
+    href: '/admin/bike-catalogue',
+    icon: null,
+    roles: ['Super Admin', 'Owner', 'Manager'],
+  },
+  {
+    id: 'bike-pricing',
+    label: 'Bike Pricing',
+    href: '/admin/bike-pricing',
+    icon: null,
+    roles: ['Super Admin', 'Owner', 'Manager'],
+  },
+  {
+    id: 'bike-sync',
+    label: 'Data Sync',
+    href: '/admin/bike-sync',
+    icon: null,
+    roles: ['Super Admin', 'Owner', 'Manager'],
+  },
+  {
     id: 'inventory',
     label: 'Inventory',
     href: '/admin/inventory',

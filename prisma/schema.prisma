@@ -15,33 +15,33 @@ datasource db {
 // -----------------------------------------------------------------------------
 
 model Dealership {
-  id             String    @id @default(uuid()) @db.Uuid
-  code           String    @unique @db.VarChar(20)
-  name           String    @db.VarChar(120)
-  tagline        String?   @db.VarChar(255)
-  addressLine1   String    @db.VarChar(255)
-  addressLine2   String?   @db.VarChar(255)
-  city           String    @default("Thane") @db.VarChar(80)
-  state          String    @default("Maharashtra") @db.VarChar(80)
-  pincode        String    @db.VarChar(10)
-  stateCode      String    @default("27") @db.VarChar(2)
-  gstin          String    @unique @db.VarChar(15)
-  panNumber      String?   @db.VarChar(10)
-  rtoCode        String    @default("MH-04") @db.VarChar(10)
-  phone          String    @db.VarChar(20)
-  email          String    @db.VarChar(120)
-  invoicePrefix  String    @default("TBY-INV-2026-") @db.VarChar(30)
-  bookingPrefix  String    @default("TBY-BK-2026-") @db.VarChar(30)
-  createdAt      DateTime  @default(now()) @db.Timestamptz(6)
-  updatedAt      DateTime  @updatedAt @db.Timestamptz(6)
+  id            String   @id @default(uuid()) @db.Uuid
+  code          String   @unique @db.VarChar(20)
+  name          String   @db.VarChar(120)
+  tagline       String?  @db.VarChar(255)
+  addressLine1  String   @db.VarChar(255)
+  addressLine2  String?  @db.VarChar(255)
+  city          String   @default("Thane") @db.VarChar(80)
+  state         String   @default("Maharashtra") @db.VarChar(80)
+  pincode       String   @db.VarChar(10)
+  stateCode     String   @default("27") @db.VarChar(2)
+  gstin         String   @unique @db.VarChar(15)
+  panNumber     String?  @db.VarChar(10)
+  rtoCode       String   @default("MH-04") @db.VarChar(10)
+  phone         String   @db.VarChar(20)
+  email         String   @db.VarChar(120)
+  invoicePrefix String   @default("TBY-INV-2026-") @db.VarChar(30)
+  bookingPrefix String   @default("TBY-BK-2026-") @db.VarChar(30)
+  createdAt     DateTime @default(now()) @db.Timestamptz(6)
+  updatedAt     DateTime @updatedAt @db.Timestamptz(6)
 
-  users          User[]
-  stockUnits     StockUnit[]
-  bookings       Booking[]
-  sales          Sale[]
-  invoices       Invoice[]
-  settings       Settings[]
-  expenses       Expense[]
+  users      User[]
+  stockUnits StockUnit[]
+  bookings   Booking[]
+  sales      Sale[]
+  invoices   Invoice[]
+  settings   Settings[]
+  expenses   Expense[]
 
   @@map("dealerships")
 }
@@ -61,12 +61,18 @@ model User {
   createdAt     DateTime  @default(now()) @db.Timestamptz(6)
   updatedAt     DateTime  @updatedAt @db.Timestamptz(6)
 
-  dealership    Dealership @relation(fields: [dealershipId], references: [id])
-  role          Role       @relation(fields: [roleId], references: [id])
+  dealership    Dealership  @relation(fields: [dealershipId], references: [id])
+  role          Role        @relation(fields: [roleId], references: [id])
   sessions      Session[]
   accounts      Account[]
   auditLogs     AuditLog[]
   tasksAssigned StaffTask[] @relation("AssignedTasks")
+
+  // Motorcycle Data Integration Engine — staff accountability for pricing & sync.
+  bikePricingUpdates   BikePricing[]      @relation("BikePricingUpdatedBy")
+  bikePricingApprovals BikePricing[]      @relation("BikePricingApprovedBy")
+  bikePriceHistory     BikePriceHistory[]
+  bikeSyncRuns         BikeSyncRun[]
 
   @@index([dealershipId])
   @@index([roleId])
@@ -86,12 +92,12 @@ model Role {
 }
 
 model Permission {
-  id          String   @id @default(uuid()) @db.Uuid
-  code        String   @unique @db.VarChar(80) // e.g. stock:inward, sale:complete, refund:approve
-  module      String   @db.VarChar(50)
-  description String?  @db.VarChar(255)
+  id          String  @id @default(uuid()) @db.Uuid
+  code        String  @unique @db.VarChar(80) // e.g. stock:inward, sale:complete, refund:approve
+  module      String  @db.VarChar(50)
+  description String? @db.VarChar(255)
 
-  roles       RolePermission[]
+  roles RolePermission[]
 
   @@map("permissions")
 }
@@ -100,8 +106,8 @@ model RolePermission {
   roleId       String @db.Uuid
   permissionId String @db.Uuid
 
-  role         Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
-  permission   Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
+  role       Role       @relation(fields: [roleId], references: [id], onDelete: Cascade)
+  permission Permission @relation(fields: [permissionId], references: [id], onDelete: Cascade)
 
   @@id([roleId, permissionId])
   @@map("role_permissions")
@@ -134,7 +140,7 @@ model Session {
   userId       String   @db.Uuid
   expires      DateTime @db.Timestamptz(6)
 
-  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+  user User @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("sessions")
 }
@@ -153,69 +159,70 @@ model VerificationToken {
 // -----------------------------------------------------------------------------
 
 model Brand {
-  id          String   @id @default(uuid()) @db.Uuid
-  name        String   @unique @db.VarChar(80)
-  slug        String   @unique @db.VarChar(80)
-  logoUrl     String?  @db.VarChar(255)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  id        String   @id @default(uuid()) @db.Uuid
+  name      String   @unique @db.VarChar(80)
+  slug      String   @unique @db.VarChar(80)
+  logoUrl   String?  @db.VarChar(255)
+  isActive  Boolean  @default(true)
+  createdAt DateTime @default(now()) @db.Timestamptz(6)
 
-  models      Model[]
+  models     Model[]
+  bikeModels BikeModel[]
 
   @@map("brands")
 }
 
 model Model {
-  id          String   @id @default(uuid()) @db.Uuid
-  brandId     String   @db.Uuid
-  name        String   @db.VarChar(120)
-  slug        String   @unique @db.VarChar(120)
-  category    String   @db.VarChar(50) // Roadster, Sport, Cruiser, Scooter, Adventure
-  engineCc    Int
-  powerBhp    Decimal  @db.Decimal(5, 2)
-  torqueNm    Decimal  @db.Decimal(5, 2)
-  mileageKmpl Decimal? @db.Decimal(4, 1)
-  kerbWeight  Int
-  fuelCapacity Decimal @db.Decimal(4, 1)
-  description String?  @db.Text
-  isUsed      Boolean  @default(false)
-  isActive    Boolean  @default(true)
-  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+  id           String   @id @default(uuid()) @db.Uuid
+  brandId      String   @db.Uuid
+  name         String   @db.VarChar(120)
+  slug         String   @unique @db.VarChar(120)
+  category     String   @db.VarChar(50) // Roadster, Sport, Cruiser, Scooter, Adventure
+  engineCc     Int
+  powerBhp     Decimal  @db.Decimal(5, 2)
+  torqueNm     Decimal  @db.Decimal(5, 2)
+  mileageKmpl  Decimal? @db.Decimal(4, 1)
+  kerbWeight   Int
+  fuelCapacity Decimal  @db.Decimal(4, 1)
+  description  String?  @db.Text
+  isUsed       Boolean  @default(false)
+  isActive     Boolean  @default(true)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
 
-  brand       Brand    @relation(fields: [brandId], references: [id])
-  variants    Variant[]
+  brand    Brand     @relation(fields: [brandId], references: [id])
+  variants Variant[]
 
   @@index([brandId])
   @@map("models")
 }
 
 model Variant {
-  id                  String   @id @default(uuid()) @db.Uuid
-  modelId             String   @db.Uuid
-  name                String   @db.VarChar(100)
-  exShowroomPricePaise BigInt  // Integer paise (e.g. 14990000n)
-  rtoTaxPaise         BigInt   // Integer paise
-  insurancePaise      BigInt   // Integer paise
+  id                   String  @id @default(uuid()) @db.Uuid
+  modelId              String  @db.Uuid
+  name                 String  @db.VarChar(100)
+  exShowroomPricePaise BigInt // Integer paise (e.g. 14990000n)
+  rtoTaxPaise          BigInt // Integer paise
+  insurancePaise       BigInt // Integer paise
   handlingChargesPaise BigInt  @default(150000)
-  hsnCode             String   @default("8711") @db.VarChar(10)
-  isActive            Boolean  @default(true)
+  hsnCode              String  @default("8711") @db.VarChar(10)
+  isActive             Boolean @default(true)
 
-  model               Model    @relation(fields: [modelId], references: [id])
-  colours             Colour[]
-  stockUnits          StockUnit[]
+  model      Model       @relation(fields: [modelId], references: [id])
+  colours    Colour[]
+  stockUnits StockUnit[]
 
   @@index([modelId])
   @@map("variants")
 }
 
 model Colour {
-  id        String   @id @default(uuid()) @db.Uuid
-  variantId String   @db.Uuid
-  name      String   @db.VarChar(60)
-  hexCode   String   @db.VarChar(10)
-  imageUrl  String?  @db.VarChar(255)
+  id        String  @id @default(uuid()) @db.Uuid
+  variantId String  @db.Uuid
+  name      String  @db.VarChar(60)
+  hexCode   String  @db.VarChar(10)
+  imageUrl  String? @db.VarChar(255)
 
-  variant   Variant  @relation(fields: [variantId], references: [id])
+  variant Variant @relation(fields: [variantId], references: [id])
 
   @@index([variantId])
   @@map("colours")
@@ -257,11 +264,11 @@ model StockUnit {
   inwardDate         DateTime        @default(now()) @db.Timestamptz(6)
   updatedAt          DateTime        @updatedAt @db.Timestamptz(6)
 
-  dealership         Dealership      @relation(fields: [dealershipId], references: [id])
-  variant            Variant         @relation(fields: [variantId], references: [id])
-  movements          StockMovement[]
-  reservation        Reservation?
-  sale               Sale?
+  dealership  Dealership      @relation(fields: [dealershipId], references: [id])
+  variant     Variant         @relation(fields: [variantId], references: [id])
+  movements   StockMovement[]
+  reservation Reservation?
+  sale        Sale?
 
   @@index([dealershipId])
   @@index([variantId])
@@ -279,21 +286,21 @@ model StockMovement {
   recordedBy  String            @db.VarChar(100)
   timestamp   DateTime          @default(now()) @db.Timestamptz(6)
 
-  stockUnit   StockUnit         @relation(fields: [stockUnitId], references: [id], onDelete: Cascade)
+  stockUnit StockUnit @relation(fields: [stockUnitId], references: [id], onDelete: Cascade)
 
   @@index([stockUnitId])
   @@map("stock_movements")
 }
 
 model Reservation {
-  id          String    @id @default(uuid()) @db.Uuid
-  bookingId   String    @unique @db.Uuid
-  stockUnitId String    @unique @db.Uuid
-  reservedAt  DateTime  @default(now()) @db.Timestamptz(6)
-  expiresAt   DateTime  @db.Timestamptz(6)
+  id          String   @id @default(uuid()) @db.Uuid
+  bookingId   String   @unique @db.Uuid
+  stockUnitId String   @unique @db.Uuid
+  reservedAt  DateTime @default(now()) @db.Timestamptz(6)
+  expiresAt   DateTime @db.Timestamptz(6)
 
-  booking     Booking   @relation(fields: [bookingId], references: [id])
-  stockUnit   StockUnit @relation(fields: [stockUnitId], references: [id])
+  booking   Booking   @relation(fields: [bookingId], references: [id])
+  stockUnit StockUnit @relation(fields: [stockUnitId], references: [id])
 
   @@map("reservations")
 }
@@ -331,11 +338,11 @@ model Booking {
   createdAt             DateTime      @default(now()) @db.Timestamptz(6)
   updatedAt             DateTime      @updatedAt @db.Timestamptz(6)
 
-  dealership            Dealership    @relation(fields: [dealershipId], references: [id])
-  customer              Customer      @relation(fields: [customerId], references: [id])
-  reservation           Reservation?
-  payments              Payment[]
-  refunds               Refund[]
+  dealership  Dealership   @relation(fields: [dealershipId], references: [id])
+  customer    Customer     @relation(fields: [customerId], references: [id])
+  reservation Reservation?
+  payments    Payment[]
+  refunds     Refund[]
 
   @@index([dealershipId])
   @@index([customerId])
@@ -363,11 +370,11 @@ model Sale {
   saleDate            DateTime   @default(now()) @db.Timestamptz(6)
   status              SaleStatus @default(INVOICED)
 
-  dealership          Dealership @relation(fields: [dealershipId], references: [id])
-  customer            Customer   @relation(fields: [customerId], references: [id])
-  stockUnit           StockUnit  @relation(fields: [stockUnitId], references: [id])
-  invoice             Invoice?
-  payments            Payment[]
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
+  customer   Customer   @relation(fields: [customerId], references: [id])
+  stockUnit  StockUnit  @relation(fields: [stockUnitId], references: [id])
+  invoice    Invoice?
+  payments   Payment[]
 
   @@index([dealershipId])
   @@index([customerId])
@@ -404,9 +411,9 @@ model Payment {
   status         PaymentStatus @default(SUCCESS)
   paymentDate    DateTime      @default(now()) @db.Timestamptz(6)
 
-  booking        Booking?      @relation(fields: [bookingId], references: [id])
-  sale           Sale?         @relation(fields: [saleId], references: [id])
-  refunds        Refund[]
+  booking Booking? @relation(fields: [bookingId], references: [id])
+  sale    Sale?    @relation(fields: [saleId], references: [id])
+  refunds Refund[]
 
   @@index([bookingId])
   @@index([saleId])
@@ -414,24 +421,24 @@ model Payment {
 }
 
 model Invoice {
-  id                  String   @id @default(uuid()) @db.Uuid
-  dealershipId        String   @db.Uuid
-  saleId              String   @unique @db.Uuid
-  invoiceNumber       String   @unique @db.VarChar(40)
-  gstin               String   @db.VarChar(15)
-  customerGstin       String?  @db.VarChar(15)
-  placeOfSupply       String   @default("27-Maharashtra") @db.VarChar(50)
-  gstRateBps          Int      @default(1800) // 18.00%
-  taxableAmountPaise  BigInt
-  cgstAmountPaise     BigInt
-  sgstAmountPaise     BigInt
-  igstAmountPaise     BigInt   @default(0)
-  totalInvoicePaise   BigInt
-  pdfUrl              String?  @db.VarChar(255)
-  issuedAt            DateTime @default(now()) @db.Timestamptz(6)
+  id                 String   @id @default(uuid()) @db.Uuid
+  dealershipId       String   @db.Uuid
+  saleId             String   @unique @db.Uuid
+  invoiceNumber      String   @unique @db.VarChar(40)
+  gstin              String   @db.VarChar(15)
+  customerGstin      String?  @db.VarChar(15)
+  placeOfSupply      String   @default("27-Maharashtra") @db.VarChar(50)
+  gstRateBps         Int      @default(1800) // 18.00%
+  taxableAmountPaise BigInt
+  cgstAmountPaise    BigInt
+  sgstAmountPaise    BigInt
+  igstAmountPaise    BigInt   @default(0)
+  totalInvoicePaise  BigInt
+  pdfUrl             String?  @db.VarChar(255)
+  issuedAt           DateTime @default(now()) @db.Timestamptz(6)
 
-  dealership          Dealership @relation(fields: [dealershipId], references: [id])
-  sale                Sale       @relation(fields: [saleId], references: [id])
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
+  sale       Sale       @relation(fields: [saleId], references: [id])
 
   @@index([dealershipId])
   @@map("invoices")
@@ -450,8 +457,8 @@ model Refund {
   requestedAt  DateTime     @default(now()) @db.Timestamptz(6)
   approvedAt   DateTime?    @db.Timestamptz(6)
 
-  payment      Payment      @relation(fields: [paymentId], references: [id])
-  booking      Booking      @relation(fields: [bookingId], references: [id])
+  payment Payment @relation(fields: [paymentId], references: [id])
+  booking Booking @relation(fields: [bookingId], references: [id])
 
   @@index([bookingId])
   @@index([paymentId])
@@ -459,15 +466,15 @@ model Refund {
 }
 
 model Expense {
-  id           String     @id @default(uuid()) @db.Uuid
-  dealershipId String     @db.Uuid
-  category     String     @db.VarChar(60) // Showroom Rent, Electricity, Logistics, PDI Supplies
+  id           String   @id @default(uuid()) @db.Uuid
+  dealershipId String   @db.Uuid
+  category     String   @db.VarChar(60) // Showroom Rent, Electricity, Logistics, PDI Supplies
   amountPaise  BigInt
-  description  String?    @db.VarChar(255)
-  paidTo       String     @db.VarChar(120)
-  paymentDate  DateTime   @db.Date
+  description  String?  @db.VarChar(255)
+  paidTo       String   @db.VarChar(120)
+  paymentDate  DateTime @db.Date
 
-  dealership   Dealership @relation(fields: [dealershipId], references: [id])
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
 
   @@map("expenses")
 }
@@ -503,20 +510,20 @@ model Customer {
 }
 
 model Lead {
-  id              String         @id @default(uuid()) @db.Uuid
-  customerId      String?        @db.Uuid
-  customerName    String         @db.VarChar(120)
-  phone           String         @db.VarChar(20)
-  email           String?        @db.VarChar(150)
-  bikeOfInterest  String         @db.VarChar(120)
-  source          String         @default("WEBSITE") @db.VarChar(50)
-  stage           String         @default("NEW") @db.VarChar(50) // NEW, CONTACTED, TEST_RIDE, QUOTATION, BOOKED, LOST
-  assignedTo      String?        @db.VarChar(120)
-  notes           String?        @db.Text
-  createdAt       DateTime       @default(now()) @db.Timestamptz(6)
+  id             String   @id @default(uuid()) @db.Uuid
+  customerId     String?  @db.Uuid
+  customerName   String   @db.VarChar(120)
+  phone          String   @db.VarChar(20)
+  email          String?  @db.VarChar(150)
+  bikeOfInterest String   @db.VarChar(120)
+  source         String   @default("WEBSITE") @db.VarChar(50)
+  stage          String   @default("NEW") @db.VarChar(50) // NEW, CONTACTED, TEST_RIDE, QUOTATION, BOOKED, LOST
+  assignedTo     String?  @db.VarChar(120)
+  notes          String?  @db.Text
+  createdAt      DateTime @default(now()) @db.Timestamptz(6)
 
-  customer        Customer?      @relation(fields: [customerId], references: [id])
-  activities      LeadActivity[]
+  customer   Customer?      @relation(fields: [customerId], references: [id])
+  activities LeadActivity[]
 
   @@index([phone])
   @@map("leads")
@@ -529,7 +536,7 @@ model LeadActivity {
   notes     String?  @db.Text
   timestamp DateTime @default(now()) @db.Timestamptz(6)
 
-  lead      Lead     @relation(fields: [leadId], references: [id], onDelete: Cascade)
+  lead Lead @relation(fields: [leadId], references: [id], onDelete: Cascade)
 
   @@index([leadId])
   @@map("lead_activities")
@@ -549,7 +556,7 @@ model TestRide {
   assignedStaff     String   @default("Suraj Patil") @db.VarChar(120)
   createdAt         DateTime @default(now()) @db.Timestamptz(6)
 
-  customer          Customer? @relation(fields: [customerId], references: [id])
+  customer Customer? @relation(fields: [customerId], references: [id])
 
   @@map("test_rides")
 }
@@ -566,7 +573,7 @@ model FinanceApplication {
   status           String   @default("SUBMITTED") @db.VarChar(40)
   createdAt        DateTime @default(now()) @db.Timestamptz(6)
 
-  customer         Customer @relation(fields: [customerId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("finance_applications")
 }
@@ -582,7 +589,7 @@ model InsuranceApplication {
   status          String   @default("SUBMITTED") @db.VarChar(40)
   createdAt       DateTime @default(now()) @db.Timestamptz(6)
 
-  customer        Customer @relation(fields: [customerId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("insurance_applications")
 }
@@ -598,7 +605,7 @@ model RTOApplication {
   status         String   @default("SUBMITTED") @db.VarChar(40)
   createdAt      DateTime @default(now()) @db.Timestamptz(6)
 
-  customer       Customer @relation(fields: [customerId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("rto_applications")
 }
@@ -615,7 +622,7 @@ model ServiceRequest {
   deletedAt    DateTime? @db.Timestamptz(6)
   createdAt    DateTime  @default(now()) @db.Timestamptz(6)
 
-  customer     Customer  @relation(fields: [customerId], references: [id])
+  customer Customer @relation(fields: [customerId], references: [id])
 
   @@map("service_requests")
 }
@@ -630,7 +637,7 @@ model StaffTask {
   priority    String   @default("MEDIUM") @db.VarChar(20)
   createdAt   DateTime @default(now()) @db.Timestamptz(6)
 
-  user        User     @relation("AssignedTasks", fields: [assignedTo], references: [id])
+  user User @relation("AssignedTasks", fields: [assignedTo], references: [id])
 
   @@map("staff_tasks")
 }
@@ -648,7 +655,7 @@ model AuditLog {
   ipAddress   String?  @db.VarChar(50)
   timestamp   DateTime @default(now()) @db.Timestamptz(6)
 
-  user        User?    @relation(fields: [userId], references: [id])
+  user User? @relation(fields: [userId], references: [id])
 
   @@index([action])
   @@index([timestamp])
@@ -668,15 +675,15 @@ model Document {
 }
 
 model Settings {
-  id              String     @id @default(uuid()) @db.Uuid
-  dealershipId    String     @db.Uuid
-  gstRateBps      Int        @default(1800)
-  theme           String     @default("dark") @db.VarChar(20)
-  autoLockMinutes Int        @default(30)
-  invoiceTerms    String     @db.Text
-  updatedAt       DateTime   @updatedAt @db.Timestamptz(6)
+  id              String   @id @default(uuid()) @db.Uuid
+  dealershipId    String   @db.Uuid
+  gstRateBps      Int      @default(1800)
+  theme           String   @default("dark") @db.VarChar(20)
+  autoLockMinutes Int      @default(30)
+  invoiceTerms    String   @db.Text
+  updatedAt       DateTime @updatedAt @db.Timestamptz(6)
 
-  dealership      Dealership @relation(fields: [dealershipId], references: [id])
+  dealership Dealership @relation(fields: [dealershipId], references: [id])
 
   @@map("settings")
 }
@@ -706,11 +713,11 @@ model Blog {
 }
 
 model Faq {
-  id        String   @id @default(uuid()) @db.Uuid
-  question  String   @db.VarChar(255)
-  answer    String   @db.Text
-  category  String   @default("General") @db.VarChar(50)
-  sortOrder Int      @default(0)
+  id        String @id @default(uuid()) @db.Uuid
+  question  String @db.VarChar(255)
+  answer    String @db.Text
+  category  String @default("General") @db.VarChar(50)
+  sortOrder Int    @default(0)
 
   @@map("faqs")
 }
@@ -724,12 +731,12 @@ model SocialLink {
 }
 
 model Banner {
-  id       String   @id @default(uuid()) @db.Uuid
-  title    String   @db.VarChar(150)
-  subtitle String?  @db.VarChar(255)
-  imageUrl String   @db.VarChar(255)
-  linkUrl  String?  @db.VarChar(255)
-  isActive Boolean  @default(true)
+  id       String  @id @default(uuid()) @db.Uuid
+  title    String  @db.VarChar(150)
+  subtitle String? @db.VarChar(255)
+  imageUrl String  @db.VarChar(255)
+  linkUrl  String? @db.VarChar(255)
+  isActive Boolean @default(true)
 
   @@map("banners")
 }
@@ -752,4 +759,328 @@ model ChatbotFeedback {
   createdAt DateTime @default(now()) @db.Timestamptz(6)
 
   @@map("chatbot_feedbacks")
+}
+
+// -----------------------------------------------------------------------------
+// MOTORCYCLE DATA INTEGRATION ENGINE
+// -----------------------------------------------------------------------------
+// External providers manage motorcycle INFORMATION (the BikeModel/BikeVariant/
+// BikeColour/BikeImage layer below). Authorised backend staff EXCLUSIVELY manage
+// pricing (BikePricing/BikePriceHistory). Sync code never touches pricing.
+// -----------------------------------------------------------------------------
+
+enum SyncTrigger {
+  SCHEDULED
+  MANUAL
+}
+
+enum SyncRunStatus {
+  RUNNING
+  SUCCESS
+  PARTIAL
+  FAILED
+}
+
+enum SyncLogLevel {
+  INFO
+  WARN
+  ERROR
+}
+
+enum PriceChangeType {
+  CREATE
+  UPDATE
+  PUBLISH
+}
+
+/// Registry of authorised motorcycle-information providers. Credentials are never
+/// stored here — only the code/name/attribution/rate-limit metadata. Secret values
+/// live in environment variables (see docs/BIKE_DATA_INTEGRATION.md).
+model DataProvider {
+  id                  String    @id @default(uuid()) @db.Uuid
+  code                String    @unique @db.VarChar(50)
+  name                String    @db.VarChar(120)
+  description         String?   @db.Text
+  baseUrl             String?   @db.VarChar(255)
+  docsUrl             String?   @db.VarChar(255)
+  attributionText     String?   @db.VarChar(255)
+  credentialEnvPrefix String?   @db.VarChar(50)
+  isEnabled           Boolean   @default(false)
+  requiresCredentials Boolean   @default(true)
+  rateLimitPerMinute  Int       @default(60)
+  lastSyncAt          DateTime? @db.Timestamptz(6)
+  lastSyncStatus      String?   @db.VarChar(20)
+  createdAt           DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt           DateTime  @updatedAt @db.Timestamptz(6)
+
+  models   BikeModel[]
+  variants BikeVariant[]
+  colours  BikeColour[]
+  images   BikeImage[]
+  syncRuns BikeSyncRun[]
+  requests BikeProviderRequest[]
+
+  @@map("data_providers")
+}
+
+/// A motorcycle model imported from an authorised provider. Holds specifications,
+/// descriptions and images only — never pricing.
+model BikeModel {
+  id                   String    @id @default(uuid()) @db.Uuid
+  brandId              String?   @db.Uuid
+  providerId           String?   @db.Uuid
+  externalId           String?   @db.VarChar(120)
+  name                 String    @db.VarChar(150)
+  slug                 String    @unique @db.VarChar(160)
+  category             String?   @db.VarChar(60)
+  description          String?   @db.Text
+  technicalDescription String?   @db.Text
+  imageUrl             String?   @db.VarChar(500)
+  sourceAttribution    String?   @db.VarChar(255)
+  isActive             Boolean   @default(true)
+  lastSyncedAt         DateTime? @db.Timestamptz(6)
+  deletedAt            DateTime? @db.Timestamptz(6)
+  createdAt            DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt            DateTime  @updatedAt @db.Timestamptz(6)
+
+  brand    Brand?        @relation(fields: [brandId], references: [id])
+  provider DataProvider? @relation(fields: [providerId], references: [id])
+  variants BikeVariant[]
+  images   BikeImage[]
+
+  @@unique([providerId, externalId])
+  @@index([brandId])
+  @@index([name])
+  @@map("bike_models")
+}
+
+/// A motorcycle variant imported from an authorised provider. Carries all
+/// technical specifications. Unique per model by name and per provider by external id.
+model BikeVariant {
+  id                 String    @id @default(uuid()) @db.Uuid
+  modelId            String    @db.Uuid
+  providerId         String?   @db.Uuid
+  externalId         String?   @db.VarChar(120)
+  name               String    @db.VarChar(120)
+  engineCc           Int?
+  powerBhp           Decimal?  @db.Decimal(6, 2)
+  powerKw            Decimal?  @db.Decimal(6, 2)
+  torqueNm           Decimal?  @db.Decimal(6, 2)
+  mileageKmpl        Decimal?  @db.Decimal(5, 1)
+  fuelType           String?   @db.VarChar(40)
+  fuelCapacityLitres Decimal?  @db.Decimal(5, 1)
+  transmission       String?   @db.VarChar(80)
+  transmissionGears  Int?
+  coolingSystem      String?   @db.VarChar(60)
+  topSpeedKmph       Int?
+  kerbWeightKg       Int?
+  seatHeightMm       Int?
+  groundClearanceMm  Int?
+  wheelbaseMm        Int?
+  lengthMm           Int?
+  widthMm            Int?
+  heightMm           Int?
+  frontBrake         String?   @db.VarChar(80)
+  rearBrake          String?   @db.VarChar(80)
+  absType            String?   @db.VarChar(40)
+  frontSuspension    String?   @db.VarChar(120)
+  rearSuspension     String?   @db.VarChar(120)
+  features           Json?
+  specifications     Json?
+  description        String?   @db.Text
+  isActive           Boolean   @default(true)
+  lastSyncedAt       DateTime? @db.Timestamptz(6)
+  deletedAt          DateTime? @db.Timestamptz(6)
+  createdAt          DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt          DateTime  @updatedAt @db.Timestamptz(6)
+
+  model        BikeModel          @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  provider     DataProvider?      @relation(fields: [providerId], references: [id])
+  colours      BikeColour[]
+  images       BikeImage[]
+  pricing      BikePricing?
+  priceHistory BikePriceHistory[]
+
+  @@unique([providerId, externalId])
+  @@unique([modelId, name])
+  @@index([modelId])
+  @@map("bike_variants")
+}
+
+model BikeColour {
+  id           String    @id @default(uuid()) @db.Uuid
+  variantId    String    @db.Uuid
+  providerId   String?   @db.Uuid
+  externalId   String?   @db.VarChar(120)
+  name         String    @db.VarChar(80)
+  hexCode      String?   @db.VarChar(10)
+  imageUrl     String?   @db.VarChar(500)
+  isActive     Boolean   @default(true)
+  lastSyncedAt DateTime? @db.Timestamptz(6)
+  createdAt    DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt    DateTime  @updatedAt @db.Timestamptz(6)
+
+  variant  BikeVariant   @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  provider DataProvider? @relation(fields: [providerId], references: [id])
+
+  @@unique([variantId, name])
+  @@index([variantId])
+  @@map("bike_colours")
+}
+
+model BikeImage {
+  id          String   @id @default(uuid()) @db.Uuid
+  modelId     String?  @db.Uuid
+  variantId   String?  @db.Uuid
+  providerId  String?  @db.Uuid
+  externalId  String?  @db.VarChar(120)
+  url         String   @db.VarChar(500)
+  alt         String?  @db.VarChar(200)
+  type        String   @default("gallery") @db.VarChar(30)
+  sortOrder   Int      @default(0)
+  licence     String?  @db.VarChar(200)
+  attribution String?  @db.VarChar(255)
+  createdAt   DateTime @default(now()) @db.Timestamptz(6)
+
+  model    BikeModel?    @relation(fields: [modelId], references: [id], onDelete: Cascade)
+  variant  BikeVariant?  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  provider DataProvider? @relation(fields: [providerId], references: [id])
+
+  @@index([modelId])
+  @@index([variantId])
+  @@map("bike_images")
+}
+
+/// Staff-managed pricing. One row per variant. NEVER written by the sync engine.
+/// Fields here are separate from BikeVariant specifications so the admin pricing
+/// interface cannot accidentally modify API-managed technical data.
+model BikePricing {
+  id                     String    @id @default(uuid()) @db.Uuid
+  variantId              String    @unique @db.Uuid
+  exShowroomPricePaise   BigInt
+  onRoadPricePaise       BigInt?
+  insurancePaise         BigInt    @default(0)
+  rtoPaise               BigInt    @default(0)
+  accessoriesPaise       BigInt    @default(0)
+  dealerOfferPaise       BigInt    @default(0)
+  finalSellingPricePaise BigInt?
+  notes                  String?   @db.Text
+  isPublished            Boolean   @default(false)
+  approvedByUserId       String?   @db.Uuid
+  approvedByName         String?   @db.VarChar(120)
+  approvedAt             DateTime? @db.Timestamptz(6)
+  updatedByUserId        String    @db.Uuid
+  updatedByName          String    @db.VarChar(120)
+  createdAt              DateTime  @default(now()) @db.Timestamptz(6)
+  updatedAt              DateTime  @updatedAt @db.Timestamptz(6)
+
+  variant    BikeVariant        @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  updatedBy  User               @relation("BikePricingUpdatedBy", fields: [updatedByUserId], references: [id])
+  approvedBy User?              @relation("BikePricingApprovedBy", fields: [approvedByUserId], references: [id])
+  history    BikePriceHistory[]
+
+  @@index([variantId])
+  @@map("bike_pricing")
+}
+
+/// Immutable audit trail. Captures staff id, previous/new prices and timestamp for
+/// every staff pricing action. Rows are never updated or deleted by application code.
+model BikePriceHistory {
+  id                       String          @id @default(uuid()) @db.Uuid
+  pricingId                String?         @db.Uuid
+  variantId                String          @db.Uuid
+  changeType               PriceChangeType
+  previousExShowroomPaise  BigInt?
+  newExShowroomPaise       BigInt?
+  previousOnRoadPricePaise BigInt?
+  newOnRoadPricePaise      BigInt?
+  previousDealerOfferPaise BigInt?
+  newDealerOfferPaise      BigInt?
+  previousPublished        Boolean?
+  newPublished             Boolean?
+  changedFields            Json?
+  staffUserId              String          @db.Uuid
+  staffName                String          @db.VarChar(120)
+  reason                   String?         @db.Text
+  ipAddress                String?         @db.VarChar(50)
+  createdAt                DateTime        @default(now()) @db.Timestamptz(6)
+
+  pricing   BikePricing? @relation(fields: [pricingId], references: [id], onDelete: SetNull)
+  variant   BikeVariant  @relation(fields: [variantId], references: [id], onDelete: Cascade)
+  staffUser User         @relation(fields: [staffUserId], references: [id])
+
+  @@index([variantId])
+  @@index([staffUserId])
+  @@index([createdAt])
+  @@map("bike_price_history")
+}
+
+model BikeSyncRun {
+  id                String        @id @default(uuid()) @db.Uuid
+  providerId        String        @db.Uuid
+  trigger           SyncTrigger
+  status            SyncRunStatus @default(RUNNING)
+  requestedByUserId String?       @db.Uuid
+  startedAt         DateTime      @default(now()) @db.Timestamptz(6)
+  finishedAt        DateTime?     @db.Timestamptz(6)
+  modelsSeen        Int           @default(0)
+  modelsCreated     Int           @default(0)
+  modelsUpdated     Int           @default(0)
+  modelsUnchanged   Int           @default(0)
+  variantsSeen      Int           @default(0)
+  variantsCreated   Int           @default(0)
+  variantsUpdated   Int           @default(0)
+  coloursSeen       Int           @default(0)
+  imagesSeen        Int           @default(0)
+  errorCount        Int           @default(0)
+  summary           Json?
+
+  provider    DataProvider          @relation(fields: [providerId], references: [id])
+  requestedBy User?                 @relation(fields: [requestedByUserId], references: [id])
+  logs        BikeSyncLog[]
+  requests    BikeProviderRequest[]
+
+  @@index([providerId])
+  @@index([startedAt])
+  @@map("bike_sync_runs")
+}
+
+model BikeSyncLog {
+  id         String       @id @default(uuid()) @db.Uuid
+  runId      String       @db.Uuid
+  level      SyncLogLevel @default(INFO)
+  entityType String?      @db.VarChar(30)
+  externalId String?      @db.VarChar(120)
+  message    String       @db.Text
+  details    Json?
+  createdAt  DateTime     @default(now()) @db.Timestamptz(6)
+
+  run BikeSyncRun @relation(fields: [runId], references: [id], onDelete: Cascade)
+
+  @@index([runId])
+  @@index([level])
+  @@map("bike_sync_logs")
+}
+
+/// One row per outbound provider HTTP request — used for request logging and
+/// database-backed rate limiting. Contains no response bodies or secrets.
+model BikeProviderRequest {
+  id           String   @id @default(uuid()) @db.Uuid
+  providerId   String   @db.Uuid
+  runId        String?  @db.Uuid
+  method       String   @db.VarChar(10)
+  endpoint     String   @db.VarChar(500)
+  statusCode   Int?
+  success      Boolean  @default(false)
+  attempt      Int      @default(1)
+  durationMs   Int?
+  errorMessage String?  @db.VarChar(500)
+  createdAt    DateTime @default(now()) @db.Timestamptz(6)
+
+  provider DataProvider @relation(fields: [providerId], references: [id])
+  run      BikeSyncRun? @relation(fields: [runId], references: [id], onDelete: SetNull)
+
+  @@index([providerId, createdAt])
+  @@index([runId])
+  @@map("bike_provider_requests")
 }

@@ -1,0 +1,84 @@
+@import "tailwindcss";
+
+@custom-variant dark (&:where(.dark, .dark *));
+
+@theme {
+  --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+  --font-mono: 'JetBrains Mono', monospace;
+
+  /* User's Exact Palette Definition from Uploaded Reference */
+  --color-obsidian: #0B0F0D;
+  --color-evergreen: #1F2A1F;
+  --color-moss: #3E5A3F;
+  --color-sage: #8CA98C;
+  --color-sand: #D9C7A3;
+  --color-bronze: #B08D57;
+
+  /* Overriding standard slate and amber tokens to map seamlessly to this luxury palette */
+  --color-slate-950: #0B0F0D;
+  --color-slate-900: #141C15;
+  --color-slate-800: #1F2A1F;
+  --color-slate-700: #3E5A3F;
+  --color-slate-600: #557256;
+  --color-slate-500: #748F74;
+  --color-slate-400: #8CA98C;
+  --color-slate-300: #B7C7B7;
+  --color-slate-200: #D9C7A3;
+  --color-slate-100: #F4EFE6;
+
+  /* Primary Brand & Gold/Amber Accent */
+  --color-amber-500: #B08D57;
+  --color-amber-400: #D9C7A3;
+  --color-amber-300: #E8DCBE;
+  --color-amber-600: #947340;
+}
+
+:root {
+  --bg-obsidian: #0B0F0D;
+  --surface-evergreen: #1F2A1F;
+  --border-moss: #3E5A3F;
+  --text-sage: #8CA98C;
+  --text-sand: #D9C7A3;
+  --brand-bronze: #B08D57;
+}
+
+body {
+  font-family: var(--font-sans);
+  background-color: #0B0F0D;
+  color: #D9C7A3;
+}
+
+/* Custom subtle scrollbar with new palette */
+::-webkit-scrollbar {
+  width: 6px;
+  height: 6px;
+}
+::-webkit-scrollbar-track {
+  background: #0B0F0D;
+}
+::-webkit-scrollbar-thumb {
+  background: #3E5A3F;
+  border-radius: 3px;
+}
+::-webkit-scrollbar-thumb:hover {
+  background: #8CA98C;
+}
+
+@keyframes marquee {
+  0% {
+    transform: translateX(0%);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+
+.animate-marquee {
+  display: flex;
+  width: max-content;
+  animation: marquee 35s linear infinite;
+}
+
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
