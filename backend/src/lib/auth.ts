@@ -1,6 +1,7 @@
 import { NextAuthOptions } from 'next-auth';
 import { PrismaAdapter } from '@next-auth/prisma-adapter';
 import CredentialsProvider from 'next-auth/providers/credentials';
+import { compare } from 'bcryptjs';
 import { prisma } from './prisma';
 
 export const authOptions: NextAuthOptions = {
@@ -27,22 +28,25 @@ export const authOptions: NextAuthOptions = {
           include: { role: true },
         });
 
-        if (!user || !user.isActive) return null;
-        // In production, verify bcrypt hash
+        if (!user || !user.isActive || user.deletedAt || !user.passwordHash) return null;
+
+        const isValid = await compare(credentials.password, user.passwordHash);
+        if (!isValid) return null;
+
         return {
           id: user.id,
           name: user.name,
           email: user.email,
           role: user.role.name,
-        } as any;
+        } as unknown as { id: string; name: string; email: string };
       },
     }),
   ],
   callbacks: {
     async session({ session, user }) {
       if (session.user) {
-        (session.user as any).id = user.id;
-        (session.user as any).role = (user as any).role;
+        (session.user as { id?: string; role?: string }).id = user.id;
+        (session.user as { id?: string; role?: string }).role = (user as { role?: string }).role;
       }
       return session;
     },
