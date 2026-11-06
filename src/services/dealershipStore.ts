@@ -129,7 +129,7 @@ class DealershipStore {
           category: 'Motorcycles',
           location: 'Khopat, Thane West, Maharashtra',
           description: 'Certified Pre-Owned by The Bike Yard Thane. Single owner, 45-point PDI cleared, 6-month engine warranty. Clean MH-04 Thane RTO documentation and valid insurance.',
-          photos: ['/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg'],
+          photos: ['/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg'],
           postedBy: 'Suraj Patil (Sales Exec)',
           postedAt: '2026-10-24T09:30:00.000Z',
           olxAdId: 'OLX-THN-84920194',

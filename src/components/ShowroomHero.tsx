@@ -86,7 +86,7 @@ export const ShowroomHero: React.FC<ShowroomHeroProps> = ({
             <div className="relative rounded-2xl border border-slate-800 bg-slate-900/60 p-2 shadow-2xl overflow-hidden group">
               <div className="relative aspect-[16/10] overflow-hidden rounded-xl">
                 <img
-                  src="/src/assets/images/hero_motorcycle_showroom_1793817699343.jpg"
+                  src="/assets/images/hero_motorcycle_showroom_1793817699343.jpg"
                   alt="The Bike Yard Motorcycle Showroom in Khopat Thane"
                   className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
                   referrerPolicy="no-referrer"

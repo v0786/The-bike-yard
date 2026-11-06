@@ -35,59 +35,59 @@ interface RawBikeSeed {
 
 const POPULAR_INDIAN_MODELS: RawBikeSeed[] = [
   // Royal Enfield
-  { brand: 'Royal Enfield', model: 'Hunter 350', category: 'Roadster', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 36.2, kerbWeightKg: 181, fuelCapacityL: 13, image: '/src/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 137640 },
-  { brand: 'Royal Enfield', model: 'Classic 350 Reborn', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 35.0, kerbWeightKg: 195, fuelCapacityL: 13, image: '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 193080 },
-  { brand: 'Royal Enfield', model: 'Bullet 350', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 36.0, kerbWeightKg: 195, fuelCapacityL: 13, image: '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 173562 },
-  { brand: 'Royal Enfield', model: 'Meteor 350', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 34.5, kerbWeightKg: 191, fuelCapacityL: 15, image: '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 205844 },
-  { brand: 'Royal Enfield', model: 'Himalayan 450', category: 'Adventure', engineCc: 452, powerBhp: 40.0, torqueNm: 40.0, mileageKmpl: 30.0, kerbWeightKg: 196, fuelCapacityL: 17, image: '/src/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 285000 },
-  { brand: 'Royal Enfield', model: 'Guerrilla 450', category: 'Roadster', engineCc: 452, powerBhp: 40.0, torqueNm: 40.0, mileageKmpl: 29.5, kerbWeightKg: 185, fuelCapacityL: 11, image: '/src/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 239000 },
-  { brand: 'Royal Enfield', model: 'Continental GT 650', category: 'Sport', engineCc: 648, powerBhp: 47.0, torqueNm: 52.0, mileageKmpl: 25.0, kerbWeightKg: 211, fuelCapacityL: 12.5, image: '/src/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 319000 },
-  { brand: 'Royal Enfield', model: 'Interceptor 650', category: 'Roadster', engineCc: 648, powerBhp: 47.0, torqueNm: 52.0, mileageKmpl: 24.0, kerbWeightKg: 213, fuelCapacityL: 13.7, image: '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 303000 },
+  { brand: 'Royal Enfield', model: 'Hunter 350', category: 'Roadster', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 36.2, kerbWeightKg: 181, fuelCapacityL: 13, image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 137640 },
+  { brand: 'Royal Enfield', model: 'Classic 350 Reborn', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 35.0, kerbWeightKg: 195, fuelCapacityL: 13, image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 193080 },
+  { brand: 'Royal Enfield', model: 'Bullet 350', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 36.0, kerbWeightKg: 195, fuelCapacityL: 13, image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 173562 },
+  { brand: 'Royal Enfield', model: 'Meteor 350', category: 'Cruiser', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 34.5, kerbWeightKg: 191, fuelCapacityL: 15, image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 205844 },
+  { brand: 'Royal Enfield', model: 'Himalayan 450', category: 'Adventure', engineCc: 452, powerBhp: 40.0, torqueNm: 40.0, mileageKmpl: 30.0, kerbWeightKg: 196, fuelCapacityL: 17, image: '/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 285000 },
+  { brand: 'Royal Enfield', model: 'Guerrilla 450', category: 'Roadster', engineCc: 452, powerBhp: 40.0, torqueNm: 40.0, mileageKmpl: 29.5, kerbWeightKg: 185, fuelCapacityL: 11, image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 239000 },
+  { brand: 'Royal Enfield', model: 'Continental GT 650', category: 'Sport', engineCc: 648, powerBhp: 47.0, torqueNm: 52.0, mileageKmpl: 25.0, kerbWeightKg: 211, fuelCapacityL: 12.5, image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 319000 },
+  { brand: 'Royal Enfield', model: 'Interceptor 650', category: 'Roadster', engineCc: 648, powerBhp: 47.0, torqueNm: 52.0, mileageKmpl: 24.0, kerbWeightKg: 213, fuelCapacityL: 13.7, image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 303000 },
 
   // KTM
-  { brand: 'KTM', model: '390 Duke (Gen 3)', category: 'Sport', engineCc: 399, powerBhp: 45.3, torqueNm: 39.0, mileageKmpl: 28.5, kerbWeightKg: 168, fuelCapacityL: 15, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 310520 },
-  { brand: 'KTM', model: '250 Duke', category: 'Sport', engineCc: 249, powerBhp: 31.0, torqueNm: 25.0, mileageKmpl: 32.0, kerbWeightKg: 163, fuelCapacityL: 15, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 240000 },
-  { brand: 'KTM', model: '200 Duke', category: 'Sport', engineCc: 199, powerBhp: 25.0, torqueNm: 19.2, mileageKmpl: 34.0, kerbWeightKg: 159, fuelCapacityL: 13.5, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 198000 },
-  { brand: 'KTM', model: 'RC 390', category: 'Sport', engineCc: 373, powerBhp: 43.5, torqueNm: 37.0, mileageKmpl: 26.0, kerbWeightKg: 172, fuelCapacityL: 13.7, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 318000 },
-  { brand: 'KTM', model: '390 Adventure', category: 'Adventure', engineCc: 373, powerBhp: 43.5, torqueNm: 37.0, mileageKmpl: 28.0, kerbWeightKg: 177, fuelCapacityL: 14.5, image: '/src/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 338000 },
+  { brand: 'KTM', model: '390 Duke (Gen 3)', category: 'Sport', engineCc: 399, powerBhp: 45.3, torqueNm: 39.0, mileageKmpl: 28.5, kerbWeightKg: 168, fuelCapacityL: 15, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 310520 },
+  { brand: 'KTM', model: '250 Duke', category: 'Sport', engineCc: 249, powerBhp: 31.0, torqueNm: 25.0, mileageKmpl: 32.0, kerbWeightKg: 163, fuelCapacityL: 15, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 240000 },
+  { brand: 'KTM', model: '200 Duke', category: 'Sport', engineCc: 199, powerBhp: 25.0, torqueNm: 19.2, mileageKmpl: 34.0, kerbWeightKg: 159, fuelCapacityL: 13.5, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 198000 },
+  { brand: 'KTM', model: 'RC 390', category: 'Sport', engineCc: 373, powerBhp: 43.5, torqueNm: 37.0, mileageKmpl: 26.0, kerbWeightKg: 172, fuelCapacityL: 13.7, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 318000 },
+  { brand: 'KTM', model: '390 Adventure', category: 'Adventure', engineCc: 373, powerBhp: 43.5, torqueNm: 37.0, mileageKmpl: 28.0, kerbWeightKg: 177, fuelCapacityL: 14.5, image: '/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 338000 },
 
   // Triumph
-  { brand: 'Triumph', model: 'Speed 400', category: 'Roadster', engineCc: 398, powerBhp: 40.0, torqueNm: 37.5, mileageKmpl: 30.0, kerbWeightKg: 176, fuelCapacityL: 13, image: '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 234497 },
-  { brand: 'Triumph', model: 'Scrambler 400 X', category: 'Adventure', engineCc: 398, powerBhp: 40.0, torqueNm: 37.5, mileageKmpl: 28.0, kerbWeightKg: 179, fuelCapacityL: 13, image: '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 264497 },
-  { brand: 'Triumph', model: 'Speed T4', category: 'Roadster', engineCc: 398, powerBhp: 31.0, torqueNm: 36.0, mileageKmpl: 33.0, kerbWeightKg: 180, fuelCapacityL: 13, image: '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 217000 },
+  { brand: 'Triumph', model: 'Speed 400', category: 'Roadster', engineCc: 398, powerBhp: 40.0, torqueNm: 37.5, mileageKmpl: 30.0, kerbWeightKg: 176, fuelCapacityL: 13, image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 234497 },
+  { brand: 'Triumph', model: 'Scrambler 400 X', category: 'Adventure', engineCc: 398, powerBhp: 40.0, torqueNm: 37.5, mileageKmpl: 28.0, kerbWeightKg: 179, fuelCapacityL: 13, image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 264497 },
+  { brand: 'Triumph', model: 'Speed T4', category: 'Roadster', engineCc: 398, powerBhp: 31.0, torqueNm: 36.0, mileageKmpl: 33.0, kerbWeightKg: 180, fuelCapacityL: 13, image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 217000 },
 
   // Yamaha
-  { brand: 'Yamaha', model: 'Aerox 155', category: 'Scooter', engineCc: 155, powerBhp: 15.0, torqueNm: 13.9, mileageKmpl: 42.0, kerbWeightKg: 126, fuelCapacityL: 5.5, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 148300 },
-  { brand: 'Yamaha', model: 'YZF R15 V4', category: 'Sport', engineCc: 155, powerBhp: 18.4, torqueNm: 14.2, mileageKmpl: 45.0, kerbWeightKg: 142, fuelCapacityL: 11, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 182000 },
-  { brand: 'Yamaha', model: 'MT-15 V2', category: 'Sport', engineCc: 155, powerBhp: 18.4, torqueNm: 14.1, mileageKmpl: 47.0, kerbWeightKg: 141, fuelCapacityL: 10, image: '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 168000 },
-  { brand: 'Yamaha', model: 'RayZR 125 Fi Hybrid', category: 'Scooter', engineCc: 125, powerBhp: 8.2, torqueNm: 10.3, mileageKmpl: 58.0, kerbWeightKg: 99, fuelCapacityL: 5.2, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 85300 },
+  { brand: 'Yamaha', model: 'Aerox 155', category: 'Scooter', engineCc: 155, powerBhp: 15.0, torqueNm: 13.9, mileageKmpl: 42.0, kerbWeightKg: 126, fuelCapacityL: 5.5, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 148300 },
+  { brand: 'Yamaha', model: 'YZF R15 V4', category: 'Sport', engineCc: 155, powerBhp: 18.4, torqueNm: 14.2, mileageKmpl: 45.0, kerbWeightKg: 142, fuelCapacityL: 11, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 182000 },
+  { brand: 'Yamaha', model: 'MT-15 V2', category: 'Sport', engineCc: 155, powerBhp: 18.4, torqueNm: 14.1, mileageKmpl: 47.0, kerbWeightKg: 141, fuelCapacityL: 10, image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg', baseExShowroom: 168000 },
+  { brand: 'Yamaha', model: 'RayZR 125 Fi Hybrid', category: 'Scooter', engineCc: 125, powerBhp: 8.2, torqueNm: 10.3, mileageKmpl: 58.0, kerbWeightKg: 99, fuelCapacityL: 5.2, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 85300 },
 
   // Bajaj
-  { brand: 'Bajaj', model: 'Pulsar NS200', category: 'Sport', engineCc: 199, powerBhp: 24.5, torqueNm: 18.7, mileageKmpl: 36.0, kerbWeightKg: 158, fuelCapacityL: 12, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 142000 },
-  { brand: 'Bajaj', model: 'Pulsar N160', category: 'Sport', engineCc: 164, powerBhp: 16.0, torqueNm: 14.65, mileageKmpl: 45.0, kerbWeightKg: 154, fuelCapacityL: 14, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 123000 },
-  { brand: 'Bajaj', model: 'Pulsar 150', category: 'Commuter', engineCc: 149, powerBhp: 14.0, torqueNm: 13.25, mileageKmpl: 48.0, kerbWeightKg: 148, fuelCapacityL: 15, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 110000 },
-  { brand: 'Bajaj', model: 'Dominar 400', category: 'Cruiser', engineCc: 373, powerBhp: 40.0, torqueNm: 35.0, mileageKmpl: 27.0, kerbWeightKg: 193, fuelCapacityL: 13, image: '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 231000 },
-  { brand: 'Bajaj', model: 'Chetak Electric', category: 'Scooter', engineCc: 0, powerBhp: 5.4, torqueNm: 16.2, mileageKmpl: 126.0, kerbWeightKg: 134, fuelCapacityL: 0, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 99998 },
+  { brand: 'Bajaj', model: 'Pulsar NS200', category: 'Sport', engineCc: 199, powerBhp: 24.5, torqueNm: 18.7, mileageKmpl: 36.0, kerbWeightKg: 158, fuelCapacityL: 12, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 142000 },
+  { brand: 'Bajaj', model: 'Pulsar N160', category: 'Sport', engineCc: 164, powerBhp: 16.0, torqueNm: 14.65, mileageKmpl: 45.0, kerbWeightKg: 154, fuelCapacityL: 14, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 123000 },
+  { brand: 'Bajaj', model: 'Pulsar 150', category: 'Commuter', engineCc: 149, powerBhp: 14.0, torqueNm: 13.25, mileageKmpl: 48.0, kerbWeightKg: 148, fuelCapacityL: 15, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 110000 },
+  { brand: 'Bajaj', model: 'Dominar 400', category: 'Cruiser', engineCc: 373, powerBhp: 40.0, torqueNm: 35.0, mileageKmpl: 27.0, kerbWeightKg: 193, fuelCapacityL: 13, image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 231000 },
+  { brand: 'Bajaj', model: 'Chetak Electric', category: 'Scooter', engineCc: 0, powerBhp: 5.4, torqueNm: 16.2, mileageKmpl: 126.0, kerbWeightKg: 134, fuelCapacityL: 0, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 99998 },
 
   // Honda
-  { brand: 'Honda', model: 'Activa 6G', category: 'Scooter', engineCc: 109, powerBhp: 7.7, torqueNm: 8.9, mileageKmpl: 50.0, kerbWeightKg: 106, fuelCapacityL: 5.3, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 76684 },
-  { brand: 'Honda', model: 'Shine 125', category: 'Commuter', engineCc: 124, powerBhp: 10.7, torqueNm: 11.0, mileageKmpl: 55.0, kerbWeightKg: 114, fuelCapacityL: 10.5, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 80250 },
-  { brand: 'Honda', model: 'CB350 Hness', category: 'Cruiser', engineCc: 348, powerBhp: 20.8, torqueNm: 30.0, mileageKmpl: 35.0, kerbWeightKg: 181, fuelCapacityL: 15, image: '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 209857 },
+  { brand: 'Honda', model: 'Activa 6G', category: 'Scooter', engineCc: 109, powerBhp: 7.7, torqueNm: 8.9, mileageKmpl: 50.0, kerbWeightKg: 106, fuelCapacityL: 5.3, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 76684 },
+  { brand: 'Honda', model: 'Shine 125', category: 'Commuter', engineCc: 124, powerBhp: 10.7, torqueNm: 11.0, mileageKmpl: 55.0, kerbWeightKg: 114, fuelCapacityL: 10.5, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 80250 },
+  { brand: 'Honda', model: 'CB350 Hness', category: 'Cruiser', engineCc: 348, powerBhp: 20.8, torqueNm: 30.0, mileageKmpl: 35.0, kerbWeightKg: 181, fuelCapacityL: 15, image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg', baseExShowroom: 209857 },
 
   // TVS
-  { brand: 'TVS', model: 'Apache RTR 160 4V', category: 'Sport', engineCc: 159, powerBhp: 17.5, torqueNm: 14.7, mileageKmpl: 45.0, kerbWeightKg: 146, fuelCapacityL: 12, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 124870 },
-  { brand: 'TVS', model: 'Raider 125', category: 'Commuter', engineCc: 124, powerBhp: 11.2, torqueNm: 11.2, mileageKmpl: 57.0, kerbWeightKg: 123, fuelCapacityL: 10, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 95219 },
-  { brand: 'TVS', model: 'Ntorq 125', category: 'Scooter', engineCc: 124, powerBhp: 9.3, torqueNm: 10.5, mileageKmpl: 47.0, kerbWeightKg: 118, fuelCapacityL: 5.8, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 89641 },
-  { brand: 'TVS', model: 'Ronin', category: 'Roadster', engineCc: 225, powerBhp: 20.4, torqueNm: 19.9, mileageKmpl: 40.0, kerbWeightKg: 159, fuelCapacityL: 14, image: '/src/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 149200 },
+  { brand: 'TVS', model: 'Apache RTR 160 4V', category: 'Sport', engineCc: 159, powerBhp: 17.5, torqueNm: 14.7, mileageKmpl: 45.0, kerbWeightKg: 146, fuelCapacityL: 12, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 124870 },
+  { brand: 'TVS', model: 'Raider 125', category: 'Commuter', engineCc: 124, powerBhp: 11.2, torqueNm: 11.2, mileageKmpl: 57.0, kerbWeightKg: 123, fuelCapacityL: 10, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 95219 },
+  { brand: 'TVS', model: 'Ntorq 125', category: 'Scooter', engineCc: 124, powerBhp: 9.3, torqueNm: 10.5, mileageKmpl: 47.0, kerbWeightKg: 118, fuelCapacityL: 5.8, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 89641 },
+  { brand: 'TVS', model: 'Ronin', category: 'Roadster', engineCc: 225, powerBhp: 20.4, torqueNm: 19.9, mileageKmpl: 40.0, kerbWeightKg: 159, fuelCapacityL: 14, image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 149200 },
 
   // Suzuki
-  { brand: 'Suzuki', model: 'Access 125', category: 'Scooter', engineCc: 124, powerBhp: 8.7, torqueNm: 10.0, mileageKmpl: 50.0, kerbWeightKg: 103, fuelCapacityL: 5.0, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 80700 },
-  { brand: 'Suzuki', model: 'Burgman Street 125', category: 'Scooter', engineCc: 124, powerBhp: 8.7, torqueNm: 10.0, mileageKmpl: 48.0, kerbWeightKg: 110, fuelCapacityL: 5.5, image: '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 94301 },
+  { brand: 'Suzuki', model: 'Access 125', category: 'Scooter', engineCc: 124, powerBhp: 8.7, torqueNm: 10.0, mileageKmpl: 50.0, kerbWeightKg: 103, fuelCapacityL: 5.0, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 80700 },
+  { brand: 'Suzuki', model: 'Burgman Street 125', category: 'Scooter', engineCc: 124, powerBhp: 8.7, torqueNm: 10.0, mileageKmpl: 48.0, kerbWeightKg: 110, fuelCapacityL: 5.5, image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg', baseExShowroom: 94301 },
 
   // Hero
-  { brand: 'Hero', model: 'Splendor Plus', category: 'Commuter', engineCc: 97, powerBhp: 7.9, torqueNm: 8.05, mileageKmpl: 65.0, kerbWeightKg: 112, fuelCapacityL: 9.8, image: '/src/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 75441 },
-  { brand: 'Hero', model: 'Xpulse 200 4V', category: 'Adventure', engineCc: 199, powerBhp: 19.1, torqueNm: 17.35, mileageKmpl: 38.0, kerbWeightKg: 158, fuelCapacityL: 13, image: '/src/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 147391 },
-  { brand: 'Hero', model: 'Mavrick 440', category: 'Roadster', engineCc: 440, powerBhp: 27.0, torqueNm: 36.0, mileageKmpl: 32.0, kerbWeightKg: 187, fuelCapacityL: 13.5, image: '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 199000 },
+  { brand: 'Hero', model: 'Splendor Plus', category: 'Commuter', engineCc: 97, powerBhp: 7.9, torqueNm: 8.05, mileageKmpl: 65.0, kerbWeightKg: 112, fuelCapacityL: 9.8, image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg', baseExShowroom: 75441 },
+  { brand: 'Hero', model: 'Xpulse 200 4V', category: 'Adventure', engineCc: 199, powerBhp: 19.1, torqueNm: 17.35, mileageKmpl: 38.0, kerbWeightKg: 158, fuelCapacityL: 13, image: '/assets/images/bike_himalayan_450_1793818522395.jpg', baseExShowroom: 147391 },
+  { brand: 'Hero', model: 'Mavrick 440', category: 'Roadster', engineCc: 440, powerBhp: 27.0, torqueNm: 36.0, mileageKmpl: 32.0, kerbWeightKg: 187, fuelCapacityL: 13.5, image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg', baseExShowroom: 199000 },
 ];
 
 /**
@@ -281,14 +281,14 @@ export function parseBikesCsv(csvText: string): { importedCount: number; bikes: 
 
     const defaultImage = customImage || (
       brand.toLowerCase().includes('ktm')
-        ? '/src/assets/images/bike_ktm_duke_390_1793817701221.jpg'
+        ? '/assets/images/bike_ktm_duke_390_1793817701221.jpg'
         : brand.toLowerCase().includes('triumph')
-        ? '/src/assets/images/bike_triumph_speed_400_1793818520492.jpg'
+        ? '/assets/images/bike_triumph_speed_400_1793818520492.jpg'
         : brand.toLowerCase().includes('yamaha')
-        ? '/src/assets/images/bike_yamaha_aerox_155_1793817701070.jpg'
+        ? '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg'
         : brand.toLowerCase().includes('classic') || brand.toLowerCase().includes('bullet')
-        ? '/src/assets/images/bike_used_re_classic_350_1793818522002.jpg'
-        : '/src/assets/images/bike_royal_enfield_hunter_1793817700106.jpg'
+        ? '/assets/images/bike_used_re_classic_350_1793818522002.jpg'
+        : '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg'
     );
 
     importedBikes.push({
