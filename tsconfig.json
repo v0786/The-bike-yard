@@ -1,60 +1,28 @@
 {
   "compilerOptions": {
-    "module": "es2020",
-    "target": "es2020",
+    "target": "ES2022",
+    "experimentalDecorators": true,
+    "useDefineForClassFields": false,
+    "module": "ESNext",
+    "types": ["vite/client"],
     "lib": [
-      "es2020",
-      "dom"
+      "ES2022",
+      "DOM",
+      "DOM.Iterable"
     ],
-    "types": [
-      "next",
-      "node"
-    ],
-    "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "strict": true,
-    "jsx": "react-jsx",
-    "esModuleInterop": true,
-    "resolveJsonModule": true,
-    // Recommended Options
     "skipLibCheck": true,
-    "noUncheckedSideEffectImports": true,
-    "forceConsistentCasingInFileNames": true,
+    "moduleResolution": "bundler",
+    "isolatedModules": true,
+    "moduleDetection": "force",
+    "allowJs": true,
+    "jsx": "react-jsx",
     "paths": {
       "@/*": [
-        "./src/*"
+        "./*"
       ]
     },
-    "declaration": true,
-    "declarationMap": true,
-    "outDir": "./dist",
-    // Stricter Typechecking Options
-    "noUncheckedIndexedAccess": true,
-    "exactOptionalPropertyTypes": true,
-    // Style Options
-    "noImplicitReturns": false,
-    "noImplicitOverride": false,
-    "noUnusedLocals": false,
-    "noUnusedParameters": false,
-    "noFallthroughCasesInSwitch": false,
-    "noPropertyAccessFromIndexSignature": false,
-    "allowJs": true,
-    "noEmit": true,
-    "incremental": true,
-    "moduleResolution": "bundler",
-    "plugins": [
-      {
-        "name": "next"
-      }
-    ]
+    "allowImportingTsExtensions": true,
+    "noEmit": true
   },
-  "include": [
-    "src/**/*",
-    ".next/types/**/*.ts",
-    ".next/dev/types/**/*.ts"
-  ],
-  "exclude": [
-    "node_modules",
-    "dist"
-  ]
+  "exclude": ["dist"]
 }
