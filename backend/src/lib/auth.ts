@@ -7,7 +7,7 @@ import { prisma } from './prisma';
 export const authOptions: NextAuthOptions = {
   adapter: PrismaAdapter(prisma),
   session: {
-    strategy: 'database',
+    strategy: 'jwt',
     maxAge: 8 * 60 * 60, // Eight-hour session lifetime
   },
   pages: {
@@ -43,10 +43,13 @@ export const authOptions: NextAuthOptions = {
     }),
   ],
   callbacks: {
-    async session({ session, user }) {
-      if (session.user) {
-        (session.user as { id?: string; role?: string }).id = user.id;
-        (session.user as { id?: string; role?: string }).role = (user as { role?: string }).role;
+    async jwt({ token, user }) {
+      if (user) token.sub = user.id;
+      return token;
+    },
+    async session({ session, token }) {
+      if (session.user && token.sub) {
+        (session.user as { id?: string }).id = token.sub;
       }
       return session;
     },
