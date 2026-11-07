@@ -6,6 +6,7 @@ import { Navbar } from './components/Navbar';
 import { ShowroomHero } from './components/ShowroomHero';
 import { TrendingMarquee } from './components/TrendingMarquee';
 import { BikeListing } from './components/BikeListing';
+import { BikeWaleReferenceCatalog } from './components/BikeWaleReferenceCatalog';
 import { PersistentOnRoadBar } from './components/PersistentOnRoadBar';
 import { FinanceEmiSection } from './components/FinanceEmiSection';
 import { BikeDetailModal } from './components/BikeDetailModal';
@@ -188,6 +189,7 @@ export default function App() {
         {/* PUBLIC DIGITAL SHOWROOM — BIKEWALE STYLE EXPLORATION */}
         {activeView === 'showroom' && (
           <div className="space-y-12 sm:space-y-16 pb-24 md:pb-28">
+            <BikeWaleReferenceCatalog />
             {/* Showroom Hero Banner */}
             <ShowroomHero
               inStockTotal={totalInStock}
