@@ -152,6 +152,9 @@ export default function App() {
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500/20 selection:text-amber-400">
+      <div role="status" className="bg-amber-500 px-4 py-2 text-center text-xs font-semibold text-slate-950">
+        CLIENT PREVIEW — Sample inventory, prices, staff personas and transactions are illustrative only. No real payments, bookings or regulatory submissions are processed.
+      </div>
       {/* Top Navbar */}
       <Navbar
         activeView={activeView}
