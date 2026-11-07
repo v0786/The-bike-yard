@@ -1,20 +1,21 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# The Bike Yard — Documentation Pack
 
-# Run and deploy your AI Studio app
+This archive contains 13 recovered original project documents plus this index and an archive note (15 Markdown files total).
 
-This contains everything you need to run your app locally.
+## Included documents
 
-View your app in AI Studio: https://ai.studio/apps/ac3a8093-2544-4437-98ac-dbb4a1a3b3df
+1. AGENTS.md
+2. API.md
+3. ARCHITECTURE.md
+4. AUTH_SECURITY.md
+5. CHECKLIST.md
+6. DATABASE.md
+7. DEBUGGING.md
+8. DESIGN.md
+9. FEATURES.md
+10. INTEGRATIONS.md
+11. MCP.md
+12. THE_BIKE_YARD_DEVELOPMENT_CHECKLIST.md
+13. THE_BIKE_YARD_TEAM_DEV_QA_PLAN.md
 
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+The original PRD.md and several planning/setup documents referenced by the project are not present in the recovered Library files, so they have not been fabricated or substituted.
