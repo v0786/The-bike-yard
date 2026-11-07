@@ -1,20 +1,7 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# Archive Note
 
-# Run and deploy your AI Studio app
+Prepared from the project documents available in the user's ChatGPT Library on 8 November 2026.
 
-This contains everything you need to run your app locally.
+**Recovery status:** 13 original Bike Yard Markdown documents were found and included. Two additional Markdown files in this package are the index and this note; they are not original project specifications.
 
-View your app in AI Studio: https://ai.studio/apps/ac3a8093-2544-4437-98ac-dbb4a1a3b3df
-
-## Run Locally
-
-**Prerequisites:**  Node.js
-
-
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+**Important:** This is not a claim that all 15 original source-of-truth specifications were recovered. PRD.md and other referenced documents were not found in the available files.
