@@ -1,64 +1,33 @@
 import { NextResponse } from 'next/server';
-import { z } from 'zod';
 import { requireRole } from '@/lib/api-auth';
-import { completeSale } from '@/services/sales.service';
 
 export const dynamic = 'force-dynamic';
 
-const completeSaleSchema = z.object({
-  dealershipId: z.string().uuid(),
-  customerId: z.string().uuid(),
-  stockUnitId: z.string().uuid(),
-  bookingId: z.string().uuid().optional(),
-  accessoriesPaise: z.coerce.bigint().nonnegative().optional(),
-  paymentMode: z.enum(['NEFT', 'UPI', 'CARD', 'CHEQUE', 'CASH']),
-  salesExecutive: z.string().min(1).optional(),
-});
-
-// POST /api/sales — complete a sale (marks stock sold, creates sale + GST invoice + payment).
-// Server-side role enforcement; financial values are recomputed in the service.
-export async function POST(request: Request) {
+/**
+ * Sale completion is deliberately disabled until verified payment reconciliation,
+ * GST configuration, inventory locking, and audit trails are implemented.
+ *
+ * The legacy sales service must not be called from a public API: it marks
+ * payments SUCCESS and deliveries DELIVERED without payment confirmation.
+ */
+export async function POST() {
   try {
-    const user = await requireRole(['Manager', 'Super Admin', 'Owner']);
-    const body = await request.json();
-    const input = completeSaleSchema.parse(body);
-
-    const sale = await completeSale({
-      ...input,
-      salesExecutive: input.salesExecutive ?? (user as { name?: string }).name ?? 'Staff',
-    });
-
-    // Serialize BigInt money fields safely.
-    return NextResponse.json(
-      {
-        data: {
-          id: sale.id,
-          saleNumber: sale.saleNumber,
-          status: sale.status,
-          totalOnRoadPaise: sale.totalOnRoadPaise.toString(),
-          gstAmountPaise: sale.gstAmountPaise.toString(),
-          saleDate: sale.saleDate,
-        },
-      },
-      { status: 201 },
-    );
+    await requireRole(['Manager', 'Super Admin', 'Owner']);
   } catch (error: unknown) {
-    const e = error as { name?: string; statusCode?: number; code?: string; message?: string };
-    if (e?.statusCode) {
-      return NextResponse.json(
-        { error: { code: e.code ?? 'AUTH_ERROR', message: e.message ?? 'Authorization failed' } },
-        { status: e.statusCode },
-      );
-    }
-    if (e?.name === 'ZodError') {
-      return NextResponse.json(
-        { error: { code: 'VALIDATION_ERROR', message: 'Invalid sale payload' } },
-        { status: 400 },
-      );
-    }
+    const e = error as { statusCode?: number; code?: string; message?: string };
     return NextResponse.json(
-      { error: { code: 'INTERNAL_ERROR', message: 'Failed to complete sale' } },
-      { status: 500 },
+      { error: { code: e.statusCode ? e.code ?? 'AUTH_ERROR' : 'AUTH_ERROR', message: 'Not authorized to complete sales.' } },
+      { status: e.statusCode ?? 401 },
     );
   }
+
+  return NextResponse.json(
+    {
+      error: {
+        code: 'SALE_COMPLETION_DISABLED',
+        message: 'Sale completion is unavailable until verified payments, tax configuration and inventory concurrency controls are deployed.',
+      },
+    },
+    { status: 503 },
+  );
 }
