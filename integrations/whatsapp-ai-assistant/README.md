@@ -42,6 +42,12 @@ Start with a simple greeting and general FAQ response. Add live catalogue, prici
 - M6 ops: deploy Postgres, run Prisma migration/generate in target env, add staff inbox UI + notifications, define consent/retention.
 - M7/M8: monitoring/alerts/backups/access controls/privacy notices; **owner approval + Meta eligibility** before any production number work.
 
+## 2b. Optional n8n starter
+
+An optional n8n standalone starter is available in [`n8n/`](./n8n/README.md), including importable GET/POST workflows, PostgreSQL schema, environment example, and a Cloudflare Worker dispatcher with Meta HMAC signature validation.
+
+**Important:** the existing backend integration described above remains the recommended source of truth. Do not point the same Meta app/test number at both the backend webhook and the n8n webhook at the same time, or duplicate replies may occur. The n8n package is inactive by default and requires credentials, environment configuration, and test validation before use.
+
 ## 3. Proposed architecture
 
 ```text
