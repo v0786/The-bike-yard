@@ -27,7 +27,7 @@ export function BikeCardRail({ label, children }: { label: string; children: Rea
         ))}
       </div>
       <div ref={rail} role="region" aria-label={label} tabIndex={0}
-        className="min-w-0 grid grid-flow-col auto-cols-[minmax(0,94%)] gap-6 overflow-x-auto overscroll-x-contain snap-x snap-mandatory p-2 sm:auto-cols-[calc((100%_-_1.5rem)/2)] lg:auto-cols-[calc((100%_-_3rem)/3)] [&>*]:snap-start">
+        className="min-w-0 flex gap-6 overflow-x-auto overscroll-x-contain snap-x snap-mandatory p-2 [&>*]:min-w-0 [&>*]:shrink-0 [&>*]:basis-[94%] [&>*]:snap-start sm:[&>*]:basis-[calc((100%_-_1.5rem)/2)] lg:[&>*]:basis-[calc((100%_-_3rem)/3)]">
         {children}
       </div>
     </div>
