@@ -1,4 +1,5 @@
 import React, { useEffect, useState } from 'react';
+import { getBackendBikewaleCatalog, isBackendConfigured } from '../services/backendClient';
 
 type ReferenceBike = {
   brand: string;
@@ -13,30 +14,37 @@ type FeedResponse = { bikes?: ReferenceBike[]; configured?: boolean; message?: s
 export function BikeWaleReferenceCatalog() {
   const [items, setItems] = useState<ReferenceBike[]>([]);
   const [status, setStatus] = useState<'loading' | 'ready' | 'unavailable'>('loading');
-  const endpoint = import.meta.env.VITE_BIKEWALE_CATALOG_URL as string | undefined;
+  const endpoint = (import.meta.env.VITE_BIKEWALE_CATALOG_URL as string | undefined)?.trim();
 
   useEffect(() => {
-    if (!endpoint) {
-      setStatus('unavailable');
-      return;
-    }
     const controller = new AbortController();
-    fetch(endpoint, { signal: controller.signal })
-      .then(async (response) => {
-        if (!response.ok) throw new Error('Reference feed unavailable');
-        return response.json() as Promise<FeedResponse>;
-      })
-      .then((data) => {
-        if (!data.configured || !Array.isArray(data.bikes)) {
+
+    const load = async () => {
+      try {
+        let data: FeedResponse | null = null;
+        if (endpoint) {
+          const response = await fetch(endpoint, { signal: controller.signal });
+          if (!response.ok) throw new Error('Reference feed unavailable');
+          data = (await response.json()) as FeedResponse;
+        } else if (isBackendConfigured()) {
+          data = (await getBackendBikewaleCatalog()) as FeedResponse;
+        } else {
+          setStatus('unavailable');
+          return;
+        }
+
+        if (!data?.configured || !Array.isArray(data.bikes) || data.bikes.length === 0) {
           setStatus('unavailable');
           return;
         }
         setItems(data.bikes);
         setStatus('ready');
-      })
-      .catch(() => {
+      } catch {
         if (!controller.signal.aborted) setStatus('unavailable');
-      });
+      }
+    };
+
+    load();
     return () => controller.abort();
   }, [endpoint]);
 

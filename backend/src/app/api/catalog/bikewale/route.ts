@@ -1,5 +1,6 @@
 import { NextResponse } from 'next/server';
 import { z } from 'zod';
+import { corsPreflight, withCors } from '@/lib/cors';
 
 // This endpoint accepts only a separately configured, approved BikeWale data feed.
 // API Anything may be used by an operator to discover and validate that feed;
@@ -17,12 +18,19 @@ const feedSchema = z.array(bikeSchema).max(100);
 export const runtime = 'nodejs';
 export const revalidate = 3600;
 
-export async function GET() {
+export async function OPTIONS(request: Request) {
+  return corsPreflight(request);
+}
+
+export async function GET(request: Request) {
   const feedUrl = process.env.BIKEWALE_APPROVED_FEED_URL;
   if (!feedUrl) {
-    return NextResponse.json(
-      { bikes: [], configured: false, source: 'BikeWale', message: 'Approved BikeWale feed is not configured.' },
-      { status: 200 }
+    return withCors(
+      request,
+      NextResponse.json(
+        { bikes: [], configured: false, source: 'BikeWale', message: 'Approved BikeWale feed is not configured.' },
+        { status: 200 }
+      )
     );
   }
 
@@ -55,11 +63,14 @@ export async function GET() {
       sourceUrl: bike.sourceUrl && new URL(bike.sourceUrl).hostname.endsWith('.bikewale.com')
         ? bike.sourceUrl : undefined,
     }));
-    return NextResponse.json({ bikes, configured: true, source: 'BikeWale' });
+    return withCors(request, NextResponse.json({ bikes, configured: true, source: 'BikeWale' }));
   } catch {
-    return NextResponse.json(
-      { bikes: [], configured: true, source: 'BikeWale', message: 'BikeWale feed temporarily unavailable.' },
-      { status: 503 }
+    return withCors(
+      request,
+      NextResponse.json(
+        { bikes: [], configured: true, source: 'BikeWale', message: 'BikeWale feed temporarily unavailable.' },
+        { status: 503 }
+      )
     );
   }
 }

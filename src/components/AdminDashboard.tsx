@@ -43,6 +43,7 @@ import { PendingLeadsAlertModule } from './PendingLeadsAlertModule';
 import { PricingPanel } from './admin/PricingPanel';
 import { OffersPanel } from './admin/OffersPanel';
 import { DealershipInfoForm } from './admin/DealershipInfoForm';
+import { BackendStatusPanel } from './admin/BackendStatusPanel';
 
 interface AdminDashboardProps {
   state: DealershipState;
@@ -1146,6 +1147,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
               </div>
 
               <DealershipInfoForm info={state.dealershipInfo} currentUser={currentUser} />
+
+              <BackendStatusPanel />
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-1">

@@ -47,7 +47,24 @@ public/              # robots.txt, sitemap.xml, favicon.svg, hero & bike photogr
 
 ## Environment variables
 
-The SPA runs fully client-side and needs **no secrets** to build or deploy. See `.env.example` for optional `GEMINI_API_KEY` (AI Studio integration). Never commit `.env*` files.
+The SPA runs fully client-side and needs **no secrets** to build or deploy. See root `.env.example`.
+
+- `VITE_API_BASE_URL` (optional) — base URL of the separate `backend/` API (e.g. `https://your-backend.example.com`). When set, the SPA can call safe read-only endpoints: `GET /api/health` and `GET /api/catalog/bikewale` (used as a fallback for the BikeWale reference catalogue). The Admin → **Dealership Settings** tab shows backend connectivity/database status.
+- `VITE_BIKEWALE_CATALOG_URL` (optional) — direct reference-catalog feed URL (takes precedence over the backend catalog route for that component).
+
+Never commit `.env*` files.
+
+## Connect SPA to the backend API (`backend/`)
+
+`backend/` is a separate Next.js 16 + Prisma (PostgreSQL) app with `/api/health`, `/api/auth/[...nextauth]`, `/api/catalog/bikewale`, `/api/sales`. **`POST /api/sales` is intentionally disabled (503)** until verified payments, tax configuration, and inventory concurrency controls are deployed — do not bypass this.
+
+To connect:
+
+1. Deploy `backend/` with a PostgreSQL database. Set `DATABASE_URL`, `NEXTAUTH_URL`, `NEXTAUTH_SECRET` (see `backend/.env.example`).
+2. Set `CORS_ORIGINS` in the backend to include the SPA origin(s), e.g. `https://the-bike-yard.vercel.app,http://localhost:5173` (enables CORS for safe read-only routes).
+3. Set `VITE_API_BASE_URL` in the SPA environment (Vercel project env or local `.env`) to the backend origin and rebuild/redeploy the SPA.
+
+**Notes:** authenticated operations (NextAuth credentials, protected mutations) require the backend to be deployed and reachable with correct session/cookie/CORS configuration across origins; the SPA currently uses in-app demo RBAC for staff flows. Full server-backed auth/data sync is a follow-on integration beyond the safe connectivity wired here.
 
 ## Deployment
 
