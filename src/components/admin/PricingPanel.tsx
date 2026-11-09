@@ -1,9 +1,9 @@
-import { useMemo, useState, type FC } from 'react';
+import { useEffect, useMemo, useRef, useState, type FC } from 'react';
 import { Lock, Star, Save, Search, CheckCircle2, AlertCircle } from 'lucide-react';
 import type { DealershipState } from '../../services/dealershipStore';
 import { dealershipStore } from '../../services/dealershipStore';
 import type { UserProfile } from '../../lib/rbac';
-import { formatInr } from '../../lib/currency';
+import { formatInrExact, formatInr } from '../../lib/currency';
 
 interface PricingPanelProps {
   state: DealershipState;
@@ -17,6 +17,9 @@ interface PricingPanelProps {
  * Factory specifications and descriptions are NEVER editable here.
  */
 export const PricingPanel: FC<PricingPanelProps> = ({ state, currentUser }) => {
+  const [review, setReview] = useState<{ bikeId: string; variantId: string; price: bigint; previous: bigint; onRoad: bigint; name: string } | null>(null);
+  const reviewHeading = useRef<HTMLHeadingElement>(null);
+  useEffect(() => { if (review) reviewHeading.current?.focus(); }, [review]);
   const [query, setQuery] = useState('');
   const [variantChoice, setVariantChoice] = useState<Record<string, string>>({});
   const [priceDraft, setPriceDraft] = useState<Record<string, string>>({});
@@ -48,19 +51,38 @@ export const PricingPanel: FC<PricingPanelProps> = ({ state, currentUser }) => {
       setFeedback({ id: bikeId, ok: false, message: 'Enter a price in ₹ (e.g. 149900).' });
       return;
     }
-    const rupees = Number(draft.replace(/[^0-9.]/g, ''));
-    if (!Number.isFinite(rupees) || rupees <= 0) {
-      setFeedback({ id: bikeId, ok: false, message: 'Price must be a positive number.' });
+    const value = draft.trim().replace(/,/g, '');
+    if (!/^\d{1,8}(?:\.\d{1,2})?$/.test(value)) {
+      setFeedback({ id: bikeId, ok: false, message: 'Enter a valid rupee amount with up to two decimal places.' });
       return;
     }
-    const result = dealershipStore.updateVariantPrice({
-      bikeId,
-      variantId,
-      newExShowroomPaise: BigInt(Math.round(rupees * 100)),
-      staffName,
+    const [whole, fraction = ''] = value.split('.');
+    const price = BigInt(whole!) * 100n + BigInt(fraction.padEnd(2, '0'));
+    const variant = bike.variants?.find((item) => item.id === variantId);
+    if (price <= 0n || !variant) {
+      setFeedback({ id: bikeId, ok: false, message: 'Select a variant and enter a positive price.' });
+      return;
+    }
+    setReview({
+      bikeId, variantId, price, previous: variant.exShowroomPaise,
+      onRoad: price + (price * 1100n) / 10000n + variant.insurancePaise + variant.handlingPaise,
+      name: `${bike.brand} ${bike.model} · ${variant.name}`,
     });
+  };
+
+  const confirmPrice = () => {
+    if (!review) return;
+    const { bikeId, variantId, price, previous } = review;
+    const current = dealershipStore.getState().bikes.find((bike) => bike.id === bikeId)
+      ?.variants?.find((variant) => variant.id === variantId);
+    setReview(null);
+    if (current?.exShowroomPaise !== previous) {
+      setFeedback({ id: bikeId, ok: false, message: 'The current price changed. Review the new quote before confirming.' });
+      return;
+    }
+    const result = dealershipStore.updateVariantPrice({ bikeId, variantId, newExShowroomPaise: price, staffName });
     if (result.success) {
-      setFeedback({ id: bikeId, ok: true, message: 'Price updated. RTO recomputed at 11% (MH-04).' });
+      setFeedback({ id: bikeId, ok: true, message: 'Demo price updated in this browser. RTO recomputed at 11% (MH-04).' });
       setPriceDraft((p) => ({ ...p, [bikeId]: '' }));
     } else {
       setFeedback({ id: bikeId, ok: false, message: result.error ?? 'Update failed.' });
@@ -94,6 +116,22 @@ export const PricingPanel: FC<PricingPanelProps> = ({ state, currentUser }) => {
         </label>
       </div>
 
+      {review && (
+        <section aria-label="Review price change" className="space-y-3 rounded-2xl border border-amber-500/30 bg-slate-900 p-4 text-xs text-slate-200">
+          <h4 ref={reviewHeading} tabIndex={-1} className="text-sm font-bold text-white">Review &amp; confirm price</h4>
+          <p>{review.name}</p>
+          <dl className="grid grid-cols-2 gap-2">
+            <dt>Current ex-showroom</dt><dd>{formatInrExact(review.previous)}</dd>
+            <dt>Proposed ex-showroom</dt><dd>{formatInrExact(review.price)}</dd>
+            <dt>Proposed on-road estimate</dt><dd>{formatInrExact(review.onRoad)}</dd>
+          </dl>
+          <p>This demo saves confirmed prices in this browser.</p>
+          <div className="flex gap-2">
+            <button type="button" onClick={() => setReview(null)} className="rounded-lg border border-slate-700 px-3 py-2">Back to editing</button>
+            <button type="button" onClick={confirmPrice} className="rounded-lg bg-amber-500 px-3 py-2 font-bold text-slate-950">Confirm demo price</button>
+          </div>
+        </section>
+      )}
       <div className="overflow-x-auto rounded-2xl border border-slate-800">
         <table className="min-w-full text-xs text-left">
           <thead className="bg-slate-900 text-slate-400 uppercase text-[10px] tracking-wider">
@@ -166,7 +204,7 @@ export const PricingPanel: FC<PricingPanelProps> = ({ state, currentUser }) => {
                       onClick={() => handleSave(bike.id)}
                       className="inline-flex items-center gap-1 rounded-lg bg-slate-800 px-2.5 py-1.5 text-[11px] font-bold text-slate-100 hover:bg-amber-500 hover:text-slate-950 transition-colors"
                     >
-                      <Save className="w-3.5 h-3.5" aria-hidden="true" /> Save
+                      <Save className="w-3.5 h-3.5" aria-hidden="true" /> Review
                     </button>
                     {feedbackForRow && (
                       <p className={`mt-1 flex items-center gap-1 text-[10px] ${feedbackForRow.ok ? 'text-emerald-400' : 'text-rose-400'}`} role="status">

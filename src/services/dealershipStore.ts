@@ -1,3 +1,4 @@
+import type { CustomerAcceptance } from '../types';
 import {
   Motorcycle,
   StockUnit,
@@ -231,6 +232,7 @@ class DealershipStore {
 
   // --- Capture Lead & Alert Backend Staff ---
   public createLead(params: {
+    acceptance?: CustomerAcceptance;
     customerName: string;
     phone: string;
     bikeOfInterest: string;
@@ -239,6 +241,7 @@ class DealershipStore {
     assignedTo?: string;
   }): { success: boolean; lead: Lead } {
     const newLead: Lead = {
+      acceptance: params.acceptance,
       id: `lead-${Date.now()}`,
       customerName: params.customerName.trim(),
       phone: params.phone.trim(),
@@ -712,6 +715,7 @@ class DealershipStore {
 
   // --- Booking creation with immediate reservation ---
   public createBooking(params: {
+    acceptance?: CustomerAcceptance;
     customerName: string;
     customerPhone: string;
     customerEmail?: string;
@@ -754,6 +758,7 @@ class DealershipStore {
 
     const bookingNum = `TBY-BK-2026-${String(this.state.bookings.length + 91).padStart(3, '0')}`;
     const newBooking: Booking = {
+      acceptance: params.acceptance,
       id: `book-${Date.now()}`,
       bookingNumber: bookingNum,
       customerId: customer.id,
@@ -1051,6 +1056,7 @@ class DealershipStore {
 
   // --- Test Ride Booking ---
   public scheduleTestRide(params: {
+    acceptance?: CustomerAcceptance;
     customerName: string;
     customerPhone: string;
     bikeModel: string;
@@ -1060,6 +1066,7 @@ class DealershipStore {
   }): { success: boolean; testRide: TestRide } {
     const assignedStaff = params.assignedStaff || 'Suraj Patil (Test Ride Escort)';
     const testRide: TestRide = {
+      acceptance: params.acceptance,
       id: `tr-${Date.now()}`,
       customerName: params.customerName,
       customerPhone: params.customerPhone,
@@ -1074,6 +1081,7 @@ class DealershipStore {
     this.state.testRides.unshift(testRide);
 
     this.state.leads.unshift({
+      acceptance: params.acceptance,
       id: `lead-${Date.now()}`,
       customerName: params.customerName,
       phone: params.customerPhone,

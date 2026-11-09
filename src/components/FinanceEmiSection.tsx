@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState } from 'react';
 import { Motorcycle } from '../types';
 import { FINANCE_PARTNERS, FinancePartner } from '../data/dealershipData';
@@ -51,6 +52,8 @@ export const FinanceEmiSection: React.FC<FinanceEmiSectionProps> = ({
 
   const handleApplySubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     if (!applicantName.trim() || applicantPhone.trim().length < 10 || !selectedPartner) return;
 
     // Immediately push new customer lead to the dealership store & call queue!
@@ -63,6 +66,7 @@ export const FinanceEmiSection: React.FC<FinanceEmiSectionProps> = ({
       stage: 'QUOTATION',
       assignedTo: 'Rajesh Gokhale (Finance Desk)',
       notes: `Requested two-wheeler finance via ${selectedPartner.name}. Loan: ₹${loanPrincipal.toLocaleString('en-IN')}, Tenure: ${tenureMonths}m, CIBIL: ${cibilScore}. CALL IMMEDIATELY.`,
+      acceptance,
       createdAt: new Date().toISOString(),
     });
 
@@ -345,6 +349,7 @@ export const FinanceEmiSection: React.FC<FinanceEmiSectionProps> = ({
                   <div>· Processing: {selectedPartner.processingFee}</div>
                 </div>
 
+                <CustomerTerms purpose="respond to your finance enquiry" />
                 <button
                   type="submit"
                   className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 transition-colors"

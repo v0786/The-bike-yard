@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState } from 'react';
 import { Landmark, Shield, FileCheck, CheckCircle2, Clock, Phone, MapPin, Zap } from 'lucide-react';
 import { DEALERSHIP_INFO, FINANCE_PARTNERS } from '../data/dealershipData';
@@ -20,6 +21,8 @@ export const ApplicationsHub: React.FC = () => {
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
 
     if (activeTab === 'finance') {
       dealershipStore.getState().leads.unshift({
@@ -31,6 +34,7 @@ export const ApplicationsHub: React.FC = () => {
         stage: 'QUOTATION',
         assignedTo: 'Rajesh Gokhale (Finance Desk)',
         notes: `Loan Application via ${selectedPartner.name}. Requested Amount: ₹${Number(loanAmount).toLocaleString('en-IN')}, CIBIL: ${cibilScore}. CALL IMMEDIATELY.`,
+        acceptance,
         createdAt: new Date().toISOString(),
       });
 
@@ -284,6 +288,7 @@ export const ApplicationsHub: React.FC = () => {
                 </div>
               )}
 
+              <CustomerTerms purpose="process your service enquiry" />
               <button
                 type="submit"
                 className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all"

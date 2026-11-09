@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState, useMemo } from 'react';
 import { Motorcycle, TestRide } from '../types';
 import {
@@ -129,9 +130,12 @@ export const TestRideModal: React.FC<TestRideModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     if (!customerName.trim() || customerPhone.trim().length < 10) return;
 
     const res = dealershipStore.scheduleTestRide({
+      acceptance,
       customerName,
       customerPhone,
       bikeModel: activeBike ? `${activeBike.brand} ${activeBike.model}` : 'Royal Enfield Hunter 350',
@@ -561,6 +565,7 @@ export const TestRideModal: React.FC<TestRideModalProps> = ({
                 </div>
 
                 {/* Submit Action */}
+                <CustomerTerms purpose="handle your test ride request" />
                 <button
                   type="submit"
                   className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-xs sm:text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 active:scale-95 transition-all"

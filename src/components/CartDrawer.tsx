@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState, useEffect } from 'react';
 import { cartStore, CartItem } from '../services/cartStore';
 import { formatInr } from '../lib/currency';
@@ -30,6 +31,8 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
   const handleCheckoutSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     if (!customerName.trim() || customerPhone.trim().length < 10) return;
 
     // Process all bike bookings in cart
@@ -38,6 +41,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
 
     if (bikeItem && bikeItem.bikeRef) {
       const res = dealershipStore.createBooking({
+        acceptance,
         customerName,
         customerPhone,
         bikeId: bikeItem.bikeRef.id,
@@ -156,6 +160,7 @@ export const CartDrawer: React.FC<CartDrawerProps> = ({ isOpen, onClose }) => {
                   </div>
                 </div>
 
+                <CustomerTerms purpose="simulate your checkout" />
                 <button
                   type="submit"
                   className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400"

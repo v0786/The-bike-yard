@@ -1,4 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { BikeCardRail } from './BikeCardRail';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Motorcycle } from '../types';
 import { formatInr } from '../lib/currency';
@@ -341,7 +342,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
           </button>
         </div>
       ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-6">
+        <BikeCardRail label={scope === 'new' ? 'New motorcycle cards' : 'Pre-owned motorcycle cards'}>
           {pageSlice.items.map((bike) => {
             const onRoadPaise =
               bike.exShowroomPaise + bike.rtoTaxPaise + bike.insurancePaise + bike.handlingPaise;
@@ -352,7 +353,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
               <div
                 key={bike.id}
                 onClick={() => onSelectBike(bike)}
-                className={`group flex flex-col justify-between rounded-3xl border p-4 sm:p-5 transition-all duration-300 cursor-pointer ${
+                className={`group flex flex-col justify-between rounded-3xl border p-4 sm:p-5 transition-all duration-300 motion-safe:hover:-translate-y-1 motion-reduce:transition-none cursor-pointer ${
                   isSelected
                     ? 'border-amber-500 bg-slate-900/95 shadow-2xl shadow-amber-500/10 ring-2 ring-amber-500/30'
                     : 'border-slate-800 bg-slate-900/70 hover:border-slate-700 hover:bg-slate-900 hover:shadow-xl'
@@ -615,7 +616,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
               </div>
             );
           })}
-        </div>
+        </BikeCardRail>
       )}
 
       {/* Pagination */}

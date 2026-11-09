@@ -120,7 +120,7 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
                 <span>Explicit Consent for Direct Telephone Calling & Showroom Callbacks</span>
               </div>
               <p className="text-amber-200/90 text-xs leading-relaxed">
-                By entering your telephone number, requesting an on-road quotation, booking a test ride, or applying for two-wheeler financing through The Bike Yard digital portal, you explicitly authorize and consent to receiving voice telephone calls, SMS messages, and WhatsApp communications from our authorized showroom sales executives stationed at Rutu Business Park, Khopat, Thane. This consent overrides any National Do Not Disturb (DND) or Telecom Commercial Communications Customer Preference Regulations (TCCCPR) registry solely for the purpose of fulfilling your requested motorcycle quotation, financing eligibility, and vehicle delivery.
+                The forms explain why they ask for your details. For a client preview, use sample information. A demo submission simulates the request and does not opt you into marketing messages.
               </p>
             </div>
 
@@ -131,11 +131,16 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
                 <span>Statutory Compliance & Scope</span>
               </h2>
               <p>
-                This Privacy Policy is published in compliance with Section 43A of the Information Technology Act 2000, the Information Technology (Reasonable Security Practices and Procedures and Sensitive Personal Data or Information) Rules 2011, and the Digital Personal Data Protection Act 2023 (DPDP Act).
+                Policy version 1.0. This notice describes the showroom demo. The dealership will confirm its production data handling, retention and privacy contact before accepting real customer submissions.
               </p>
               <p>
                 This policy governs how <strong>The Bike Yard</strong> collects, records, utilizes, stores, and safeguards personal identifiable information (PII) obtained from retail two-wheeler buyers, test-ride applicants, and showroom visitors across Maharashtra.
               </p>
+            </section>
+
+            <section className="space-y-2">
+              <h2 className="text-base sm:text-lg font-bold text-white">Cookies and site preferences</h2>
+              <p>Essential browser storage supports the cart, staff session and site preferences. The optional Google Maps embed can set third-party cookies and loads only after you allow it. You can change your selection through Cookie preferences in the footer.</p>
             </section>
 
             {/* Section 2 */}
@@ -144,7 +149,7 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
                 <span className="text-amber-500 font-mono">2.</span>
                 <span>Categories of Personal Information Collected</span>
               </h2>
-              <p>To execute vehicle sales and comply with mandatory Government of India transport regulations, we collect:</p>
+              <p>For an actual dealership transaction, staff may need the following details separately. Use sample information only on this demo. Never enter government ID, bank statements or other sensitive records here.</p>
               <ul className="list-disc pl-5 space-y-1 text-slate-300">
                 <li><strong className="text-white">Customer Identifiers:</strong> Full legal name, permanent address, local residential address in Thane/Mumbai, personal mobile telephone number, and email address.</li>
                 <li><strong className="text-white">Statutory Registration Documents (MH-04 RTO):</strong> Copy of Permanent Account Number (PAN Card), Aadhaar Card (for Form 20/21 e-KYC), and address verification for registration at Teen Hath Naka RTO Division.</li>
@@ -223,6 +228,7 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
         {/* TAB 2: TERMS AND CONDITIONS */}
         {activeTab === 'terms' && (
           <div className="space-y-8 text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-900/40 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-lg">
+            <p className="text-amber-300">Terms version 1.0. This demo processes no real payment or booking. The commercial terms below are illustrative and subject to dealership approval.</p>
             {/* Booking & Token Terms */}
             <section className="space-y-2">
               <h2 className="text-base sm:text-lg font-bold text-white flex items-center gap-2">

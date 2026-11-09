@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState, useRef, useEffect } from 'react';
 import { Sparkles, Send, X, Bot, User, CheckCircle2 } from 'lucide-react';
 import { dealershipStore } from '../services/dealershipStore';
@@ -142,23 +143,27 @@ export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClos
       <form
         onSubmit={(e) => {
           e.preventDefault();
+          if (!readCustomerAcceptance(e.currentTarget)) return;
           handleSend();
         }}
-        className="flex items-center gap-2 border-t border-slate-800 bg-slate-950 p-2.5"
+        className="space-y-2 border-t border-slate-800 bg-slate-950 p-2.5"
       >
-        <input
-          type="text"
-          value={input}
-          onChange={(e) => setInput(e.target.value)}
-          placeholder="Ask for prices, waiting periods, RTO..."
-          className="flex-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
-        />
-        <button
-          type="submit"
-          className="rounded-xl bg-amber-500 p-2 text-slate-950 hover:bg-amber-400 active:scale-95 transition-all"
-        >
-          <Send className="w-4 h-4" />
-        </button>
+        <div className="flex items-center gap-2">
+          <input
+            type="text"
+            value={input}
+            onChange={(e) => setInput(e.target.value)}
+            placeholder="Ask for prices, waiting periods, RTO..."
+            className="flex-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+          />
+          <button
+            type="submit"
+            className="rounded-xl bg-amber-500 p-2 text-slate-950 hover:bg-amber-400 active:scale-95 transition-all"
+          >
+            <Send className="w-4 h-4" />
+          </button>
+        </div>
+        <CustomerTerms purpose="answer your showroom question. Keep personal information out of chat" />
       </form>
     </div>
   );

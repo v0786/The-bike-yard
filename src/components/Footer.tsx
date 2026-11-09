@@ -1,3 +1,5 @@
+import { useCookiePreferences } from './CookiePreferences';
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState } from 'react';
 import { Bike, MapPin, Phone, Mail, Clock, Check, MessageCircle } from 'lucide-react';
 import { dealershipStore } from '../services/dealershipStore';
@@ -17,6 +19,7 @@ export const Footer: React.FC<FooterProps> = ({
   onOpenTermsModal,
   onNavigateToLegal,
 }) => {
+  const { open: openCookiePreferences } = useCookiePreferences();
   const [quickPhone, setQuickPhone] = useState('');
   const [quickName, setQuickName] = useState('');
   const [callbackRequested, setCallbackRequested] = useState(false);
@@ -24,10 +27,13 @@ export const Footer: React.FC<FooterProps> = ({
 
   const handleCallbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     const phoneDigits = quickPhone.replace(/\D/g, '');
     if (phoneDigits.length < 10 || phoneDigits.length > 13) return;
 
     dealershipStore.createLead({
+      acceptance,
       customerName: quickName.trim() || 'Website Visitor',
       phone: quickPhone.trim(),
       bikeOfInterest: 'General Showroom Inquiry',
@@ -42,7 +48,7 @@ export const Footer: React.FC<FooterProps> = ({
   };
 
   return (
-    <footer className="border-t border-slate-800 bg-slate-950 pb-24 md:pb-12 pt-12 text-slate-400 text-xs">
+    <footer className="border-t border-slate-800 bg-slate-950 pb-32 md:pb-28 pt-12 text-slate-400 text-xs">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 space-y-10">
         <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
           {/* Brand Col */}
@@ -151,6 +157,7 @@ export const Footer: React.FC<FooterProps> = ({
                     Call Me
                   </button>
                 </div>
+                <CustomerTerms purpose="respond to your callback request" />
               </form>
             )}
           </div>
@@ -193,6 +200,8 @@ export const Footer: React.FC<FooterProps> = ({
             >
               Terms & Conditions of Dealership
             </button>
+              <span aria-hidden="true">·</span>
+              <button type="button" className="hover:text-amber-400" onClick={openCookiePreferences}>Cookie preferences</button>
             <span>·</span>
             <span>MH-04 Central RTO</span>
           </div>

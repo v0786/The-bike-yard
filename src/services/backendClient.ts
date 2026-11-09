@@ -18,11 +18,15 @@ export interface BackendHealth {
 }
 
 export interface BackendBikewaleBike {
+  sourceId?: string;
   brand: string;
   model: string;
   variant?: string;
   engineCc?: number;
   imageUrl?: string;
+  photos?: string[];
+  colors?: { name: string; photos?: string[] }[];
+  specifications?: { label: string; value: string }[];
   sourceUrl?: string;
   retrievedAt?: string;
 }

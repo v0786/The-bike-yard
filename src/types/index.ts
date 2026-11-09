@@ -1,3 +1,5 @@
+export interface CustomerAcceptance { version: string; acceptedAt: string; }
+
 export type UserRole =
   | 'SUPER_ADMIN'
   | 'OWNER'
@@ -152,6 +154,7 @@ export interface Customer {
 }
 
 export interface Booking {
+  acceptance?: CustomerAcceptance;
   id: string;
   bookingNumber: string;
   customerId: string;
@@ -224,6 +227,7 @@ export interface Refund {
 }
 
 export interface TestRide {
+  acceptance?: CustomerAcceptance;
   id: string;
   customerName: string;
   customerPhone: string;
@@ -236,6 +240,7 @@ export interface TestRide {
 }
 
 export interface Lead {
+  acceptance?: CustomerAcceptance;
   id: string;
   customerName: string;
   phone: string;

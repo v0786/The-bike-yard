@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useEffect, useRef, useState } from 'react';
 import { Motorcycle } from '../types';
 import { formatInr, splitGst, toPaise } from '../lib/currency';
@@ -53,9 +54,12 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
 
   const handleInstantBooking = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     if (!bookingName.trim() || bookingPhone.trim().length < 10) return;
 
     const res = dealershipStore.createBooking({
+      acceptance,
       customerName: bookingName,
       customerPhone: bookingPhone,
       bikeId: bike.id,
@@ -460,6 +464,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                   </div>
                 </div>
 
+                <CustomerTerms purpose="simulate your booking" />
                 <button
                   type="submit"
                   className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 transition-colors"

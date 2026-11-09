@@ -70,7 +70,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
           {activeTab === 'privacy' ? (
             <>
               <div className="rounded-xl border border-amber-500/30 bg-amber-500/10 p-4 text-amber-300">
-                <strong>Notice of Data Collection for Direct Customer Calling:</strong> By submitting your name, phone number, or quotation request on this platform, you explicitly consent to The Bike Yard contacting you via telephone call, SMS, or WhatsApp regarding motorcycle availability, on-road quotations, test ride scheduling, and two-wheeler finance eligibility.
+                <strong>Demo data notice:</strong> Use sample details on this site. Each form explains how the details are used. Accepting the Terms &amp; Conditions does not opt you into marketing.
               </div>
 
               <h4 className="text-sm font-bold text-white pt-2">1. Personal Information We Collect</h4>
@@ -80,7 +80,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
 
               <h4 className="text-sm font-bold text-white pt-2">2. Purpose of Collection & Real-Time Dashboard Reflection</h4>
               <p>
-                All customer inquiries submitted online immediately reflect on our internal Dealership Staff Portal and Admin Dashboard. Our sales executives use this information solely to:
+                Demo enquiries appear in the sample dealership workspace. In a live dealership workflow, staff may use the details supplied to:
               </p>
               <ul className="list-disc pl-5 space-y-1 text-slate-400">
                 <li>Place direct telephone calls to confirm motorcycle model interest and answer questions.</li>
@@ -91,7 +91,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
 
               <h4 className="text-sm font-bold text-white pt-2">3. Zero Third-Party Commercial Sale</h4>
               <p>
-                The Bike Yard adheres to the Indian Digital Personal Data Protection Act (DPDP Act 2023). We never sell, lease, or rent customer telephone numbers or email addresses to unsolicited third-party marketing companies.
+                The demo does not ask for a marketing opt-in. See the full Privacy Policy for data and optional cookie preferences.
               </p>
 
               <h4 className="text-sm font-bold text-white pt-2">4. Data Retention & Opt-Out</h4>
@@ -101,6 +101,7 @@ export const LegalPagesModal: React.FC<LegalPagesModalProps> = ({
             </>
           ) : (
             <>
+              <p className="text-amber-300">This demo processes no real payment or booking. The commercial terms below are illustrative.</p>
               <h4 className="text-sm font-bold text-white">1. Motorcycle Booking & Allocation</h4>
               <p>
                 Booking deposits (advance payments) placed on this portal or in the Khopat showroom are credited toward the final on-road purchase price. A booking reserves a tentative delivery slot subject to factory dispatch and MH-04 RTO formalities.

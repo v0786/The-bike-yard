@@ -1,3 +1,4 @@
+import { CookiePreferences } from './components/CookiePreferences';
 import React, { useState, useEffect } from 'react';
 import { Routes, Route, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { dealershipStore, DealershipState } from './services/dealershipStore';
@@ -42,7 +43,7 @@ const viewFromPath = (pathname: string): AppView => {
   if (pathname.startsWith('/admin')) return 'admin';
   if (pathname.startsWith('/staff')) return 'staff';
   if (pathname.startsWith('/login')) return 'login';
-  if (pathname.startsWith('/legal')) return 'legal';
+  if (['/legal', '/privacy-policy', '/terms-and-conditions'].includes(pathname)) return 'legal';
   return 'showroom';
 };
 
@@ -56,15 +57,15 @@ const pathFromView = (view: AppView): string => {
   }
 };
 
-const LegalRoute: React.FC<{ onBackToShowroom: () => void }> = ({ onBackToShowroom }) => {
+const LegalRoute: React.FC<{ onBackToShowroom: () => void; page?: 'privacy' | 'terms' }> = ({ onBackToShowroom, page }) => {
   const [searchParams] = useSearchParams();
-  const tab = searchParams.get('tab') === 'terms' ? 'terms' : 'privacy';
+  const tab = page ?? (searchParams.get('tab') === 'terms' ? 'terms' : 'privacy');
   return (
     <>
       <Seo
-        title="Privacy & Terms | The Bike Yard"
-        description="Privacy policy and terms of service for The Bike Yard, Khopat — DPDP Act 2023 compliant privacy notice, booking advance policy and MH-04 jurisdiction terms."
-        path="/legal"
+        title={tab === 'privacy' ? 'Privacy Policy | The Bike Yard' : 'Terms & Conditions | The Bike Yard'}
+        description="The Bike Yard privacy notice and dealership terms for the Khopat showroom demo."
+        path={tab === 'privacy' ? '/privacy-policy' : '/terms-and-conditions'}
       />
       <LegalPagesView initialTab={tab} onBackToShowroom={onBackToShowroom} />
     </>
@@ -72,6 +73,10 @@ const LegalRoute: React.FC<{ onBackToShowroom: () => void }> = ({ onBackToShowro
 };
 
 export default function App() {
+  return <CookiePreferences><ShowroomApp /></CookiePreferences>;
+}
+
+function ShowroomApp() {
   const location = useLocation();
   const navigate = useNavigate();
   const activeView = viewFromPath(location.pathname);
@@ -349,6 +354,8 @@ export default function App() {
             }
           />
           <Route path="/legal" element={<LegalRoute onBackToShowroom={() => navigate('/')} />} />
+          <Route path="/privacy-policy" element={<LegalRoute key="privacy" page="privacy" onBackToShowroom={() => navigate('/')} />} />
+          <Route path="/terms-and-conditions" element={<LegalRoute key="terms" page="terms" onBackToShowroom={() => navigate('/')} />} />
           <Route path="*" element={<NotFound />} />
         </Routes>
         </React.Suspense>
@@ -478,7 +485,7 @@ export default function App() {
           setLegalModalTab('terms');
           setIsLegalModalOpen(true);
         }}
-        onNavigateToLegal={(tab) => navigate(`/legal?tab=${tab}`)}
+        onNavigateToLegal={(tab) => navigate(tab === 'privacy' ? '/privacy-policy' : '/terms-and-conditions')}
       />
 
       {/* Persistent WhatsApp enquiry shortcut (all pages) */}

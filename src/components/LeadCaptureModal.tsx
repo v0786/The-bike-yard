@@ -1,3 +1,4 @@
+import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState } from 'react';
 import { Motorcycle } from '../types';
 import { dealershipStore } from '../services/dealershipStore';
@@ -32,9 +33,12 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
+    const acceptance = readCustomerAcceptance(e.currentTarget as HTMLFormElement);
+    if (!acceptance) return;
     if (!fullName.trim() || phone.trim().length < 10) return;
 
     const res = dealershipStore.createLead({
+      acceptance,
       customerName: fullName,
       phone: phone,
       bikeOfInterest: bikeOfInterest,
@@ -210,6 +214,7 @@ export const LeadCaptureModal: React.FC<LeadCaptureModalProps> = ({
                 />
               </div>
 
+              <CustomerTerms purpose="respond to your enquiry" />
               <button
                 type="submit"
                 className="w-full flex items-center justify-center gap-2 rounded-xl bg-amber-500 py-3 text-sm font-bold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 active:scale-95 transition-all"

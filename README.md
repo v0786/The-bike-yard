@@ -54,6 +54,10 @@ The SPA runs fully client-side and needs **no secrets** to build or deploy. See 
 
 Reference cards show the BikeWale listing URL and retrieval date when supplied by the approved feed (`sourceUrl` and optional ISO 8601 `retrievedAt`). The showroom’s own prices and booking advances are demo figures.
 
+The approved BikeWale feed can supply stable `sourceId` values (one per variant), `photos`, `colors` with photo arrays, and `specifications` as label/value pairs. Set backend `BIKEWALE_APPROVED_IMAGE_HOSTS` to the comma-separated HTTPS image hostnames covered by your agreement, in addition to BikeWale hosts. The reference rail refreshes hourly while mounted and keeps its last successful result for that visit. Dealer demo prices are reviewed and confirmed in the existing pricing panel and are saved to browser storage. Global pricing needs a deployed authenticated backend and a shared catalogue.
+
+Standalone policy routes are `/privacy-policy` and `/terms-and-conditions`. The preview records versioned acceptance with its in-memory lead, test-ride and booking records. Use sample details. Optional cookie permission gates the embedded map, and footer preferences can revoke it.
+
 Never commit `.env*` files.
 
 ## Connect SPA to the backend API (`backend/`)

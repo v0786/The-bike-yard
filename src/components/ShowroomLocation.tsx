@@ -1,3 +1,4 @@
+import { useCookiePreferences } from './CookiePreferences';
 import type { FC } from 'react';
 import { MapPin, Phone, Clock, Navigation, Mail, MessageCircle } from 'lucide-react';
 import type { DealershipInfo } from '../types';
@@ -9,6 +10,7 @@ interface ShowroomLocationProps {
 
 /** Dealership location, hours and one-tap contact actions. */
 export const ShowroomLocation: FC<ShowroomLocationProps> = ({ info }) => {
+  const { maps, open } = useCookiePreferences();
   const mapQuery = encodeURIComponent(`${info.address}, ${info.city}, ${info.state} ${info.pincode}`);
   const directionsUrl = `https://www.google.com/maps/search/?api=1&query=${mapQuery}`;
   const embedUrl = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
@@ -70,14 +72,17 @@ export const ShowroomLocation: FC<ShowroomLocationProps> = ({ info }) => {
       </div>
 
       <div className="lg:col-span-3 min-h-[260px] sm:min-h-[340px]">
-        <iframe
+        {maps ? <iframe
           title="The Bike Yard showroom map — Khopat, Thane"
           src={embedUrl}
           className="h-full w-full min-h-[260px] sm:min-h-[340px] border-0 grayscale-[35%] invert-[0.92] hue-rotate-180 contrast-90"
           loading="lazy"
           referrerPolicy="no-referrer-when-downgrade"
           allowFullScreen
-        />
+        /> : <div className="flex h-full min-h-[260px] flex-col items-center justify-center gap-3 rounded-xl border border-slate-800 p-4 text-center text-sm text-slate-400">
+          <p>Allow optional cookies to display the showroom map here.</p>
+          <button type="button" onClick={open} className="text-amber-400 underline">Cookie preferences</button>
+        </div>}
       </div>
     </section>
   );
