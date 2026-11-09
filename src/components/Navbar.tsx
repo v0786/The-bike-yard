@@ -15,6 +15,7 @@ import { cartStore } from '../services/cartStore';
 import { dealershipStore } from '../services/dealershipStore';
 import { telLink } from '../lib/whatsapp';
 import { UserProfile, ROLE_CONFIGS } from '../lib/rbac';
+import { ThemePicker } from './ThemePicker';
 
 interface NavbarProps {
   activeView: 'showroom' | 'admin' | 'staff' | 'login' | 'legal';
@@ -87,6 +88,8 @@ export const Navbar: React.FC<NavbarProps> = ({
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
               <span className="hidden sm:inline">Grounded AI Desk</span>
             </button>
+            <span className="text-slate-700">|</span>
+            <ThemePicker compact />
             <span className="text-slate-700">|</span>
             <a
               href={telLink(dealerPhone)}

@@ -44,6 +44,7 @@ import { PricingPanel } from './admin/PricingPanel';
 import { OffersPanel } from './admin/OffersPanel';
 import { DealershipInfoForm } from './admin/DealershipInfoForm';
 import { BackendStatusPanel } from './admin/BackendStatusPanel';
+import { ThemePicker } from './ThemePicker';
 
 interface AdminDashboardProps {
   state: DealershipState;
@@ -1144,6 +1145,10 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 <p className="text-slate-400">
                   Taxation identification, banking coordinates, and compliance parameters for The Bike Yard.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl border border-slate-800 bg-slate-950">
+                <ThemePicker />
               </div>
 
               <DealershipInfoForm info={state.dealershipInfo} currentUser={currentUser} />

@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Bike, MapPin, Phone, Mail, Clock, Check, MessageCircle } from 'lucide-react';
 import { dealershipStore } from '../services/dealershipStore';
 import { whatsAppLink, telLink } from '../lib/whatsapp';
+import { ThemePicker } from './ThemePicker';
 
 interface FooterProps {
   onOpenTestRideModal: () => void;
@@ -155,8 +156,14 @@ export const Footer: React.FC<FooterProps> = ({
           </div>
         </div>
 
+        {/* Theme preference (public) */}
+        <div className="pt-4 border-t border-slate-900 flex flex-col sm:flex-row sm:items-center gap-2">
+          <span className="text-[11px] font-semibold text-slate-400">Showroom theme</span>
+          <ThemePicker compact />
+        </div>
+
         {/* Legal Links & Compliance Footer */}
-        <div className="pt-6 border-t border-slate-900 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
+        <div className="pt-4 flex flex-col sm:flex-row items-center justify-between text-[11px] text-slate-500 gap-3">
           <div>
             © 2026 The Bike Yard Dealership Platform. All rights reserved. Khopat, Thane, Maharashtra.
           </div>
