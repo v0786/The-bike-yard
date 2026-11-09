@@ -97,10 +97,14 @@ export const ShowroomHome: FC<ShowroomHomeProps> = ({
 
       {/* Showroom Hero */}
       <ShowroomHero
+        bikes={newBikes}
         inStockTotal={totalInStock}
         phone={info.phone}
         onExploreClick={() => scrollTo('catalogue-section')}
-        onTestRideClick={() => currentActiveBike && onBookTestRide(currentActiveBike)}
+        onTestRideClick={(bike) => {
+          const target = bike ?? currentActiveBike;
+          if (target) onBookTestRide(target);
+        }}
         onEmiClick={() => scrollTo('emi-section')}
       />
 
