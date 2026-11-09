@@ -43,9 +43,9 @@ Set the variables in `.env.example` in the n8n host's supported environment/secr
 
 Assign a PostgreSQL credential to every Postgres node. Assign secure HTTP Bearer credentials or use the host's secret manager for Meta and AI API keys. Never commit tokens, app secrets, recipient phone numbers or production IDs.
 
-## Signature verification limitation
+## Signature verification
 
-The standalone POST workflow does not validate `X-Hub-Signature-256`. Validate the HMAC SHA-256 signature against the exact raw request bytes using `WHATSAPP_APP_SECRET` at a trusted HTTPS gateway before forwarding to n8n. Do not treat the verify token as a substitute for request-signature validation. The existing backend route already performs this check.
+The included Cloudflare Worker validates `X-Hub-Signature-256` using HMAC SHA-256 over the exact raw POST bytes and fails closed if `WHATSAPP_APP_SECRET` is missing or the signature does not match. Set `WHATSAPP_APP_SECRET` as a Cloudflare Worker secret (not a Git file). Do not treat the verify token as a substitute for request-signature validation. The existing backend route also performs this check.
 
 ## Known MVP limitations
 
@@ -66,3 +66,24 @@ The standalone POST workflow does not validate `X-Hub-Signature-256`. Validate t
 7. Send test messages and verify the n8n executions and database state.
 
 Do not migrate, disconnect, register, or modify The Bike Yard's real showroom WhatsApp Business number. Production mode remains out of scope.
+
+
+## Test checklist
+
+- [ ] GET with `hub.mode=subscribe`, correct verify token and challenge returns the exact challenge as plain text (200).
+- [ ] GET with wrong token returns 403.
+- [ ] POST with missing/invalid `X-Hub-Signature-256` is rejected by the Worker (403).
+- [ ] POST from the configured Meta test phone-number ID and text body reaches n8n.
+- [ ] Duplicate `wamid` is rejected by the PostgreSQL primary key and does not reach the AI/send branch.
+- [ ] Image/audio/video/location messages produce no AI reply.
+- [ ] `STOP`, `unsubscribe`, `band karo` or supported Hindi equivalents update the conversation to OPTED_OUT and send one confirmation.
+- [ ] `talk to human` stores the message for staff and switches to HUMAN_TAKEOVER.
+- [ ] Messages during HUMAN_TAKEOVER do not reach the AI branch.
+- [ ] Missing price/stock facts result in staff confirmation language, never invented values.
+- [ ] AI timeout/provider failure produces the safe fallback.
+- [ ] Wrong test Phone Number ID fails closed.
+- [ ] The existing backend webhook and the n8n webhook are never subscribed simultaneously for the same Meta app/test number.
+
+## n8n environment access
+
+Some self-hosted n8n installations restrict `$env` access from Code nodes. If using self-hosted n8n, either configure environment access according to your n8n security policy or replace Code-node `$env` reads with n8n Variables/Credentials. Do not weaken host security casually. n8n Cloud may require adapting these references to supported Variables and Credentials.
