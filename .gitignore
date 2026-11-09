@@ -14,3 +14,19 @@ coverage/
 
 # Root source archive (not committed)
 /*.zip
+
+# Ruflo local secrets and runtime data
+.env
+.env.local
+.env.*.local
+.claude-flow/data/
+.claude-flow/logs/
+.claude-flow/sessions/
+
+# Agent tooling & local state (not part of the product)
+.agents/
+.claude/
+.claude-flow/
+.swarm/
+.mcp.json
+CLAUDE.md

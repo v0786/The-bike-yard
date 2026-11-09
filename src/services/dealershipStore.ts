@@ -23,11 +23,15 @@ import {
   INITIAL_TEST_RIDES,
   INITIAL_LEADS,
   INITIAL_STAFF_TASKS,
+  INITIAL_OFFERS,
+  DEALERSHIP_INFO,
   getColorBikeImage,
 } from '../data/dealershipData';
+import { Offer, DealershipInfo } from '../types';
 import { splitGst } from '../lib/currency';
 import {
   buildVariantsForModel,
+  generateBaseMarketCatalog,
   generateThousandBikesCatalog,
   parseBikesCsv,
 } from './marketBikesDatabase';
@@ -63,7 +67,24 @@ export interface DealershipState {
   tasks: StaffTask[];
   auditLogs: AuditLogEntry[];
   olxListings: OlxListing[];
+  offers: Offer[];
+  dealershipInfo: DealershipInfo;
   lastRealtimeEvent?: InventoryRealtimeEvent;
+}
+
+const OVERRIDES_KEY = 'tby-admin-overrides-v1';
+
+/** Persisted staff overrides: pricing (ex-showroom only), featured flags, offers, dealership info. */
+interface BikeOverrideV1 {
+  /** variantId -> exShowroomPaise (stored as string to survive BigInt serialization) */
+  v?: Record<string, string>;
+  feat?: boolean;
+}
+interface OverridesV1 {
+  v: 1;
+  bikes: Record<string, BikeOverrideV1>;
+  offers: Offer[];
+  info: DealershipInfo;
 }
 
 const INITIAL_AUDIT_LOGS: AuditLogEntry[] = [
@@ -97,15 +118,19 @@ class DealershipStore {
 
   constructor() {
     this.state = {
-      bikes: INITIAL_BIKES.map((b) => {
-        const rawRupees = Number(b.exShowroomPaise / 100n);
-        const variants = b.variants || buildVariantsForModel(rawRupees);
-        return {
-          ...b,
-          variants,
-          selectedVariantId: variants[0]?.id,
-        };
-      }),
+      bikes: [
+        ...INITIAL_BIKES.map((b) => {
+          const rawRupees = Number(b.exShowroomPaise / 100n);
+          const variants = b.variants || buildVariantsForModel(rawRupees);
+          return {
+            ...b,
+            variants,
+            selectedVariantId: variants[0]?.id,
+          };
+        }),
+        // Central Indian-market dataset (unique models, 4 variants each)
+        ...generateBaseMarketCatalog(),
+      ],
       stockUnits: [...INITIAL_STOCK_UNITS],
       customers: [...INITIAL_CUSTOMERS],
       bookings: [...INITIAL_BOOKINGS],
@@ -116,6 +141,11 @@ class DealershipStore {
       leads: [...INITIAL_LEADS],
       tasks: [...INITIAL_STAFF_TASKS],
       auditLogs: [...INITIAL_AUDIT_LOGS],
+      offers: INITIAL_OFFERS.map((o) => ({ ...o })),
+      dealershipInfo: {
+        ...DEALERSHIP_INFO,
+        bankDetails: { ...DEALERSHIP_INFO.bankDetails },
+      },
       olxListings: [
         {
           id: 'olx-seed-01',
@@ -140,6 +170,7 @@ class DealershipStore {
     };
 
     this.recalculateAllStockCounts();
+    this.applyOverrides();
 
     // Initialize cross-tab WebSockets-equivalent real-time sync channel
     if (typeof window !== 'undefined' && 'BroadcastChannel' in window) {
@@ -380,15 +411,113 @@ class DealershipStore {
 
   private recalculateAllStockCounts() {
     this.state.bikes.forEach((bike) => {
-      const liveCount = this.state.stockUnits.filter(
-        (u) => u.bikeId === bike.id && u.status === 'IN_STOCK'
-      ).length;
-      bike.inStockCount = liveCount;
+      const bikeUnits = this.state.stockUnits.filter((u) => u.bikeId === bike.id);
+      // Bikes without VIN-tracked units keep their showroom availability seed;
+      // VIN-tracked bikes are always derived from the stock ledger.
+      if (bikeUnits.length === 0) return;
+      bike.inStockCount = bikeUnits.filter((u) => u.status === 'IN_STOCK').length;
     });
+  }
+
+  // --- Persist staff overrides (pricing / featured / offers / dealership info) ---
+  private saveOverrides() {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      const bikes: Record<string, BikeOverrideV1> = {};
+      for (const b of this.state.bikes) {
+        const v: Record<string, string> = {};
+        if (b.variants) {
+          for (const variant of b.variants) v[variant.id] = variant.exShowroomPaise.toString();
+        }
+        bikes[b.id] = { v, feat: b.featured ?? false };
+      }
+      const payload: OverridesV1 = {
+        v: 1,
+        bikes,
+        offers: this.state.offers,
+        info: this.state.dealershipInfo,
+      };
+      window.localStorage.setItem(OVERRIDES_KEY, JSON.stringify(payload));
+    } catch {
+      // Quota or serialization failure — overrides simply won't persist; never crash the showroom.
+    }
+  }
+
+  private applyOverrides() {
+    if (typeof window === 'undefined' || !window.localStorage) return;
+    try {
+      const raw = window.localStorage.getItem(OVERRIDES_KEY);
+      if (!raw) return;
+      const parsed = JSON.parse(raw) as OverridesV1;
+      if (parsed?.v !== 1) return;
+
+      if (parsed.bikes) {
+        for (const [bikeId, ov] of Object.entries(parsed.bikes)) {
+          const bike = this.state.bikes.find((b) => b.id === bikeId);
+          if (!bike) continue;
+          if (ov.v && bike.variants) {
+            for (const variant of bike.variants) {
+              const stored = ov.v[variant.id];
+              if (!stored) continue;
+              try {
+                const paise = BigInt(stored);
+                if (paise > 0n) {
+                  variant.exShowroomPaise = paise;
+                  variant.rtoTaxPaise = (paise * 1100n) / 10000n; // MH-04 individual 11%
+                }
+              } catch {
+                /* ignore malformed entry */
+              }
+            }
+            // Re-sync the bike-level snapshot to its selected variant
+            const selected =
+              bike.variants.find((v) => v.id === bike.selectedVariantId) ?? bike.variants[0];
+            if (selected) {
+              bike.selectedVariantId = selected.id;
+              bike.variant = selected.name;
+              bike.exShowroomPaise = selected.exShowroomPaise;
+              bike.rtoTaxPaise = selected.rtoTaxPaise;
+              bike.insurancePaise = selected.insurancePaise;
+              bike.handlingPaise = selected.handlingPaise;
+            }
+          }
+          if (typeof ov.feat === 'boolean') bike.featured = ov.feat;
+        }
+      }
+
+      if (Array.isArray(parsed.offers)) {
+        this.state.offers = parsed.offers;
+      }
+      if (parsed.info && typeof parsed.info === 'object') {
+        this.state.dealershipInfo = {
+          ...this.state.dealershipInfo,
+          ...parsed.info,
+          bankDetails: {
+            ...this.state.dealershipInfo.bankDetails,
+            ...(parsed.info.bankDetails ?? {}),
+          },
+        };
+      }
+    } catch {
+      // Corrupted overrides — ignore and keep dataset defaults.
+    }
+  }
+
+  private syncSelectedVariantSnapshot(bikeId: string) {
+    const bike = this.state.bikes.find((b) => b.id === bikeId);
+    if (!bike || !bike.variants) return;
+    const selected =
+      bike.variants.find((v) => v.id === bike.selectedVariantId) ?? bike.variants[0];
+    if (!selected) return;
+    bike.exShowroomPaise = selected.exShowroomPaise;
+    bike.rtoTaxPaise = selected.rtoTaxPaise;
+    bike.insurancePaise = selected.insurancePaise;
+    bike.handlingPaise = selected.handlingPaise;
   }
 
   private notify(broadcast = true) {
     this.recalculateAllStockCounts();
+    this.saveOverrides();
     this.listeners.forEach((listener) => listener());
 
     if (broadcast && this.broadcastChannel) {
@@ -403,6 +532,134 @@ class DealershipStore {
         },
       });
     }
+  }
+
+  // --- Admin: update a variant's ex-showroom price (RTO auto-recomputed at 11%) ---
+  // BUSINESS RULE: staff may ONLY touch dealership-commercial fields.
+  // Factory specifications (engine, dimensions, mileage, description) are read-only here.
+  public updateVariantPrice(params: {
+    bikeId: string;
+    variantId: string;
+    newExShowroomPaise: bigint;
+    staffName: string;
+  }): { success: boolean; error?: string } {
+    const MAX_PAISE = 10_000_000_000n; // ₹10 crore sanity ceiling
+    const MIN_PAISE = 1_000_00n; // ₹1,000 sanity floor
+    if (params.newExShowroomPaise < MIN_PAISE || params.newExShowroomPaise > MAX_PAISE) {
+      return { success: false, error: 'Price out of plausible range. Enter the ex-showroom price in ₹.' };
+    }
+    const bike = this.state.bikes.find((b) => b.id === params.bikeId);
+    if (!bike || !bike.variants) return { success: false, error: 'Motorcycle not found.' };
+    const variant = bike.variants.find((v) => v.id === params.variantId);
+    if (!variant) return { success: false, error: 'Variant not found.' };
+
+    const oldPrice = variant.exShowroomPaise;
+    variant.exShowroomPaise = params.newExShowroomPaise;
+    variant.rtoTaxPaise = (params.newExShowroomPaise * 1100n) / 10000n;
+    this.syncSelectedVariantSnapshot(bike.id);
+
+    this.logAudit(
+      'PRICE_UPDATED',
+      params.staffName,
+      `Ex-showroom for ${bike.brand} ${bike.model} (${variant.name}) changed from ₹${(oldPrice / 100n).toLocaleString('en-IN')} to ₹${(params.newExShowroomPaise / 100n).toLocaleString('en-IN')}. RTO MH-04 recomputed at 11%.`
+    );
+    this.notify();
+    return { success: true };
+  }
+
+  // --- Admin: toggle a bike's "featured on homepage" merchandising flag ---
+  public toggleBikeFeatured(bikeId: string, staffName: string): boolean {
+    const bike = this.state.bikes.find((b) => b.id === bikeId);
+    if (!bike) return false;
+    bike.featured = !bike.featured;
+    this.logAudit(
+      'FEATURED_TOGGLED',
+      staffName,
+      `${bike.brand} ${bike.model} ${bike.featured ? 'marked as FEATURED on homepage' : 'removed from featured section'}.`
+    );
+    this.notify();
+    return true;
+  }
+
+  // --- Admin: offers CRUD (dealership promotions) ---
+  public addOffer(input: Omit<Offer, 'id' | 'createdAt'>, staffName: string): Offer {
+    const offer: Offer = {
+      ...input,
+      id: `offer-${Date.now()}`,
+      createdAt: new Date().toISOString(),
+    };
+    this.state.offers = [offer, ...this.state.offers];
+    this.logAudit('OFFER_CREATED', staffName, `Offer "${offer.title}" created.`);
+    this.notify();
+    return offer;
+  }
+
+  public updateOffer(offerId: string, patch: Partial<Omit<Offer, 'id' | 'createdAt'>>, staffName: string): boolean {
+    const offer = this.state.offers.find((o) => o.id === offerId);
+    if (!offer) return false;
+    Object.assign(offer, patch);
+    this.logAudit('OFFER_UPDATED', staffName, `Offer "${offer.title}" updated.`);
+    this.notify();
+    return true;
+  }
+
+  public toggleOfferActive(offerId: string, staffName: string): boolean {
+    const offer = this.state.offers.find((o) => o.id === offerId);
+    if (!offer) return false;
+    offer.active = !offer.active;
+    this.logAudit('OFFER_TOGGLED', staffName, `Offer "${offer.title}" ${offer.active ? 'activated' : 'deactivated'}.`);
+    this.notify();
+    return true;
+  }
+
+  public deleteOffer(offerId: string, staffName: string): boolean {
+    const offer = this.state.offers.find((o) => o.id === offerId);
+    if (!offer) return false;
+    this.state.offers = this.state.offers.filter((o) => o.id !== offerId);
+    this.logAudit('OFFER_DELETED', staffName, `Offer "${offer.title}" deleted.`);
+    this.notify();
+    return true;
+  }
+
+  // --- Admin: update dealership information (contact / address / hours) ---
+  public updateDealershipInfo(
+    patch: Partial<Omit<DealershipInfo, 'bankDetails'>> & { bankDetails?: Partial<DealershipInfo['bankDetails']> },
+    staffName: string
+  ): { success: boolean; error?: string } {
+    const next: DealershipInfo = {
+      ...this.state.dealershipInfo,
+      ...patch,
+      bankDetails: {
+        ...this.state.dealershipInfo.bankDetails,
+        ...(patch.bankDetails ?? {}),
+      },
+    };
+    if (!next.name.trim() || !next.address.trim() || !next.phone.trim()) {
+      return { success: false, error: 'Name, address and phone are required.' };
+    }
+    const digits = next.phone.replace(/\D/g, '');
+    if (digits.length < 10) {
+      return { success: false, error: 'Phone number must contain at least 10 digits.' };
+    }
+    if (next.email && !/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(next.email)) {
+      return { success: false, error: 'Enter a valid email address.' };
+    }
+    if (next.pincode && !/^\d{6}$/.test(next.pincode)) {
+      return { success: false, error: 'PIN code must be 6 digits.' };
+    }
+    this.state.dealershipInfo = next;
+    this.logAudit('DEALERSHIP_INFO_UPDATED', staffName, 'Dealership contact / address / hours updated.');
+    this.notify();
+    return { success: true };
+  }
+
+  /** Clear persisted staff overrides. UI should reload the page afterwards. */
+  public resetAdminOverrides(staffName: string): boolean {
+    if (typeof window !== 'undefined' && window.localStorage) {
+      window.localStorage.removeItem(OVERRIDES_KEY);
+    }
+    this.logAudit('OVERRIDES_RESET', staffName, 'All persisted staff overrides cleared. Reload to restore dataset defaults.');
+    return true;
   }
 
   public logAudit(action: string, performedBy: string, details: string) {

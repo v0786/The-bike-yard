@@ -6,62 +6,86 @@
   --font-sans: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
   --font-mono: 'JetBrains Mono', monospace;
 
-  /* User's Exact Palette Definition from Uploaded Reference */
-  --color-obsidian: #0B0F0D;
-  --color-evergreen: #1F2A1F;
-  --color-moss: #3E5A3F;
-  --color-sage: #8CA98C;
-  --color-sand: #D9C7A3;
-  --color-bronze: #B08D57;
+  /* Premium showroom palette — charcoal, obsidian black, white, champagne gold */
+  --color-obsidian: #0c0c0e;
+  --color-evergreen: #16161a;
+  --color-moss: #2c2c33;
+  --color-sage: #a1a1ab;
+  --color-sand: #f4f4f5;
+  --color-bronze: #d9a441;
 
-  /* Overriding standard slate and amber tokens to map seamlessly to this luxury palette */
-  --color-slate-950: #0B0F0D;
-  --color-slate-900: #141C15;
-  --color-slate-800: #1F2A1F;
-  --color-slate-700: #3E5A3F;
-  --color-slate-600: #557256;
-  --color-slate-500: #748F74;
-  --color-slate-400: #8CA98C;
-  --color-slate-300: #B7C7B7;
-  --color-slate-200: #D9C7A3;
-  --color-slate-100: #F4EFE6;
+  /* Neutral charcoal scale (replaces legacy green-tinted slate) */
+  --color-slate-950: #0c0c0e;
+  --color-slate-900: #131316;
+  --color-slate-800: #1e1e23;
+  --color-slate-700: #2c2c33;
+  --color-slate-600: #4b4b54;
+  --color-slate-500: #71717a;
+  --color-slate-400: #a1a1ab;
+  --color-slate-300: #c9c9cf;
+  --color-slate-200: #e4e4e7;
+  --color-slate-100: #fafafa;
 
-  /* Primary Brand & Gold/Amber Accent */
-  --color-amber-500: #B08D57;
-  --color-amber-400: #D9C7A3;
-  --color-amber-300: #E8DCBE;
-  --color-amber-600: #947340;
+  /* Champagne gold accent (replaces legacy bronze amber) */
+  --color-amber-500: #d9a441;
+  --color-amber-400: #e7be6a;
+  --color-amber-300: #f3d9a0;
+  --color-amber-600: #a97b2a;
 }
 
 :root {
-  --bg-obsidian: #0B0F0D;
-  --surface-evergreen: #1F2A1F;
-  --border-moss: #3E5A3F;
-  --text-sage: #8CA98C;
-  --text-sand: #D9C7A3;
-  --brand-bronze: #B08D57;
+  --bg-obsidian: #0c0c0e;
+  --surface-evergreen: #16161a;
+  --border-moss: #2c2c33;
+  --text-sage: #a1a1ab;
+  --text-sand: #f4f4f5;
+  --brand-bronze: #d9a441;
 }
 
 body {
   font-family: var(--font-sans);
-  background-color: #0B0F0D;
-  color: #D9C7A3;
+  background-color: #0c0c0e;
+  color: #e4e4e7;
 }
 
-/* Custom subtle scrollbar with new palette */
+/* Display heading treatment for showroom hero & section headers */
+.display-heading {
+  font-weight: 800;
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  text-wrap: balance;
+}
+
+.eyebrow {
+  font-size: 0.65rem;
+  font-weight: 800;
+  letter-spacing: 0.18em;
+  text-transform: uppercase;
+}
+
+/* Custom subtle scrollbar */
 ::-webkit-scrollbar {
   width: 6px;
   height: 6px;
 }
 ::-webkit-scrollbar-track {
-  background: #0B0F0D;
+  background: #0c0c0e;
 }
 ::-webkit-scrollbar-thumb {
-  background: #3E5A3F;
+  background: #2c2c33;
   border-radius: 3px;
 }
 ::-webkit-scrollbar-thumb:hover {
-  background: #8CA98C;
+  background: #d9a441;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .animate-marquee {
+    animation: none;
+  }
+  * {
+    scroll-behavior: auto !important;
+  }
 }
 
 @keyframes marquee {

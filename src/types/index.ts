@@ -84,6 +84,44 @@ export interface Motorcycle {
   inStockCount: number;
   image: string;
   description: string;
+  /** Merchandising flag — staff may toggle in admin (dealership-specific, not a factory spec) */
+  featured?: boolean;
+  /** ISO date the unit was inwarded / arrived at the showroom (for "Latest arrivals") */
+  arrivedAt?: string;
+}
+
+export interface DealershipInfo {
+  name: string;
+  tagline: string;
+  address: string;
+  city: string;
+  state: string;
+  pincode: string;
+  rtoCode: string;
+  phone: string;
+  landline: string;
+  email: string;
+  gstin: string;
+  bankDetails: {
+    bankName: string;
+    accountNumber: string;
+    ifsc: string;
+    branch: string;
+  };
+  openingHours: string;
+}
+
+export type OfferType = 'EXCHANGE' | 'FINANCE' | 'ACCESSORY' | 'WARRANTY' | 'FESTIVE' | 'GENERAL';
+
+export interface Offer {
+  id: string;
+  type: OfferType;
+  title: string;
+  description: string;
+  badge?: string;
+  validTill?: string; // ISO date
+  active: boolean;
+  createdAt: string;
 }
 
 export interface StockUnit {

@@ -12,6 +12,8 @@ import {
   ChevronDown,
 } from 'lucide-react';
 import { cartStore } from '../services/cartStore';
+import { dealershipStore } from '../services/dealershipStore';
+import { telLink } from '../lib/whatsapp';
 import { UserProfile, ROLE_CONFIGS } from '../lib/rbac';
 
 interface NavbarProps {
@@ -43,6 +45,7 @@ export const Navbar: React.FC<NavbarProps> = ({
 }) => {
   const [cartCount, setCartCount] = useState<number>(cartStore.getItemCount());
   const [isStaffMenuOpen, setIsStaffMenuOpen] = useState<boolean>(false);
+  const dealerPhone = dealershipStore.getState().dealershipInfo.phone;
 
   useEffect(() => {
     const unsub = cartStore.subscribe(() => {
@@ -54,12 +57,12 @@ export const Navbar: React.FC<NavbarProps> = ({
   return (
     <header className="sticky top-0 z-40 w-full border-b border-slate-800 bg-slate-950/90 backdrop-blur-md">
       {/* Dealership top utility strip */}
-      <div className="border-b border-slate-900 bg-slate-900/50 px-4 sm:px-6 py-1.5 text-xs text-slate-400">
+      <div className="hidden sm:block border-b border-slate-900 bg-slate-900/50 px-4 sm:px-6 py-1.5 text-xs text-slate-400">
         <div className="mx-auto flex max-w-7xl items-center justify-between">
           <div className="flex items-center gap-2 sm:gap-4 truncate">
             <span className="text-amber-400 font-bold shrink-0">The Bike Yard</span>
             <span className="text-slate-600">|</span>
-            <span className="truncate">BikeWale Authorized Dealer · Khopat, Thane (W) — MH-04</span>
+            <span className="truncate">Authorised Multi-Brand Dealer · Khopat, Thane (W) — MH-04</span>
             <span className="hidden md:inline text-slate-600">|</span>
           </div>
 
@@ -86,11 +89,11 @@ export const Navbar: React.FC<NavbarProps> = ({
             </button>
             <span className="text-slate-700">|</span>
             <a
-              href="tel:+919820455120"
+              href={telLink(dealerPhone)}
               className="flex items-center gap-1 font-mono text-amber-400 hover:underline"
             >
               <PhoneCall className="w-3.5 h-3.5" />
-              <span>+91 98204 55120</span>
+              <span>{dealerPhone}</span>
             </a>
 
             {/* Staff Login Button / Logged-in Staff pill */}
@@ -180,7 +183,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           </button>
         </div>
 
-        {/* Zone 2: BikeWale Style Public Exploration Links */}
+        {/* Zone 2: Public exploration links */}
         <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
           <button
             onClick={() => {

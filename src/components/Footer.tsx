@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
-import { Bike, MapPin, Phone, Mail, Clock, ShieldCheck, Check, PhoneCall, ArrowRight } from 'lucide-react';
-import { DEALERSHIP_INFO } from '../data/dealershipData';
+import { Bike, MapPin, Phone, Mail, Clock, Check, MessageCircle } from 'lucide-react';
 import { dealershipStore } from '../services/dealershipStore';
+import { whatsAppLink, telLink } from '../lib/whatsapp';
 
 interface FooterProps {
   onOpenTestRideModal: () => void;
@@ -19,29 +19,21 @@ export const Footer: React.FC<FooterProps> = ({
   const [quickPhone, setQuickPhone] = useState('');
   const [quickName, setQuickName] = useState('');
   const [callbackRequested, setCallbackRequested] = useState(false);
+  const info = dealershipStore.getState().dealershipInfo;
 
   const handleCallbackSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    if (!quickPhone.trim() || quickPhone.length < 10) return;
+    const phoneDigits = quickPhone.replace(/\D/g, '');
+    if (phoneDigits.length < 10 || phoneDigits.length > 13) return;
 
-    // Immediately push to dealership store calling queue
-    dealershipStore.getState().leads.unshift({
-      id: `lead-call-${Date.now()}`,
+    dealershipStore.createLead({
       customerName: quickName.trim() || 'Website Visitor',
       phone: quickPhone.trim(),
       bikeOfInterest: 'General Showroom Inquiry',
       source: 'WEBSITE',
-      stage: 'NEW',
-      assignedTo: 'Suraj Patil (Calling Desk)',
       notes: 'Customer requested immediate telephone callback via website footer. CALL NOW.',
-      createdAt: new Date().toISOString(),
+      assignedTo: 'Suraj Patil (Calling Desk)',
     });
-
-    dealershipStore.logAudit(
-      'CALLBACK_REQUESTED',
-      'Showroom Website Footer',
-      `Immediate callback requested for ${quickName || 'Customer'} at ${quickPhone}. Reflected in Inbound Call Queue.`
-    );
 
     setCallbackRequested(true);
     setQuickPhone('');
@@ -61,10 +53,10 @@ export const Footer: React.FC<FooterProps> = ({
               <span className="text-base font-bold text-white tracking-tight">THE BIKE YARD</span>
             </div>
             <p className="text-slate-400 leading-relaxed">
-              Authorized multi-brand motorcycle showroom and certified delivery centre in Khopat, Thane (West). Powered by pure BigInt integer paise financial transparency.
+              Authorised multi-brand motorcycle showroom and certified delivery centre in Khopat, Thane (West). Genuine bikes, transparent on-road pricing, and MH-04 paperwork handled for you.
             </p>
             <div className="text-[11px] text-amber-400 font-mono">
-              GSTIN: {DEALERSHIP_INFO.gstin} · RTO: MH-04
+              GSTIN: {info.gstin} · RTO: MH-04
             </div>
           </div>
 
@@ -74,11 +66,11 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="space-y-2 text-slate-300">
               <div className="flex items-start gap-2">
                 <MapPin className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
-                <span>{DEALERSHIP_INFO.address}, {DEALERSHIP_INFO.city} — {DEALERSHIP_INFO.pincode}</span>
+                <span>{info.address}, {info.city} — {info.pincode}</span>
               </div>
               <div className="flex items-center gap-2">
                 <Clock className="w-4 h-4 text-amber-400 shrink-0" />
-                <span>{DEALERSHIP_INFO.openingHours}</span>
+                <span>{info.openingHours}</span>
               </div>
             </div>
           </div>
@@ -89,14 +81,25 @@ export const Footer: React.FC<FooterProps> = ({
             <div className="space-y-2 text-slate-300">
               <div className="flex items-center gap-2">
                 <Phone className="w-4 h-4 text-amber-400 shrink-0" />
-                <a href="tel:+919820455120" className="hover:text-white transition-colors">
-                  {DEALERSHIP_INFO.phone}
+                <a href={telLink(info.phone)} className="hover:text-white transition-colors">
+                  {info.phone}
                 </a>
               </div>
               <div className="flex items-center gap-2">
                 <Mail className="w-4 h-4 text-amber-400 shrink-0" />
-                <a href="mailto:sales@thebikeyard.in" className="hover:text-white transition-colors">
-                  {DEALERSHIP_INFO.email}
+                <a href={`mailto:${info.email}`} className="hover:text-white transition-colors">
+                  {info.email}
+                </a>
+              </div>
+              <div className="pt-1">
+                <a
+                  href={whatsAppLink(info.phone, 'Hi The Bike Yard! I would like to enquire about a motorcycle.')}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="inline-flex items-center gap-2 rounded-lg bg-emerald-600 px-3 py-1.5 text-xs font-bold text-white hover:bg-emerald-500 transition-colors"
+                >
+                  <MessageCircle className="w-3.5 h-3.5" aria-hidden="true" />
+                  Chat on WhatsApp
                 </a>
               </div>
               <div className="pt-1">

@@ -150,3 +150,21 @@ All notable changes, architectural updates, and feature implementations for **Th
 - Grounded AI Showroom Desk with zero-hallucination domain knowledge.
 - OLX India 1-click used bike ad posting integration for sales staff.
 - Cart Drawer and booking advance checkout flow.
+
+
+---
+
+## [Version 3.0.0] — Premium Redesign, Public Bike Pages & Staff Pricing Desk
+### Changed
+- **Charcoal/obsidian + champagne-gold design system** (`src/index.css`) replacing the legacy green-tinted palette; neutral `slate` scale, gold `amber` accent, display typography utilities, reduced-motion support.
+- **React Router 7 SPA routing** with real URLs: `/` (showroom), `/bike/:id` (SEO bike pages), `/legal?tab=privacy|terms`, `/login`, `/admin`, `/staff` (RBAC-guarded), branded 404 (`*`). Per-route SEO via `Seo.tsx` (title, description, canonical, OG/Twitter, JSON-LD).
+- **Showroom hero rebuilt** — full-bleed photograph, high-contrast display type, WhatsApp/call/CTA hierarchy, trust strip. Honda/Suzuki/TVS authorised brand rails + "also on floor" marque links (`?brand=` deep-links into the catalogue).
+- **Catalogue engine extracted** (`src/lib/catalogue.ts`) — search, brand/category/budget/engine-cc filters, price & popularity sort (popularity derived from lead/booking signals), 9-per-page pagination, `?brand=/?category=/?sort=` URL state. Responsive grid retained.
+- **Base market catalogue merged at startup** — 37 unique Indian-market models × 4 variants from the central dataset (deduplicated against hand-curated showroom units), so Honda, Suzuki and TVS sections are fully browsable with real specs.
+- **Bike detail pages** — colour gallery + swatches, variant selector, MH-04 on-road breakup (11% RTO auto-computed), EMI calculator (`src/lib/emi.ts`, unit-tested), WhatsApp/call/test-ride/₹10,000 CTAs, similar motorcycles, Product + Breadcrumb JSON-LD.
+- **Homepage sections added** — Featured Motorcycles (staff star toggle), Latest Arrivals (recently inwarded), Current Dealership Offers (staff CRUD, WhatsApp claim), Why Thane Rides With Us, visit/location block with map embed.
+- **Admin: Pricing & Featured desk** — ex-showroom editing per variant with RTO auto-recompute, featured merchandising toggle; **specs read-only** enforced in UI and store. **Offers desk** (create/toggle/delete). **Dealership info form** (contact/address/hours/GSTIN) + danger-zone override reset. Staff overrides persist in localStorage; all mutations audit-logged.
+- **RBAC extended** — new `pricing` and `offers` sections for Super Admin / Owner / Manager only.
+- **Performance** — route-level code splitting (React.lazy), lazy images, `fetchPriority=high` hero; main bundle 698 kB → 465 kB.
+- **SEO** — unique metadata per route, `sitemap.xml` (40 URLs), `robots.txt` (staff areas disallowed), `favicon.svg`, canonical links, noindex on staff/login.
+- **Tests** — Vitest configured (`npm test`); 30 unit tests (emi, catalogue, currency, whatsapp). Backend typecheck + tests verified; root `tsc` now excludes the separate Next.js backend app.

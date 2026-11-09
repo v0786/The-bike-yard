@@ -1,43 +1,103 @@
 import React, { useState, useEffect } from 'react';
+import { Routes, Route, Navigate, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { dealershipStore, DealershipState } from './services/dealershipStore';
 import { Motorcycle } from './types';
-import { UserProfile, DEMO_USERS } from './lib/rbac';
+import { UserProfile } from './lib/rbac';
 import { Navbar } from './components/Navbar';
-import { ShowroomHero } from './components/ShowroomHero';
-import { TrendingMarquee } from './components/TrendingMarquee';
-import { BikeListing } from './components/BikeListing';
-import { BikeWaleReferenceCatalog } from './components/BikeWaleReferenceCatalog';
-import { PersistentOnRoadBar } from './components/PersistentOnRoadBar';
-import { FinanceEmiSection } from './components/FinanceEmiSection';
-import { BikeDetailModal } from './components/BikeDetailModal';
-import { BikeZoomSpecsModal } from './components/BikeZoomSpecsModal';
-import { TestRideModal } from './components/TestRideModal';
-import { CartDrawer } from './components/CartDrawer';
-import { LegalPagesModal } from './components/LegalPagesModal';
-import { LegalPagesView } from './components/LegalPagesView';
-import { LeadCaptureModal } from './components/LeadCaptureModal';
-import { CsvUploadModal } from './components/CsvUploadModal';
-import { BikeCompareModal } from './components/BikeCompareModal';
-import { OlxPostingModal } from './components/OlxPostingModal';
-import { StaffLoginPage } from './components/StaffLoginPage';
-import { ApplicationsHub } from './components/ApplicationsHub';
-import { AdminDashboard } from './components/AdminDashboard';
-import { StaffPortal } from './components/StaffPortal';
 import { GroundedChatbot } from './components/GroundedChatbot';
 import { MobileBottomNav } from './components/MobileBottomNav';
 import { Footer } from './components/Footer';
-import { FAQS } from './data/dealershipData';
-import { ChevronDown, ShieldCheck, Flame, Sparkles } from 'lucide-react';
+import { FloatingWhatsApp } from './components/FloatingWhatsApp';
+import { Seo } from './components/Seo';
+import { ShowroomHome } from './views/ShowroomHome';
+
+// Lazy-load staff/admin/legal surfaces & the bike detail route to keep the
+// public showroom bundle lean on mobile networks.
+const BikeDetailPage = React.lazy(() => import('./views/BikeDetailPage').then((m) => ({ default: m.BikeDetailPage })));
+const NotFound = React.lazy(() => import('./views/NotFound').then((m) => ({ default: m.NotFound })));
+const LegalPagesView = React.lazy(() => import('./components/LegalPagesView').then((m) => ({ default: m.LegalPagesView })));
+const LegalPagesModal = React.lazy(() => import('./components/LegalPagesModal').then((m) => ({ default: m.LegalPagesModal })));
+const LeadCaptureModal = React.lazy(() => import('./components/LeadCaptureModal').then((m) => ({ default: m.LeadCaptureModal })));
+const CsvUploadModal = React.lazy(() => import('./components/CsvUploadModal').then((m) => ({ default: m.CsvUploadModal })));
+const BikeDetailModal = React.lazy(() => import('./components/BikeDetailModal').then((m) => ({ default: m.BikeDetailModal })));
+const BikeZoomSpecsModal = React.lazy(() => import('./components/BikeZoomSpecsModal').then((m) => ({ default: m.BikeZoomSpecsModal })));
+const TestRideModal = React.lazy(() => import('./components/TestRideModal').then((m) => ({ default: m.TestRideModal })));
+const CartDrawer = React.lazy(() => import('./components/CartDrawer').then((m) => ({ default: m.CartDrawer })));
+const BikeCompareModal = React.lazy(() => import('./components/BikeCompareModal').then((m) => ({ default: m.BikeCompareModal })));
+const OlxPostingModal = React.lazy(() => import('./components/OlxPostingModal').then((m) => ({ default: m.OlxPostingModal })));
+const StaffLoginPage = React.lazy(() => import('./components/StaffLoginPage').then((m) => ({ default: m.StaffLoginPage })));
+const AdminDashboard = React.lazy(() => import('./components/AdminDashboard').then((m) => ({ default: m.AdminDashboard })));
+const StaffPortal = React.lazy(() => import('./components/StaffPortal').then((m) => ({ default: m.StaffPortal })));
+
+const RouteFallback: React.FC = () => (
+  <div className="flex min-h-[40vh] items-center justify-center" role="status" aria-live="polite">
+    <div className="h-8 w-8 animate-spin rounded-full border-2 border-slate-700 border-t-amber-500" />
+    <span className="sr-only">Loading…</span>
+  </div>
+);
+
+type AppView = 'showroom' | 'admin' | 'staff' | 'login' | 'legal';
+
+const viewFromPath = (pathname: string): AppView => {
+  if (pathname.startsWith('/admin')) return 'admin';
+  if (pathname.startsWith('/staff')) return 'staff';
+  if (pathname.startsWith('/login')) return 'login';
+  if (pathname.startsWith('/legal')) return 'legal';
+  return 'showroom';
+};
+
+const pathFromView = (view: AppView): string => {
+  switch (view) {
+    case 'admin': return '/admin';
+    case 'staff': return '/staff';
+    case 'login': return '/login';
+    case 'legal': return '/legal';
+    default: return '/';
+  }
+};
+
+const LegalRoute: React.FC<{ onBackToShowroom: () => void }> = ({ onBackToShowroom }) => {
+  const [searchParams] = useSearchParams();
+  const tab = searchParams.get('tab') === 'terms' ? 'terms' : 'privacy';
+  return (
+    <>
+      <Seo
+        title="Privacy & Terms | The Bike Yard"
+        description="Privacy policy and terms of service for The Bike Yard, Khopat — DPDP Act 2023 compliant privacy notice, booking advance policy and MH-04 jurisdiction terms."
+        path="/legal"
+      />
+      <LegalPagesView initialTab={tab} onBackToShowroom={onBackToShowroom} />
+    </>
+  );
+};
 
 export default function App() {
+  const location = useLocation();
+  const navigate = useNavigate();
+  const activeView = viewFromPath(location.pathname);
+
   const [state, setState] = useState<DealershipState>(dealershipStore.getState());
-  const [activeView, setActiveView] = useState<'showroom' | 'admin' | 'staff' | 'login' | 'legal'>('showroom');
-  const [legalTab, setLegalTab] = useState<'privacy' | 'terms'>('privacy');
   const [isLeadModalOpen, setIsLeadModalOpen] = useState<boolean>(false);
   const [leadTargetBike, setLeadTargetBike] = useState<Motorcycle | null>(null);
 
-  // Authentication State for Staff & Dealership Management
-  const [currentUser, setCurrentUser] = useState<UserProfile | null>(null);
+  // Authentication State for Staff & Dealership Management (session-persisted)
+  const [currentUser, setCurrentUser] = useState<UserProfile | null>(() => {
+    try {
+      const raw = sessionStorage.getItem('tby-staff-session');
+      return raw ? (JSON.parse(raw) as UserProfile) : null;
+    } catch {
+      return null;
+    }
+  });
+
+  useEffect(() => {
+    try {
+      if (currentUser) sessionStorage.setItem('tby-staff-session', JSON.stringify(currentUser));
+      else sessionStorage.removeItem('tby-staff-session');
+    } catch {
+      /* sessionStorage unavailable — non-fatal */
+    }
+  }, [currentUser]);
 
   // Vehicle Selection & Modal States
   const [selectedBike, setSelectedBike] = useState<Motorcycle | null>(state.bikes[0] || null);
@@ -54,13 +114,24 @@ export default function App() {
   const [legalModalTab, setLegalModalTab] = useState<'privacy' | 'terms'>('privacy');
   const [isCsvModalOpen, setIsCsvModalOpen] = useState<boolean>(false);
   const [isOlxModalOpen, setIsOlxModalOpen] = useState<boolean>(false);
-  const [expandedFaqIndex, setExpandedFaqIndex] = useState<number | null>(null);
 
   // Compare State
   const [isCompareOpen, setIsCompareOpen] = useState<boolean>(false);
   const [compareBikeIds, setCompareBikeIds] = useState<string[]>([]);
   const [compareBikeA, setCompareBikeA] = useState<Motorcycle | null>(null);
   const [compareBikeB, setCompareBikeB] = useState<Motorcycle | null>(null);
+
+  // Scroll to top on route change; honour #hash anchors
+  useEffect(() => {
+    if (location.hash) {
+      const el = document.getElementById(location.hash.slice(1));
+      if (el) {
+        el.scrollIntoView({ behavior: 'smooth', block: 'start' });
+        return;
+      }
+    }
+    window.scrollTo({ top: 0, behavior: 'instant' as ScrollBehavior });
+  }, [location.pathname, location.hash]);
 
   const handleToggleCompareBike = (bike: Motorcycle) => {
     setCompareBikeIds((prev) => {
@@ -109,18 +180,11 @@ export default function App() {
     setIsCompareOpen(true);
   };
 
-  const handleClearCompare = () => {
-    setCompareBikeIds([]);
-    setCompareBikeA(null);
-    setCompareBikeB(null);
-  };
-
   // Subscribe to real-time store updates
   useEffect(() => {
     const unsubscribe = dealershipStore.subscribe(() => {
       const freshState = { ...dealershipStore.getState() };
       setState(freshState);
-      // Keep selectedBike in sync with updated variant or stock counts
       if (selectedBike) {
         const updated = freshState.bikes.find((b) => b.id === selectedBike.id);
         if (updated) setSelectedBike(updated);
@@ -135,21 +199,33 @@ export default function App() {
 
   const handleStaffLogin = (user: UserProfile) => {
     setCurrentUser(user);
-    if (user.role === 'SALES_EXEC' || user.role === 'RTO_STAFF') {
-      setActiveView('staff');
-    } else {
-      setActiveView('admin');
-    }
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate(user.role === 'SALES_EXEC' || user.role === 'RTO_STAFF' ? '/staff' : '/admin');
   };
 
   const handleStaffLogout = () => {
     setCurrentUser(null);
-    setActiveView('showroom');
-    window.scrollTo({ top: 0, behavior: 'smooth' });
+    navigate('/');
+  };
+
+  const handleViewChange = (v: AppView) => {
+    if ((v === 'admin' || v === 'staff') && !currentUser) {
+      navigate('/login');
+      return;
+    }
+    navigate(pathFromView(v));
   };
 
   const currentActiveBike = selectedBike || state.bikes[0] || null;
+
+  const openTestRide = (bike: Motorcycle | null) => {
+    if (bike) setTestRideBike(bike);
+    setIsTestRideOpen(true);
+  };
+
+  const openEnquire = (bike: Motorcycle) => {
+    setLeadTargetBike(bike);
+    setIsLeadModalOpen(true);
+  };
 
   return (
     <div className="min-h-screen bg-slate-950 text-slate-100 flex flex-col selection:bg-amber-500/20 selection:text-amber-400">
@@ -159,18 +235,8 @@ export default function App() {
       {/* Top Navbar */}
       <Navbar
         activeView={activeView}
-        onViewChange={(v) => {
-          if ((v === 'admin' || v === 'staff') && !currentUser) {
-            setActiveView('login');
-          } else {
-            setActiveView(v);
-          }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenTestRideModal={() => {
-          setTestRideBike(currentActiveBike);
-          setIsTestRideOpen(true);
-        }}
+        onViewChange={handleViewChange}
+        onOpenTestRideModal={() => openTestRide(currentActiveBike)}
         onOpenChat={() => setIsChatOpen(true)}
         onOpenCart={() => setIsCartOpen(true)}
         onOpenLeadModal={() => {
@@ -179,242 +245,122 @@ export default function App() {
         }}
         onOpenCompare={() => handleOpenCompare()}
         compareCount={compareBikeIds.length}
-        onOpenCsvUpload={() => setIsCsvModalOpen(true)}
+        onOpenCsvUpload={currentUser ? () => setIsCsvModalOpen(true) : undefined}
         currentUser={currentUser}
         onLogout={handleStaffLogout}
       />
 
       {/* Main Body */}
       <main className="flex-1">
-        {/* PUBLIC DIGITAL SHOWROOM — BIKEWALE STYLE EXPLORATION */}
-        {activeView === 'showroom' && (
-          <div className="space-y-12 sm:space-y-16 pb-24 md:pb-28">
-            <BikeWaleReferenceCatalog />
-            {/* Showroom Hero Banner */}
-            <ShowroomHero
-              inStockTotal={totalInStock}
-              onExploreClick={() => {
-                const el = document.getElementById('catalogue-section');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-              onTestRideClick={() => {
-                setTestRideBike(currentActiveBike);
-                setIsTestRideOpen(true);
-              }}
-              onEmiClick={() => {
-                const el = document.getElementById('emi-section');
-                el?.scrollIntoView({ behavior: 'smooth' });
-              }}
-            />
-
-            {/* Trending Bikes Right-to-Left Scrolling Marquee */}
-            <TrendingMarquee
-              bikes={state.bikes}
-              onSelectBike={(b) => setSelectedBike(b)}
-              selectedBikeId={selectedBike?.id}
-            />
-
-            <div className="mx-auto max-w-7xl px-4 sm:px-6 space-y-16">
-              {/* New Motorcycle Catalogue */}
-              <BikeListing
-                bikes={newBikes}
-                onSelectBike={(b) => setSelectedBike(b)}
-                onBookTestRide={(b) => {
-                  setTestRideBike(b);
-                  setIsTestRideOpen(true);
-                }}
-                onZoomBike={(b) => setZoomBike(b)}
-                onOpenCsvUpload={() => setIsCsvModalOpen(true)}
-                onOpenCompare={handleOpenCompare}
-                compareBikeIds={compareBikeIds}
-                onToggleCompareBike={handleToggleCompareBike}
-                onClearCompare={handleClearCompare}
+        <React.Suspense fallback={<RouteFallback />}>
+        <Routes>
+          <Route
+            path="/"
+            element={
+              <ShowroomHome
+                state={state}
+                totalInStock={totalInStock}
+                newBikes={newBikes}
+                usedBikes={usedBikes}
+                currentUser={currentUser}
+                currentActiveBike={currentActiveBike}
                 selectedBikeId={selectedBike?.id}
-              />
-
-              {/* Certified Pre-Owned Section */}
-              <div className="space-y-6" id="used-bikes-section">
-                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3 border-b border-slate-800 pb-4">
-                  <div>
-                    <div className="flex items-center gap-2">
-                      <span className="text-xs uppercase font-extrabold text-amber-500 tracking-wider">
-                        Thane RTO Certified
-                      </span>
-                      <span className="text-slate-600">·</span>
-                      <span className="text-xs text-emerald-400 font-semibold">
-                        45-Point Inspection Passed
-                      </span>
-                    </div>
-                    <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                      Certified Pre-Owned Motorcycles & Scooters
-                    </h2>
-                  </div>
-
-                  <div className="flex items-center gap-2">
-                    {currentUser && (
-                      <button
-                        onClick={() => {
-                          setOlxTargetBike(usedBikes[0] || null);
-                          setIsOlxModalOpen(true);
-                        }}
-                        className="rounded-xl border border-emerald-500/40 bg-emerald-950/40 px-3 py-1.5 text-xs font-bold text-emerald-400 hover:bg-emerald-500 hover:text-slate-950 transition-colors shadow-sm"
-                      >
-                        Staff: 1-Click Post to OLX
-                      </button>
-                    )}
-                    <span className="text-xs text-slate-400">
-                      6-Month Warranty · Clean MH-04 Transfer
-                    </span>
-                  </div>
-                </div>
-
-                <BikeListing
-                  bikes={usedBikes}
-                  onSelectBike={(b) => setSelectedBike(b)}
-                  onBookTestRide={(b) => {
-                    setTestRideBike(b);
-                    setIsTestRideOpen(true);
-                  }}
-                  onZoomBike={(b) => setZoomBike(b)}
-                  onOpenOlxModal={(b) => {
-                    setOlxTargetBike(b);
-                    setIsOlxModalOpen(true);
-                  }}
-                  onOpenCsvUpload={() => setIsCsvModalOpen(true)}
-                  onOpenCompare={handleOpenCompare}
-                  compareBikeIds={compareBikeIds}
-                  onToggleCompareBike={handleToggleCompareBike}
-                  onClearCompare={handleClearCompare}
-                  selectedBikeId={selectedBike?.id}
-                />
-              </div>
-
-              {/* 10 Institutional Finance Partners & Live EMI Calculator */}
-              {currentActiveBike && (
-                <FinanceEmiSection
-                  selectedBike={currentActiveBike}
-                  onApplySuccess={(lead) => {
-                    // Handled internally in FinanceEmiSection; lead added to call queue
-                  }}
-                />
-              )}
-
-              {/* Finance, Insurance & RTO Hub */}
-              <div id="applications-hub">
-                <ApplicationsHub />
-              </div>
-
-              {/* Frequently Asked Questions */}
-              <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-6 sm:p-8 space-y-6">
-                <div>
-                  <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
-                    Frequently Asked Questions
-                  </h2>
-                  <p className="text-xs sm:text-sm text-slate-400">
-                    Transparent answers regarding booking advance, Maharashtra RTO taxes, and Khopat delivery processes.
-                  </p>
-                </div>
-
-                <div className="space-y-3">
-                  {FAQS.map((faq, idx) => (
-                    <div
-                      key={idx}
-                      className="rounded-xl border border-slate-800 bg-slate-950 overflow-hidden transition-all"
-                    >
-                      <button
-                        onClick={() =>
-                          setExpandedFaqIndex(expandedFaqIndex === idx ? null : idx)
-                        }
-                        className="w-full flex items-center justify-between p-4 text-left text-xs sm:text-sm font-semibold text-slate-200 hover:text-white"
-                      >
-                        <span>{faq.q}</span>
-                        <ChevronDown
-                          className={`w-4 h-4 text-slate-400 shrink-0 transition-transform ${
-                            expandedFaqIndex === idx ? 'rotate-180 text-amber-400' : ''
-                          }`}
-                        />
-                      </button>
-                      {expandedFaqIndex === idx && (
-                        <div className="px-4 pb-4 pt-1 text-xs text-slate-400 leading-relaxed border-t border-slate-800/80">
-                          {faq.a}
-                        </div>
-                      )}
-                    </div>
-                  ))}
-                </div>
-              </div>
-            </div>
-
-            {/* Persistent On-Road Price Bar Docked at Bottom */}
-            {currentActiveBike && (
-              <PersistentOnRoadBar
-                selectedBike={currentActiveBike}
-                bikes={state.bikes}
+                compareBikeIds={compareBikeIds}
                 onSelectBike={(b) => setSelectedBike(b)}
-                onOpenBooking={(b) => setDetailBike(b)}
-                onOpenTestRide={(b) => {
-                  setTestRideBike(b);
-                  setIsTestRideOpen(true);
+                onBookTestRide={openTestRide}
+                onZoomBike={(b) => setZoomBike(b)}
+                onBookNow={(b) => setDetailBike(b)}
+                onOpenCsvUpload={() => setIsCsvModalOpen(true)}
+                onOpenOlxModal={(b) => {
+                  setOlxTargetBike(b);
+                  setIsOlxModalOpen(true);
                 }}
-                onOpenSpecs={(b) => setZoomBike(b)}
+                onOpenCompare={() => handleOpenCompare()}
+                onToggleCompareBike={handleToggleCompareBike}
+                onClearCompare={() => {
+                  setCompareBikeIds([]);
+                  setCompareBikeA(null);
+                  setCompareBikeB(null);
+                }}
               />
-            )}
-          </div>
-        )}
-
-        {/* STAFF & OWNER LOGIN PORTAL */}
-        {activeView === 'login' && (
-          <StaffLoginPage
-            onLoginSuccess={handleStaffLogin}
-            onBackToShowroom={() => setActiveView('showroom')}
+            }
           />
-        )}
-
-        {/* ADMIN DASHBOARD (Protected by Staff/Owner Login) */}
-        {activeView === 'admin' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-            <AdminDashboard
-              state={state}
-              onOpenCsvUpload={() => setIsCsvModalOpen(true)}
-              onOpenOlxModal={(b) => {
-                setOlxTargetBike(b || usedBikes[0] || null);
-                setIsOlxModalOpen(true);
-              }}
-              currentUser={currentUser || undefined}
-              onLogout={handleStaffLogout}
-            />
-          </div>
-        )}
-
-        {/* STAFF OPERATIONS PORTAL */}
-        {activeView === 'staff' && (
-          <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
-            <StaffPortal
-              state={state}
-              onOpenCsvUpload={() => setIsCsvModalOpen(true)}
-              onOpenOlxModal={(b) => {
-                setOlxTargetBike(b || usedBikes[0] || null);
-                setIsOlxModalOpen(true);
-              }}
-              currentUser={currentUser}
-              onLogout={handleStaffLogout}
-            />
-          </div>
-        )}
-
-        {/* DEDICATED FULL-PAGE PRIVACY POLICY & TERMS VIEW */}
-        {activeView === 'legal' && (
-          <LegalPagesView
-            initialTab={legalTab}
-            onBackToShowroom={() => {
-              setActiveView('showroom');
-              window.scrollTo({ top: 0, behavior: 'smooth' });
-            }}
+          <Route
+            path="/bike/:bikeId"
+            element={
+              <BikeDetailPage
+                bikes={state.bikes}
+                dealershipInfo={state.dealershipInfo}
+                onEnquire={openEnquire}
+                onBookTestRide={openTestRide}
+                onBookNow={(b) => setDetailBike(b)}
+              />
+            }
           />
-        )}
+          <Route
+            path="/login"
+            element={
+              <>
+                <Seo title="Staff Login | The Bike Yard" description="Authorised staff sign-in for The Bike Yard dealership management." path="/login" noIndex />
+                <StaffLoginPage
+                  onLoginSuccess={handleStaffLogin}
+                  onBackToShowroom={() => navigate('/')}
+                />
+              </>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              currentUser ? (
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+                  <Seo title="Admin Dashboard | The Bike Yard" description="Authorised dealership administration — inventory, sales, invoices, refunds, pricing and offers." path="/admin" noIndex />
+                  <AdminDashboard
+                    state={state}
+                    onOpenCsvUpload={() => setIsCsvModalOpen(true)}
+                    onOpenOlxModal={(b) => {
+                      setOlxTargetBike(b || usedBikes[0] || null);
+                      setIsOlxModalOpen(true);
+                    }}
+                    currentUser={currentUser}
+                    onLogout={handleStaffLogout}
+                  />
+                </div>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route
+            path="/staff"
+            element={
+              currentUser ? (
+                <div className="mx-auto max-w-7xl px-4 sm:px-6 py-8">
+                  <Seo title="Staff Operations | The Bike Yard" description="Authorised staff operations portal — leads, test rides and delivery workflow." path="/staff" noIndex />
+                  <StaffPortal
+                    state={state}
+                    onOpenCsvUpload={() => setIsCsvModalOpen(true)}
+                    onOpenOlxModal={(b) => {
+                      setOlxTargetBike(b || usedBikes[0] || null);
+                      setIsOlxModalOpen(true);
+                    }}
+                    currentUser={currentUser}
+                    onLogout={handleStaffLogout}
+                  />
+                </div>
+              ) : (
+                <Navigate to="/login" replace />
+              )
+            }
+          />
+          <Route path="/legal" element={<LegalRoute onBackToShowroom={() => navigate('/')} />} />
+          <Route path="*" element={<NotFound />} />
+        </Routes>
+        </React.Suspense>
       </main>
 
       {/* MODALS & LIGHTBOXES */}
+      <React.Suspense fallback={null}>
 
       {/* Priority Callback & On-Road Quote Lead Capture Modal */}
       <LeadCaptureModal
@@ -431,8 +377,7 @@ export default function App() {
           onClose={() => setZoomBike(null)}
           onBookTestRide={(b) => {
             setZoomBike(null);
-            setTestRideBike(b);
-            setIsTestRideOpen(true);
+            openTestRide(b);
           }}
           onInstantBooking={(b) => {
             setZoomBike(null);
@@ -448,8 +393,7 @@ export default function App() {
           onClose={() => setDetailBike(null)}
           onOpenTestRide={(b) => {
             setDetailBike(null);
-            setTestRideBike(b);
-            setIsTestRideOpen(true);
+            openTestRide(b);
           }}
         />
       )}
@@ -477,11 +421,13 @@ export default function App() {
       />
 
       {/* Backend Staff CSV Upload & 1,000+ Variants Sync Modal */}
-      <CsvUploadModal
-        isOpen={isCsvModalOpen}
-        onClose={() => setIsCsvModalOpen(false)}
-        staffName={currentUser?.name || 'Staff Operations'}
-      />
+      {currentUser && (
+        <CsvUploadModal
+          isOpen={isCsvModalOpen}
+          onClose={() => setIsCsvModalOpen(false)}
+          staffName={currentUser.name || 'Staff Operations'}
+        />
+      )}
 
       {/* Side-by-Side Motorcycle Specification Comparison Modal */}
       <BikeCompareModal
@@ -496,8 +442,7 @@ export default function App() {
         }}
         onTestRideBike={(b) => {
           setIsCompareOpen(false);
-          setTestRideBike(b);
-          setIsTestRideOpen(true);
+          openTestRide(b);
         }}
       />
 
@@ -509,22 +454,13 @@ export default function App() {
         staffName={currentUser?.name || 'Suraj Patil (Sales Exec)'}
         onClose={() => setIsOlxModalOpen(false)}
       />
+      </React.Suspense>
 
       {/* Mobile Bottom Navigation */}
       <MobileBottomNav
         activeView={activeView}
-        onViewChange={(v) => {
-          if ((v === 'admin' || v === 'staff') && !currentUser) {
-            setActiveView('login');
-          } else {
-            setActiveView(v);
-          }
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
-        onOpenTestRideModal={() => {
-          setTestRideBike(currentActiveBike);
-          setIsTestRideOpen(true);
-        }}
+        onViewChange={handleViewChange}
+        onOpenTestRideModal={() => openTestRide(currentActiveBike)}
         onOpenChat={() => setIsChatOpen(true)}
         onOpenCart={() => setIsCartOpen(true)}
         currentUser={currentUser}
@@ -532,10 +468,7 @@ export default function App() {
 
       {/* Dealership Footer with Legal Privacy/Terms Triggers */}
       <Footer
-        onOpenTestRideModal={() => {
-          setTestRideBike(currentActiveBike);
-          setIsTestRideOpen(true);
-        }}
+        onOpenTestRideModal={() => openTestRide(currentActiveBike)}
         onOpenPrivacyModal={() => {
           setLegalModalTab('privacy');
           setIsLegalModalOpen(true);
@@ -544,12 +477,11 @@ export default function App() {
           setLegalModalTab('terms');
           setIsLegalModalOpen(true);
         }}
-        onNavigateToLegal={(tab) => {
-          setLegalTab(tab);
-          setActiveView('legal');
-          window.scrollTo({ top: 0, behavior: 'smooth' });
-        }}
+        onNavigateToLegal={(tab) => navigate(`/legal?tab=${tab}`)}
       />
+
+      {/* Persistent WhatsApp enquiry shortcut (all pages) */}
+      <FloatingWhatsApp phone={state.dealershipInfo.phone} />
     </div>
   );
 }

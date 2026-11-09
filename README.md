@@ -1,20 +1,64 @@
-<div align="center">
-<img width="1200" height="475" alt="GHBanner" src="https://ai.google.dev/static/site-assets/images/share-ais-513315318.png" />
-</div>
+# The Bike Yard — Motorcycle Dealership Platform
 
-# Run and deploy your AI Studio app
+Premium multi-brand motorcycle dealership for **The Bike Yard** (Rutu Business Park, Khopat, Thane (W), Maharashtra — MH-04). Public showroom + certified pre-owned + staff operations, built as a fast React SPA and deployed to Vercel.
 
-This contains everything you need to run your app locally.
+**Production:** https://the-bike-yard.vercel.app/
 
-View your app in AI Studio: https://ai.studio/apps/ac3a8093-2544-4437-98ac-dbb4a1a3b3df
+## What's inside
 
-## Run Locally
+- **Public showroom** — hero, Honda / Suzuki / TVS authorised brand rails, featured & latest arrivals, offers, full catalogue with search, filters (brand / category / budget / engine capacity / stock), price & popularity sort, pagination, and side-by-side comparison.
+- **Dedicated motorcycle pages** — `/bike/:id` with colour gallery, variant & colour selection, MH-04 on-road price breakup (11% RTO), EMI calculator, WhatsApp / call / test-ride / ₹10,000 booking CTAs, similar motorcycles, Product + Breadcrumb JSON-LD.
+- **Conversion tooling** — WhatsApp deep links, instant-callback form, lead capture, test-ride scheduler, cart & ₹10,000 booking advance, 10+ lender EMI estimates.
+- **Staff portal & admin dashboard** — RBAC (7 roles), inbound call queue, stock/VIN ledger, atomic sales + GST invoices, refunds with separation-of-duties, OLX posting, CSV catalogue upload.
+- **Pricing & merchandising desk** — authorised staff (Super Admin / Owner / Manager) edit **ex-showroom prices only** (RTO auto-recomputes at 11%) and the homepage **Featured** flag. Factory specs & descriptions are read-only (central dataset). Staff-managed **Offers** and editable **dealership contact information**. Every change is audit-logged; overrides persist in the browser via localStorage.
+- **SEO & performance** — per-route titles/descriptions/canonicals, Open Graph, `sitemap.xml`, `robots.txt`, AutoDealer/Product structured data, custom 404, code-split routes, lazy images.
 
-**Prerequisites:**  Node.js
+## Tech stack
 
+React 19 · Vite 8 · Tailwind CSS 4 · TypeScript · React Router 7 · Vitest · `backend/` contains a separate Next.js 16 + Prisma dealership backend (not part of the Vercel SPA deployment; see `backend/README.md`).
 
-1. Install dependencies:
-   `npm install`
-2. Set the `GEMINI_API_KEY` in [.env.local](.env.local) to your Gemini API key
-3. Run the app:
-   `npm run dev`
+## Develop
+
+```bash
+npm install
+npm run dev        # http://localhost:3000
+```
+
+## Verify
+
+```bash
+npm run lint       # tsc --noEmit (root app)
+npm test           # vitest run (unit tests: emi, catalogue, currency, whatsapp)
+npm run build      # production build → dist/
+cd backend && npx tsc --noEmit && npx vitest run   # backend checks
+```
+
+## Project structure
+
+```
+src/
+  components/        # shared UI (catalogue, modals, admin panels in components/admin/)
+  views/             # ShowroomHome, BikeDetailPage, NotFound (route surfaces)
+  data/              # dealershipData.ts — seed bikes, stock, leads, FAQ, DEALERSHIP_INFO
+  services/          # dealershipStore (state + overrides), marketBikesDatabase (central dataset), cartStore
+  lib/               # pure logic: emi, catalogue (filter/sort/paginate), currency (BigInt paise), rbac, whatsapp
+public/              # robots.txt, sitemap.xml, favicon.svg, hero & bike photography
+```
+
+## Environment variables
+
+The SPA runs fully client-side and needs **no secrets** to build or deploy. See `.env.example` for optional `GEMINI_API_KEY` (AI Studio integration). Never commit `.env*` files.
+
+## Deployment
+
+Vercel (framework: Vite). `vercel.json` rewrites all routes to `index.html` for client-side routing. Deploy with:
+
+```bash
+npx vercel --prod
+```
+
+## Business rules encoded in code
+
+- Currency is BigInt **paise** end-to-end (`formatInr`, `splitGst`).
+- Staff can edit **prices and dealership-specific fields only** — never factory specs.
+- Enquiry leads always land in the staff call queue with an audit log entry.

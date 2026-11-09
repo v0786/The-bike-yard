@@ -1,4 +1,4 @@
-import { Motorcycle, StockUnit, Customer, Booking, Sale, Payment, Refund, TestRide, Lead, StaffTask } from '../types';
+import { Motorcycle, StockUnit, Customer, Booking, Sale, Payment, Refund, TestRide, Lead, StaffTask, Offer } from '../types';
 
 export const DEALERSHIP_INFO = {
   name: 'The Bike Yard',
@@ -284,6 +284,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
       'Grey': '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg',
     },
     inStockCount: 4,
+    featured: true,
+    arrivedAt: '2026-10-28',
     image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg',
     description: 'A nimble, agile urban roadster built on the renowned J-series engine. Perfect for cruising Thane Ghodbunder curves and daily Mumbai commutes.',
   },
@@ -330,6 +332,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
       'Black': '/assets/images/bike_speed400_black_1793847697134.jpg',
     },
     inStockCount: 2,
+    featured: true,
+    arrivedAt: '2026-10-19',
     image: '/assets/images/bike_triumph_speed_400_1793818520492.jpg',
     description: 'British engineering heritage meets modern roadster capability. TR-series DOHC engine with upside-down big piston forks and switchable traction control.',
   },
@@ -376,6 +380,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
       'Black': '/assets/images/bike_duke390_black_1793847731027.jpg',
     },
     inStockCount: 2,
+    featured: true,
+    arrivedAt: '2026-09-12',
     image: '/assets/images/bike_ktm_duke_390_1793817701221.jpg',
     description: 'The Corner Rocket unleashed. Third-generation 399cc LC4c engine with launch control, Quickshifter+, and 5-inch TFT cockpit with Turn-by-Turn navigation.',
   },
@@ -421,6 +427,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
       'Black': '/assets/images/himalayan_black_bike_1793847981859.jpg',
     },
     inStockCount: 2,
+    featured: true,
+    arrivedAt: '2026-10-30',
     image: '/assets/images/bike_himalayan_450_1793818522395.jpg',
     description: 'Purpose-built for demanding terrains. All-new liquid-cooled Sherpa 450 motor, Showa upside down forks, 230mm ground clearance, and Tripper Dash with Google Maps integration.',
   },
@@ -466,6 +474,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
       'Black': '/assets/images/aerox_black_scooter_1793847999766.jpg',
     },
     inStockCount: 3,
+    featured: false,
+    arrivedAt: '2026-08-08',
     image: '/assets/images/bike_yamaha_aerox_155_1793817701070.jpg',
     description: 'Liquid-cooled 155cc 4-valve VVA powerplant inside a high-rigidity underbone frame. Uncompromising maxi-sports scooter with Class-D LED twin headlights.',
   },
@@ -508,6 +518,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
     year: 2023,
     odometerKm: 9840,
     inStockCount: 1,
+    featured: false,
+    arrivedAt: '2026-10-05',
     image: '/assets/images/bike_used_re_classic_350_1793818522002.jpg',
     description: 'Thane Central (MH-04) registered, single IT professional owner, full showroom service records, zero insurance claims. Certified with 45-point PDI & 6-month engine warranty.',
   },
@@ -549,6 +561,8 @@ export const INITIAL_BIKES: Motorcycle[] = [
     year: 2023,
     odometerKm: 11400,
     inStockCount: 1,
+    featured: false,
+    arrivedAt: '2026-09-27',
     image: '/assets/images/bike_used_bajaj_pulsar_1793818520449.jpg',
     description: 'Well-maintained streetfighter. Liquid-cooled triple spark DTS-i engine, upside-down forks, new MRF tyres, pristine engine condition. Clean MH-04 transfer ready.',
   },
@@ -829,5 +843,52 @@ export const FAQS = [
   {
     q: 'Are test rides free and what documents are required?',
     a: 'Test rides are 100% complimentary. You must hold an active Indian Driving License (Two-Wheeler with Gear) and wear a helmet and closed footwear (we also provide sanitized ISI-certified helmets at the showroom).',
+  },
+];
+
+/**
+ * Current dealership offers (merchandising — safe for staff to manage in admin).
+ * These are the showroom's own promotions, not manufacturer specifications.
+ */
+export const INITIAL_OFFERS: Offer[] = [
+  {
+    id: 'offer-festive-exchange',
+    type: 'EXCHANGE',
+    title: 'Festive Exchange Bonus',
+    description: 'Exchange your old motorcycle and get up to ₹10,000 extra on the assessed value. Free RTO transfer paperwork for MH-04 / MH-02 / MH-03.',
+    badge: 'Festive',
+    validTill: '2026-11-30',
+    active: true,
+    createdAt: '2026-10-25T09:00:00.000Z',
+  },
+  {
+    id: 'offer-finance-zero-pf',
+    type: 'FINANCE',
+    title: 'Zero Processing Fee — Bajaj Finance & HDFC',
+    description: 'Zero loan processing fee on two-wheeler finance via Bajaj Finance and HDFC Bank Two-Wheeler Loans. Min. 15% down payment, approval in ~45 minutes in-store.',
+    badge: 'Finance',
+    validTill: '2026-12-31',
+    active: true,
+    createdAt: '2026-10-20T09:00:00.000Z',
+  },
+  {
+    id: 'offer-accessory-rider-kit',
+    type: 'ACCESSORY',
+    title: 'Free Rider Kit on Duke 390 & Speed 400',
+    description: 'Complimentary ISI-certified helmet, tank pad and crash guard with KTM 390 Duke or Triumph Speed 400 bookings. Subject to showroom stock of accessory kits.',
+    badge: 'Accessories',
+    validTill: '2026-12-15',
+    active: true,
+    createdAt: '2026-11-01T09:00:00.000Z',
+  },
+  {
+    id: 'offer-service-honda-tvs',
+    type: 'WARRANTY',
+    title: '3 Free Services on Honda & TVS Commuters',
+    description: 'Complimentary 3 periodic services (labour only) on Honda Activa 6G, Shine 125, TVS Raider 125 and Ntorq 125 purchased this month.',
+    badge: 'Service',
+    validTill: '2026-11-30',
+    active: true,
+    createdAt: '2026-11-02T09:00:00.000Z',
   },
 ];

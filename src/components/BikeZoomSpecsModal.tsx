@@ -170,7 +170,7 @@ export const BikeZoomSpecsModal: React.FC<BikeZoomSpecsModalProps> = ({
           </div>
         )}
 
-        {/* BikeDekho / BikeWale Style Tab Navigation */}
+        {/* Tabbed specification navigation */}
         <div className="flex border-b border-slate-800 gap-2">
           <button
             onClick={() => setActiveTab('specs')}

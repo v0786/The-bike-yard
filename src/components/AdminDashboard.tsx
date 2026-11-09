@@ -40,6 +40,9 @@ import {
 } from 'lucide-react';
 import { StockUnitStatus, Motorcycle } from '../types';
 import { PendingLeadsAlertModule } from './PendingLeadsAlertModule';
+import { PricingPanel } from './admin/PricingPanel';
+import { OffersPanel } from './admin/OffersPanel';
+import { DealershipInfoForm } from './admin/DealershipInfoForm';
 
 interface AdminDashboardProps {
   state: DealershipState;
@@ -170,6 +173,8 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
     { id: 'overview', label: 'Overview & KPIs' },
     { id: 'calls', label: `Inbound Call Queue (${pendingCallsCount})` },
     { id: 'inventory', label: 'Live Stock Units' },
+    { id: 'pricing', label: 'Pricing & Featured' },
+    { id: 'offers', label: `Offers (${state.offers.filter((o) => o.active).length})` },
     { id: 'olx', label: `OLX India Ads (${state.olxListings?.length || 0})` },
     { id: 'stock_inward', label: 'Inward New Stock' },
     { id: 'sales', label: 'Execute Sale' },
@@ -576,6 +581,14 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
           )}
 
           {/* TAB: OLX INDIA 1-CLICK ADS MANAGEMENT */}
+          {activeTab === 'pricing' && (
+            <PricingPanel state={state} currentUser={currentUser} />
+          )}
+
+          {activeTab === 'offers' && (
+            <OffersPanel state={state} currentUser={currentUser} />
+          )}
+
           {activeTab === 'olx' && (
             <div className="space-y-6">
               {/* Pro Dealer Status Banner */}
@@ -1132,35 +1145,54 @@ export const AdminDashboard: React.FC<AdminDashboardProps> = ({
                 </p>
               </div>
 
+              <DealershipInfoForm info={state.dealershipInfo} currentUser={currentUser} />
+
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-1">
                   <div className="text-slate-400">Maharashtra GSTIN</div>
-                  <div className="font-mono font-bold text-white text-sm">27AABCT9981K1ZT</div>
+                  <div className="font-mono font-bold text-white text-sm">{state.dealershipInfo.gstin}</div>
                   <div className="text-[10px] text-emerald-400">Active · State Code 27</div>
                 </div>
 
                 <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-1">
                   <div className="text-slate-400">RTO Jurisdiction</div>
-                  <div className="font-bold text-white text-sm">MH-04 (Thane Central)</div>
-                  <div className="text-[10px] text-slate-400">Teen Hath Naka RTO Division</div>
+                  <div className="font-bold text-white text-sm">{state.dealershipInfo.rtoCode}</div>
+                  <div className="text-[10px] text-slate-400">Thane RTO Division</div>
                 </div>
               </div>
 
               <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
                 <div className="text-slate-400 font-semibold">Dealership Physical Address</div>
                 <div className="text-slate-200">
-                  Shop 4 & 5, Rutu Business Park, Near Cadbury Junction, Khopat, Thane (West) — 400601, Maharashtra
+                  {state.dealershipInfo.address}, {state.dealershipInfo.city} ({state.dealershipInfo.state}) — {state.dealershipInfo.pincode}
                 </div>
               </div>
 
               <div className="p-4 rounded-xl border border-slate-800 bg-slate-950 space-y-2">
-                <div className="text-slate-400 font-semibold">Official Escrow Bank Account</div>
+                <div className="text-slate-400 font-semibold">Official Escrow Bank Account <span className="text-[10px] text-slate-600">(locked — Super Admin only)</span></div>
                 <div className="grid grid-cols-2 gap-2 text-slate-300">
-                  <div>Bank: HDFC Bank Ltd, Khopat Branch</div>
-                  <div>Account: 50200084920194</div>
-                  <div>IFSC: HDFC0001024</div>
-                  <div>Branch Code: 1024 (Khopat)</div>
+                  <div>Bank: {state.dealershipInfo.bankDetails.bankName}</div>
+                  <div>Account: {state.dealershipInfo.bankDetails.accountNumber}</div>
+                  <div>IFSC: {state.dealershipInfo.bankDetails.ifsc}</div>
+                  <div>Branch: {state.dealershipInfo.bankDetails.branch}</div>
                 </div>
+              </div>
+
+              <div className="p-4 rounded-xl border border-rose-500/20 bg-rose-950/20 space-y-2">
+                <div className="text-rose-400 font-semibold text-[11px] uppercase tracking-wider">Danger Zone</div>
+                <p className="text-[10px] text-slate-500">Clears all locally persisted staff overrides (pricing, featured flags, offers, dealership info) saved in this browser. The central dataset and seed offers are restored on reload.</p>
+                <button
+                  type="button"
+                  onClick={() => {
+                    if (window.confirm('Clear all staff overrides saved in this browser?')) {
+                      dealershipStore.resetAdminOverrides(`${currentUser.name} (${currentUser.designation})`);
+                      window.location.reload();
+                    }
+                  }}
+                  className="rounded-lg border border-rose-500/40 px-3 py-1.5 text-[11px] font-bold text-rose-400 hover:bg-rose-950/60 transition-colors"
+                >
+                  Reset Local Overrides
+                </button>
               </div>
             </div>
           )}

@@ -33,6 +33,30 @@ interface RawBikeSeed {
   baseExShowroom: number;
 }
 
+/**
+ * Bikes already present as hand-curated showroom entries — skip them in the
+ * generated base catalogue to avoid duplicates.
+ */
+const HAND_CURATED_MODEL_KEYS = new Set([
+  'royal enfield hunter 350',
+  'royal enfield classic 350 reborn',
+  'ktm 390 duke (gen 3)',
+  'triumph speed 400',
+  'yamaha aerox 155',
+  'royal enfield himalayan 450',
+]);
+
+/** Recent-arrival dates for a few market models (drives the "Latest Arrivals" row). */
+const ARRIVED_AT: Record<string, string> = {
+  'TVS Raider 125': '2026-11-02',
+  'TVS Ronin': '2026-10-29',
+  'Honda Activa 6G': '2026-10-27',
+  'Suzuki Access 125': '2026-10-24',
+  'Suzuki Burgman Street 125': '2026-10-18',
+  'Hero Xpulse 200 4V': '2026-10-15',
+  'TVS Apache RTR 160 4V': '2026-10-11',
+};
+
 const POPULAR_INDIAN_MODELS: RawBikeSeed[] = [
   // Royal Enfield
   { brand: 'Royal Enfield', model: 'Hunter 350', category: 'Roadster', engineCc: 349, powerBhp: 20.2, torqueNm: 27.0, mileageKmpl: 36.2, kerbWeightKg: 181, fuelCapacityL: 13, image: '/assets/images/bike_royal_enfield_hunter_1793817700106.jpg', baseExShowroom: 137640 },
@@ -144,6 +168,60 @@ export function buildVariantsForModel(basePrice: number): BikeVariant[] {
       features: ['Full Color TFT Display', 'Turn-by-Turn Navigation', 'Quickshifter / Traction Control'],
     },
   ];
+}
+
+/**
+ * Base Indian-market catalogue shipped with the app.
+ * One entry per unique model (4 variants each), specs sourced from the central
+ * market dataset above. Used bikes and hand-curated showroom units are added
+ * separately by the dealership store.
+ */
+export function generateBaseMarketCatalog(): Motorcycle[] {
+  const result: Motorcycle[] = [];
+  let index = 0;
+
+  for (const seed of POPULAR_INDIAN_MODELS) {
+    const key = `${seed.brand} ${seed.model}`.toLowerCase();
+    if (HAND_CURATED_MODEL_KEYS.has(key)) continue;
+
+    const slug = key.replace(/[^a-z0-9]+/g, '-').replace(/(^-|-$)/g, '');
+    const variants = buildVariantsForModel(seed.baseExShowroom);
+    const defaultVariant = variants[0]!;
+    const arrivedAt = ARRIVED_AT[`${seed.brand} ${seed.model}`];
+
+    result.push({
+      id: `bike-mkt-${slug}`,
+      brand: seed.brand,
+      model: seed.model,
+      variant: defaultVariant.name,
+      variants,
+      selectedVariantId: defaultVariant.id,
+      category: seed.category,
+      exShowroomPaise: defaultVariant.exShowroomPaise,
+      rtoTaxPaise: defaultVariant.rtoTaxPaise,
+      insurancePaise: defaultVariant.insurancePaise,
+      handlingPaise: defaultVariant.handlingPaise,
+      engineCc: seed.engineCc,
+      powerBhp: seed.powerBhp,
+      torqueNm: seed.torqueNm,
+      mileageKmpl: seed.mileageKmpl,
+      kerbWeightKg: seed.kerbWeightKg,
+      fuelCapacityL: seed.fuelCapacityL,
+      availableColors: [
+        { name: 'Stealth Black', hex: '#111827' },
+        { name: 'Racing Blue', hex: '#2563eb' },
+        { name: 'Crimson Red', hex: '#dc2626' },
+      ],
+      inStockCount: ((index * 5 + 3) % 7) + 1,
+      image: seed.image,
+      description: `${seed.brand} ${seed.model} — BS6 Phase 2 compliant. Display, test ride and booking available at The Bike Yard, Khopat (MH-04). Ex-showroom price is the central dataset figure; on-road Thane price is computed with 11% MH-04 RTO registration and IRDAI-compliant insurance.`,
+      featured: false,
+      ...(arrivedAt ? { arrivedAt } : {}),
+    });
+    index++;
+  }
+
+  return result;
 }
 
 /**
