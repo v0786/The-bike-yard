@@ -50,7 +50,7 @@ export const Footer: React.FC<FooterProps> = ({
   return (
     <footer className="border-t border-slate-800 bg-slate-950 pb-32 md:pb-28 pt-12 text-slate-400 text-xs">
       <div className="mx-auto max-w-7xl px-4 sm:px-6 space-y-10">
-        <div className="grid grid-cols-1 md:grid-cols-4 gap-8">
+        <div className="grid min-w-0 grid-cols-1 gap-8 sm:grid-cols-2 lg:grid-cols-4">
           {/* Brand Col */}
           <div className="space-y-3">
             <div className="flex items-center gap-2.5">
@@ -148,7 +148,7 @@ export const Footer: React.FC<FooterProps> = ({
                     value={quickPhone}
                     onChange={(e) => setQuickPhone(e.target.value)}
                     placeholder="Mobile Number"
-                    className="flex-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+                    className="min-w-0 flex-1 rounded-lg border border-slate-800 bg-slate-900 px-3 py-1.5 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
                   />
                   <button
                     type="submit"

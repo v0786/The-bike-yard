@@ -240,13 +240,13 @@ export const FinancePartners: React.FC<FinancePartnersProps> = ({
       {/* Selected Partner Highlight Detail Strip */}
       {activePartner && (
         <div className="rounded-2xl border border-slate-800 bg-slate-950/80 p-4 sm:p-5 flex flex-col md:flex-row md:items-center justify-between gap-4">
-          <div className="flex items-start sm:items-center gap-3.5">
+          <div className="flex min-w-0 flex-wrap items-start gap-3 sm:flex-nowrap sm:items-center">
             <div className="p-2 rounded-xl bg-slate-900 border border-slate-800 shrink-0">
               <PartnerLogoSvg partnerId={activePartner.id} className="h-8 w-auto max-w-[140px]" />
             </div>
 
-            <div className="space-y-0.5">
-              <div className="flex items-center gap-2">
+            <div className="min-w-0 space-y-0.5">
+              <div className="flex flex-wrap items-center gap-x-2 gap-y-1">
                 <h4 className="text-sm sm:text-base font-bold text-white">{activePartner.name}</h4>
                 <span className="text-slate-600">·</span>
                 <span className="text-xs text-amber-400 font-semibold">{activePartner.specialFeature}</span>

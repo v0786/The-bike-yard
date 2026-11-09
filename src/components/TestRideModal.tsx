@@ -172,7 +172,7 @@ export const TestRideModal: React.FC<TestRideModalProps> = ({
 
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 bg-slate-950/85 backdrop-blur-md overflow-y-auto">
-      <div className="relative w-full max-w-4xl max-h-[92vh] overflow-y-auto rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl p-5 sm:p-7 space-y-6 animate-scaleUp">
+      <div className="relative w-full max-w-4xl max-h-[calc(100dvh-1.5rem)] overflow-y-auto rounded-3xl border border-slate-700 bg-slate-900 shadow-2xl p-5 sm:p-7 space-y-6 animate-scaleUp">
         {/* Top Header */}
         <div className="flex items-start justify-between border-b border-slate-800 pb-4">
           <div>

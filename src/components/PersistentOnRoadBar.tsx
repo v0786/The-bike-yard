@@ -33,7 +33,7 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
   onOpenSpecs,
 }) => {
   const [isExpanded, setIsExpanded] = useState<boolean>(false);
-  const [isMobileCollapsed, setIsMobileCollapsed] = useState<boolean>(false);
+  const [isMobileCollapsed, setIsMobileCollapsed] = useState(true);
   const [addedToCartToast, setAddedToCartToast] = useState<boolean>(false);
   const [isHapticActive, setIsHapticActive] = useState<boolean>(false);
 
@@ -85,14 +85,14 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
       aria-label="Selected vehicle pricing breakdown"
       className={`fixed z-30 transition-all duration-300 safe-area-pb ${
         isMobileCollapsed
-          ? 'bottom-3 left-3 right-3 sm:bottom-0 sm:left-0 sm:right-0 sm:translate-y-0'
-          : 'bottom-0 left-0 right-0'
+          ? 'bottom-[calc(4rem+env(safe-area-inset-bottom))] left-3 right-3 md:bottom-0 md:left-0 md:right-0'
+          : 'bottom-[calc(3.5rem+env(safe-area-inset-bottom))] left-0 right-0 md:bottom-0'
       }`}
     >
       {/* Mobile Collapsed Floating Pill State (Non-obstructive) */}
-      {isMobileCollapsed ? (
+      {isMobileCollapsed && (
         <div
-          className={`sm:hidden flex items-center justify-between gap-2.5 p-2.5 rounded-2xl bg-slate-950/95 border border-amber-500/40 shadow-2xl backdrop-blur-xl transition-transform duration-150 ${
+          className={`md:hidden flex items-center justify-between gap-2.5 p-2.5 rounded-2xl bg-slate-950/95 border border-amber-500/40 shadow-2xl backdrop-blur-xl transition-transform duration-150 ${
             isHapticActive ? 'scale-95 ring-2 ring-amber-400' : ''
           }`}
         >
@@ -145,16 +145,16 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
             </button>
           </div>
         </div>
-      ) : (
-        /* Full Expanded Persistent Bar */
+      )}
+      {/* Full expanded pricing bar */}
         <div
-          className={`border-t border-slate-700 bg-slate-950/95 backdrop-blur-xl shadow-2xl transition-all duration-150 ${
+          className={`${isMobileCollapsed ? 'hidden md:block' : 'block'} border-t border-slate-700 bg-slate-950/95 backdrop-blur-xl shadow-2xl transition-all duration-150 ${
             isHapticActive ? 'ring-1 ring-amber-500/40' : ''
           }`}
         >
           {/* Expanded Transparency Calculation Details */}
           {isExpanded && (
-            <div className="border-b border-slate-800 bg-slate-900/95 p-4 sm:p-6 max-h-[60vh] overflow-y-auto animate-fadeIn">
+            <div className="border-b border-slate-800 bg-slate-900/95 p-4 sm:p-6 max-h-[45dvh] overflow-y-auto animate-fadeIn">
               <div className="mx-auto max-w-7xl space-y-4">
                 <div className="flex items-center justify-between">
                   <div className="flex items-center gap-2">
@@ -268,7 +268,7 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
             </div>
 
             {/* Pricing & Transparency Trigger */}
-            <div className="flex items-center gap-3 sm:gap-6 ml-auto sm:ml-0">
+            <div className="flex w-full flex-wrap items-center justify-between gap-2 sm:w-auto sm:gap-4">
               <div className="text-right">
                 <div className="text-[10px] uppercase font-semibold text-slate-400 flex items-center justify-end gap-1">
                   <span>On-Road Thane (MH-04)</span>
@@ -320,7 +320,7 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
                     triggerHaptic('light');
                     setIsMobileCollapsed(true);
                   }}
-                  className="sm:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white active:scale-90 transition-all"
+                  className="md:hidden p-2 rounded-xl bg-slate-900 border border-slate-800 text-slate-400 hover:text-white active:scale-90 transition-all"
                 >
                   <Minimize2 className="w-4 h-4 text-slate-300" />
                 </button>
@@ -328,7 +328,6 @@ export const PersistentOnRoadBar: React.FC<PersistentOnRoadBarProps> = ({
             </div>
           </div>
         </div>
-      )}
     </aside>
   );
 };

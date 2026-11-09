@@ -23,6 +23,7 @@ const PAGE_SIZE = 9;
 interface BikeListingProps {
   bikes: Motorcycle[];
   scope?: 'new' | 'used';
+  comparisonBikes?: Motorcycle[];
   onSelectBike: (bike: Motorcycle) => void;
   onBookTestRide: (bike: Motorcycle) => void;
   onZoomBike?: (bike: Motorcycle) => void;
@@ -38,6 +39,7 @@ interface BikeListingProps {
 export const BikeListing: React.FC<BikeListingProps> = ({
   bikes,
   scope = 'new',
+  comparisonBikes = bikes,
   onSelectBike,
   onBookTestRide,
   onZoomBike,
@@ -214,7 +216,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
               </button>
             )}
 
-            <div className="relative min-w-[220px] sm:min-w-[260px]">
+            <div className="relative w-full min-w-0 sm:w-64">
               <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" />
               <input
                 type="text"
@@ -342,7 +344,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
           </button>
         </div>
       ) : (
-        <BikeCardRail label={scope === 'new' ? 'New motorcycle cards' : 'Pre-owned motorcycle cards'}>
+        <BikeCardRail key={pageSlice.page} label={scope === 'new' ? 'New motorcycle cards' : 'Pre-owned motorcycle cards'}>
           {pageSlice.items.map((bike) => {
             const onRoadPaise =
               bike.exShowroomPaise + bike.rtoTaxPaise + bike.insurancePaise + bike.handlingPaise;
@@ -659,8 +661,8 @@ export const BikeListing: React.FC<BikeListingProps> = ({
       )}
 
       {/* Floating Quick Comparison Dock */}
-      {compareBikeIds.length > 0 && (
-        <div className="fixed bottom-20 sm:bottom-6 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl rounded-2xl border border-amber-500/40 bg-slate-950/95 backdrop-blur-xl p-3 sm:p-4 shadow-2xl flex items-center justify-between gap-3 animate-in slide-in-from-bottom-5">
+      {scope === 'new' && compareBikeIds.length > 0 && (
+        <div className="fixed bottom-[calc(8.5rem+env(safe-area-inset-bottom))] md:bottom-24 left-1/2 -translate-x-1/2 z-40 w-[95%] max-w-2xl rounded-2xl border border-amber-500/40 bg-slate-950/95 backdrop-blur-xl p-2.5 sm:p-4 shadow-2xl flex flex-wrap items-center justify-between gap-2 animate-in slide-in-from-bottom-5">
           <div className="flex items-center gap-3 min-w-0">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-xl bg-amber-500/20 text-amber-400 border border-amber-500/30">
               <Scale className="w-5 h-5" />
@@ -677,7 +679,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
               <div className="text-[11px] text-slate-400 truncate">
                 {compareBikeIds
                   .map((id) => {
-                    const b = bikes.find((item) => item.id === id);
+                    const b = comparisonBikes.find((item) => item.id === id);
                     return b ? `${b.brand} ${b.model}` : '';
                   })
                   .filter(Boolean)

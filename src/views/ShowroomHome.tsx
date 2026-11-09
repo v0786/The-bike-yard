@@ -124,6 +124,7 @@ export const ShowroomHome: FC<ShowroomHomeProps> = ({
         {/* New motorcycle catalogue */}
         <BikeListing
           bikes={newBikes}
+          comparisonBikes={state.bikes}
           onSelectBike={onSelectBike}
           onBookTestRide={onBookTestRide}
           onZoomBike={onZoomBike}

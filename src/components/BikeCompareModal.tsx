@@ -281,13 +281,13 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
       onClick={onClose}
     >
       <div
-        className="relative w-full max-w-5xl rounded-3xl border border-slate-800 bg-[#0B0F0D] shadow-2xl overflow-hidden my-auto max-h-[92vh] flex flex-col"
+        className="relative w-full max-w-5xl rounded-3xl border border-slate-800 bg-[#0B0F0D] shadow-2xl overflow-hidden my-auto max-h-[calc(100dvh-1rem)] flex flex-col"
         onClick={(e) => e.stopPropagation()}
       >
         {/* Modal Header */}
-        <div className="flex items-center justify-between p-4 sm:p-6 border-b border-slate-800 bg-[#141C15]/80 backdrop-blur-md shrink-0">
+        <div className="flex flex-wrap items-start justify-between gap-2 p-3 sm:p-6 border-b border-slate-800 bg-[#141C15]/80 backdrop-blur-md shrink-0">
           <div className="space-y-1">
-            <div className="flex items-center gap-2">
+            <div className="flex flex-wrap items-center gap-2">
               <span className="flex items-center gap-1.5 text-xs uppercase font-extrabold text-amber-500 tracking-wider">
                 <Scale className="w-4 h-4 text-amber-400" />
                 Side-by-Side Motorcycle Comparison
@@ -348,7 +348,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                 <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
                   Motorcycle 1
                 </span>
-                <div className="relative flex-1 max-w-[240px]">
+                <div className="relative min-w-0 flex-1 max-w-[240px]">
                   <select
                     value={bikeAId}
                     onChange={(e) => setBikeAId(e.target.value)}
@@ -431,7 +431,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                 <span className="text-[11px] font-bold text-amber-400 uppercase tracking-wider">
                   Motorcycle 2
                 </span>
-                <div className="relative flex-1 max-w-[240px]">
+                <div className="relative min-w-0 flex-1 max-w-[240px]">
                   <select
                     value={bikeBId}
                     onChange={(e) => setBikeBId(e.target.value)}
@@ -532,7 +532,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                         return (
                           <div
                             key={idx}
-                            className={`grid grid-cols-12 p-3 text-xs sm:text-sm items-center transition-colors ${
+                            className={`grid grid-cols-12 p-2 [overflow-wrap:anywhere] sm:p-3 text-xs sm:text-sm items-center transition-colors ${
                               row.isDifferent
                                 ? 'bg-amber-500/[0.03] hover:bg-amber-500/[0.07]'
                                 : 'hover:bg-slate-900/40'

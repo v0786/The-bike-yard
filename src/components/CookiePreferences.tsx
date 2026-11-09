@@ -25,7 +25,7 @@ export function CookiePreferences({ children }: { children: ReactNode }) {
     <CookieContext.Provider value={{ maps: choice === 'allow', open }}>
       {children}
       {(choice === null || editing) && (
-        <aside aria-label="Cookie preferences" className="fixed inset-x-3 bottom-20 z-[70] mx-auto max-w-xl space-y-2 rounded-2xl border border-slate-700 bg-slate-950 p-4 text-xs text-slate-300 shadow-xl md:bottom-4">
+        <aside aria-label="Cookie preferences" className="fixed inset-x-3 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-[70] mx-auto max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] max-w-xl space-y-2 overflow-y-auto rounded-2xl border border-slate-700 bg-slate-950 p-4 text-xs text-slate-300 shadow-xl md:bottom-24 md:max-h-[calc(100dvh-7rem)]">
           <h2 className="text-sm font-bold text-white">Cookie and site preferences</h2>
           <p>Essential browser storage supports the showroom and cart. The optional Google Maps embed can set third-party cookies. See our <a className="text-amber-400 underline" href="/privacy-policy">Privacy Policy</a>.</p>
           {editing && <label className="flex items-center gap-2"><input type="checkbox" checked={mapsDraft} onChange={(event) => setMapsDraft(event.target.checked)} /> Allow Google Maps embed</label>}

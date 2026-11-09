@@ -73,7 +73,7 @@ export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClos
   if (!isOpen) return null;
 
   return (
-    <div className="fixed bottom-4 right-4 sm:bottom-6 sm:right-6 z-50 w-[94vw] sm:w-[400px] h-[520px] max-h-[85vh] rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
+    <div className="fixed inset-x-2 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-50 h-[520px] max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] sm:left-auto sm:right-6 sm:w-[400px] md:bottom-6 rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
       {/* Header */}
       <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3">
         <div className="flex items-center gap-2.5">
@@ -113,7 +113,7 @@ export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClos
               {m.sender === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
             </div>
             <div
-              className={`max-w-[80%] rounded-2xl p-3 leading-relaxed ${
+              className={`max-w-[80%] [overflow-wrap:anywhere] rounded-2xl p-3 leading-relaxed ${
                 m.sender === 'user'
                   ? 'bg-amber-500 text-slate-950 font-medium'
                   : 'bg-slate-950 border border-slate-800 text-slate-200'
@@ -154,7 +154,7 @@ export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClos
             value={input}
             onChange={(e) => setInput(e.target.value)}
             placeholder="Ask for prices, waiting periods, RTO..."
-            className="flex-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
+            className="min-w-0 flex-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
           />
           <button
             type="submit"

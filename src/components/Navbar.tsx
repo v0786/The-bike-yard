@@ -10,6 +10,8 @@ import {
   ShieldCheck,
   User,
   ChevronDown,
+  Menu,
+  X,
 } from 'lucide-react';
 import { cartStore } from '../services/cartStore';
 import { dealershipStore } from '../services/dealershipStore';
@@ -44,6 +46,7 @@ export const Navbar: React.FC<NavbarProps> = ({
   currentUser,
   onLogout,
 }) => {
+  const [isNavigationOpen, setNavigationOpen] = useState(false);
   const [cartCount, setCartCount] = useState<number>(cartStore.getItemCount());
   const [isStaffMenuOpen, setIsStaffMenuOpen] = useState<boolean>(false);
   const dealerPhone = dealershipStore.getState().dealershipInfo.phone;
@@ -167,10 +170,10 @@ export const Navbar: React.FC<NavbarProps> = ({
       </div>
 
       {/* Main navigation row adhering strictly to the 3-zone contract */}
-      <div className="mx-auto flex max-w-7xl items-center justify-between gap-4 sm:gap-8 px-4 sm:px-6 py-3.5">
+      <div className="mx-auto flex max-w-7xl flex-wrap items-center justify-between gap-x-2 gap-y-2 px-3 py-2.5 sm:gap-x-4 sm:px-6 sm:py-3.5">
         {/* Zone 1: Single text element wordmark */}
-        <div className="flex items-center gap-2.5 sm:gap-3 shrink-0">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
+        <div className="flex min-w-0 items-center gap-2 sm:gap-3">
+          <div className="hidden h-9 w-9 shrink-0 items-center min-[360px]:flex justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
             <Bike className="w-5 h-5" />
           </div>
           <button
@@ -187,7 +190,11 @@ export const Navbar: React.FC<NavbarProps> = ({
         </div>
 
         {/* Zone 2: Public exploration links */}
-        <nav className="hidden lg:flex items-center gap-6 text-sm font-medium text-slate-300">
+        <nav id="showroom-navigation" aria-label="Showroom navigation"
+          onClick={(event) => {
+            if ((event.target as Element).closest('button')) setNavigationOpen(false);
+          }}
+          className={`order-last max-h-[50dvh] w-full flex-wrap items-center gap-x-4 gap-y-1 overflow-y-auto text-sm font-medium text-slate-300 max-xl:[&_button]:min-h-11 xl:order-none xl:flex xl:max-h-none xl:w-auto xl:min-w-0 xl:flex-1 xl:justify-center xl:gap-x-3 xl:text-xs ${isNavigationOpen ? 'flex border-t border-slate-800 pt-1' : 'hidden'} xl:border-t-0 xl:pt-0`}>
           <button
             onClick={() => {
               onViewChange('showroom');
@@ -239,6 +246,12 @@ export const Navbar: React.FC<NavbarProps> = ({
           >
             MH-04 RTO & Insurance
           </button>
+
+          {onOpenLeadModal && (
+            <button type="button" onClick={onOpenLeadModal} className="text-slate-300 hover:text-white sm:hidden">
+              Get Quote
+            </button>
+          )}
 
           {onOpenCompare && (
             <button
@@ -293,7 +306,13 @@ export const Navbar: React.FC<NavbarProps> = ({
         </nav>
 
         {/* Zone 3: Cart Button + Callback CTA + Book Test Ride */}
-        <div className="flex items-center gap-2 sm:gap-3 shrink-0">
+        <div className="flex shrink-0 items-center gap-1.5 sm:gap-3">
+          <button type="button" aria-expanded={isNavigationOpen} aria-controls="showroom-navigation"
+            aria-label={isNavigationOpen ? 'Close showroom menu' : 'Open showroom menu'}
+            onClick={() => setNavigationOpen((open) => !open)}
+            className="grid h-11 w-11 place-items-center rounded-xl border border-slate-800 bg-slate-900 text-slate-200 xl:hidden">
+            {isNavigationOpen ? <X className="h-4 w-4" aria-hidden="true" /> : <Menu className="h-4 w-4" aria-hidden="true" />}
+          </button>
           {onOpenLeadModal && (
             <button
               onClick={onOpenLeadModal}
@@ -307,7 +326,7 @@ export const Navbar: React.FC<NavbarProps> = ({
           <button
             onClick={onOpenCart}
             aria-label="View Shopping Cart"
-            className="relative flex items-center justify-center h-10 w-10 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
+            className="relative flex items-center justify-center h-11 w-11 rounded-xl border border-slate-800 bg-slate-900 text-slate-300 hover:text-white hover:border-slate-700 transition-colors"
           >
             <ShoppingBag className="w-4 h-4" />
             {cartCount > 0 && (
@@ -319,10 +338,11 @@ export const Navbar: React.FC<NavbarProps> = ({
 
           <button
             onClick={onOpenTestRideModal}
-            className="flex items-center gap-1.5 rounded-xl bg-amber-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all whitespace-nowrap"
+            aria-label="Book Test Ride"
+            className="flex h-11 items-center gap-1.5 rounded-xl bg-amber-500 px-3.5 sm:px-4 py-2 sm:py-2.5 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 active:scale-95 transition-all whitespace-nowrap"
           >
             <Calendar className="w-3.5 h-3.5" />
-            <span>Book Test Ride</span>
+            <span className="hidden sm:inline">Book Test Ride</span>
           </button>
         </div>
       </div>
