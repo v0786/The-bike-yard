@@ -4,6 +4,8 @@
  * for display purposes (final EMI is rounded to whole paise).
  */
 
+export const SHOWROOM_EMI_DEFAULTS = { downPaymentPercent: 20, annualRatePercent: 8.99, months: 36 };
+
 export interface EmiResult {
   /** Monthly instalment in paise */
   emiPaise: bigint;

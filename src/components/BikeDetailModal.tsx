@@ -1,28 +1,33 @@
-import React, { useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Motorcycle } from '../types';
-import { formatInr, splitGst } from '../lib/currency';
+import { formatInr, splitGst, toPaise } from '../lib/currency';
 import { X, Check, ShieldCheck, Calculator, Sparkles, MapPin, AlertCircle, ArrowRight } from 'lucide-react';
 import { dealershipStore } from '../services/dealershipStore';
+import { computeEmi, SHOWROOM_EMI_DEFAULTS } from '../lib/emi';
 import { getColorBikeImage } from '../data/dealershipData';
 
 interface BikeDetailModalProps {
-  bike: Motorcycle | null;
+  bike: Motorcycle;
+  initialBookingForm?: boolean;
   onClose: () => void;
   onOpenTestRide: (bike: Motorcycle) => void;
 }
 
 export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
   bike,
+  initialBookingForm = false,
   onClose,
   onOpenTestRide,
 }) => {
-  if (!bike) return null;
-
   const [selectedColor, setSelectedColor] = useState<string>(
     bike.selectedColor || bike.availableColors[0]?.name || 'Standard'
   );
   const activeBikeImage = getColorBikeImage(bike, selectedColor);
-  const [showBookingForm, setShowBookingForm] = useState<boolean>(false);
+  const [showBookingForm, setShowBookingForm] = useState(initialBookingForm);
+  const bookingNameInput = useRef<HTMLInputElement>(null);
+  useEffect(() => {
+    if (showBookingForm) bookingNameInput.current?.focus();
+  }, [showBookingForm]);
   const [bookingName, setBookingName] = useState<string>('');
   const [bookingPhone, setBookingPhone] = useState<string>('');
   const [advanceAmount, setAdvanceAmount] = useState<number>(10000);
@@ -33,16 +38,15 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
     bike.exShowroomPaise + bike.rtoTaxPaise + bike.insurancePaise + bike.handlingPaise;
   const totalRupees = Number(totalOnRoadPaise) / 100;
 
-  const [downPayment, setDownPayment] = useState<number>(Math.round(totalRupees * 0.2));
-  const [tenureMonths, setTenureMonths] = useState<number>(36);
-  const [interestRate, setInterestRate] = useState<number>(9.99);
-
-  // EMI calculation: E = P * r * (1 + r)^n / ((1 + r)^n - 1)
-  const principal = Math.max(0, totalRupees - downPayment);
-  const monthlyRate = interestRate / 12 / 100;
-  const emiNumerator = principal * monthlyRate * Math.pow(1 + monthlyRate, tenureMonths);
-  const emiDenominator = Math.pow(1 + monthlyRate, tenureMonths) - 1;
-  const monthlyEmi = Math.round(emiNumerator / emiDenominator);
+  const [customDownPayment, setCustomDownPayment] = useState<number | null>(null);
+  const [tenureMonths, setTenureMonths] = useState(SHOWROOM_EMI_DEFAULTS.months);
+  const [interestRate, setInterestRate] = useState(SHOWROOM_EMI_DEFAULTS.annualRatePercent);
+  const maxDownPayment = Math.round(totalRupees * 0.8);
+  const minDownPayment = Math.min(15000, maxDownPayment);
+  const downPaymentPaise = customDownPayment === null
+    ? (totalOnRoadPaise * BigInt(SHOWROOM_EMI_DEFAULTS.downPaymentPercent)) / 100n
+    : toPaise(Math.min(customDownPayment, maxDownPayment));
+  const { emiPaise } = computeEmi(totalOnRoadPaise, downPaymentPaise, interestRate, tenureMonths);
 
   // Maharashtra GST split calculation (Intra-State 18%)
   const gstDetails = splitGst(bike.exShowroomPaise, 1800, false);
@@ -297,7 +301,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                   <span>On-Road Finance & EMI Calculator</span>
                 </div>
                 <div className="text-xs font-bold text-amber-400">
-                  ~ ₹{monthlyEmi.toLocaleString('en-IN')}/month
+                  ~ {formatInr(emiPaise)}/month
                 </div>
               </div>
 
@@ -306,15 +310,16 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                 <div>
                   <div className="flex justify-between text-slate-400 mb-1">
                     <span>Down Payment</span>
-                    <span className="text-white font-semibold">₹{downPayment.toLocaleString('en-IN')}</span>
+                    <span className="text-white font-semibold">{formatInr(downPaymentPaise)}</span>
                   </div>
                   <input
                     type="range"
-                    min={15000}
-                    max={Math.round(totalRupees * 0.8)}
-                    step={5000}
-                    value={downPayment}
-                    onChange={(e) => setDownPayment(Number(e.target.value))}
+                    aria-label="Down payment in rupees"
+                    min={Math.min(minDownPayment, Number(downPaymentPaise) / 100)}
+                    max={maxDownPayment}
+                    step={0.01}
+                    value={Number(downPaymentPaise) / 100}
+                    onChange={(e) => setCustomDownPayment(Number(e.target.value))}
                     className="w-full accent-amber-500 bg-slate-800 rounded-lg h-1.5"
                   />
                 </div>
@@ -350,7 +355,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                     type="range"
                     min={8.5}
                     max={13.5}
-                    step={0.25}
+                    step={0.01}
                     value={interestRate}
                     onChange={(e) => setInterestRate(Number(e.target.value))}
                     className="w-full accent-amber-500 bg-slate-800 rounded-lg h-1.5"
@@ -366,8 +371,8 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                   <div className="rounded-xl border border-emerald-500/30 bg-emerald-950/40 p-4 text-xs text-emerald-300 flex items-start gap-2">
                     <Check className="w-4 h-4 shrink-0 text-emerald-400 mt-0.5" />
                     <div>
-                      <div className="font-bold">Booking Confirmed: {bookingSuccess}</div>
-                      <div>A physical chassis has been locked in Khopat for delivery!</div>
+                      <div className="font-bold">Demo Booking Confirmed: {bookingSuccess}</div>
+                      <div>A sample chassis has been reserved in this demo.</div>
                     </div>
                   </div>
                 )}
@@ -376,7 +381,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                     onClick={() => setShowBookingForm(true)}
                     className="flex-1 flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-5 py-3.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-400 active:scale-95 transition-all"
                   >
-                    <span>Instant Booking Advance</span>
+                    <span>Demo Booking Advance</span>
                     <ArrowRight className="w-4 h-4" />
                   </button>
                   <button
@@ -396,7 +401,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                 className="rounded-2xl border border-amber-500/30 bg-slate-950 p-5 space-y-4"
               >
                 <div className="flex items-center justify-between border-b border-slate-800 pb-2">
-                  <div className="text-xs font-bold text-amber-400">Lock Vehicle with Advance</div>
+                  <div className="text-xs font-bold text-amber-400">Demo Booking with Advance</div>
                   <button
                     type="button"
                     onClick={() => setShowBookingForm(false)}
@@ -406,10 +411,13 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                   </button>
                 </div>
 
+                <p className="text-xs text-slate-400">Use sample details. This form simulates a reservation and collects no payment.</p>
                 <div className="space-y-3 text-xs">
                   <div>
-                    <label className="text-slate-400 block mb-1">Your Full Name</label>
+                    <label htmlFor="demo-booking-name" className="text-slate-400 block mb-1">Your Full Name</label>
                     <input
+                      id="demo-booking-name"
+                      ref={bookingNameInput}
                       type="text"
                       required
                       value={bookingName}
@@ -456,7 +464,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                   type="submit"
                   className="w-full rounded-xl bg-amber-500 py-3 text-xs font-bold text-slate-950 shadow-md hover:bg-amber-400 transition-colors"
                 >
-                  Pay ₹{advanceAmount.toLocaleString('en-IN')} & Reserve Chassis
+                  Simulate ₹{advanceAmount.toLocaleString('en-IN')} Advance & Reserve Sample Chassis
                 </button>
               </form>
             )}

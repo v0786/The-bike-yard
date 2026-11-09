@@ -22,7 +22,6 @@ import {
 } from 'lucide-react';
 
 interface BikeCompareModalProps {
-  isOpen: boolean;
   onClose: () => void;
   bikes: Motorcycle[];
   initialBikeA?: Motorcycle | null;
@@ -32,7 +31,6 @@ interface BikeCompareModalProps {
 }
 
 export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
-  isOpen,
   onClose,
   bikes,
   initialBikeA,
@@ -49,16 +47,8 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
   );
   const [onlyDifferences, setOnlyDifferences] = useState<boolean>(false);
 
-  // Keep synced if initial props change
-  React.useEffect(() => {
-    if (initialBikeA?.id) setBikeAId(initialBikeA.id);
-    if (initialBikeB?.id) setBikeBId(initialBikeB.id);
-  }, [initialBikeA, initialBikeB]);
-
-  const bikeA = useMemo(() => bikes.find((b) => b.id === bikeAId) || bikes[0], [bikes, bikeAId]);
-  const bikeB = useMemo(() => bikes.find((b) => b.id === bikeBId) || bikes[1] || bikes[0], [bikes, bikeBId]);
-
-  if (!isOpen || !bikeA || !bikeB) return null;
+  const bikeA = bikes.find((bike) => bike.id === bikeAId) ?? bikes[0]!;
+  const bikeB = bikes.find((bike) => bike.id === bikeBId) ?? bikes[1] ?? bikes[0]!;
 
   const handleSwap = () => {
     const temp = bikeAId;

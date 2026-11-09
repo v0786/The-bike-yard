@@ -52,6 +52,8 @@ The SPA runs fully client-side and needs **no secrets** to build or deploy. See 
 - `VITE_API_BASE_URL` (optional) — base URL of the separate `backend/` API (e.g. `https://your-backend.example.com`). When set, the SPA can call safe read-only endpoints: `GET /api/health` and `GET /api/catalog/bikewale` (used as a fallback for the BikeWale reference catalogue). The Admin → **Dealership Settings** tab shows backend connectivity/database status.
 - `VITE_BIKEWALE_CATALOG_URL` (optional) — direct reference-catalog feed URL (takes precedence over the backend catalog route for that component).
 
+Reference cards show the BikeWale listing URL and retrieval date when supplied by the approved feed (`sourceUrl` and optional ISO 8601 `retrievedAt`). The showroom’s own prices and booking advances are demo figures.
+
 Never commit `.env*` files.
 
 ## Connect SPA to the backend API (`backend/`)

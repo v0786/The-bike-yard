@@ -102,6 +102,7 @@ export default function App() {
   // Vehicle Selection & Modal States
   const [selectedBike, setSelectedBike] = useState<Motorcycle | null>(state.bikes[0] || null);
   const [detailBike, setDetailBike] = useState<Motorcycle | null>(null);
+  const [openBookingForm, setOpenBookingForm] = useState(false);
   const [zoomBike, setZoomBike] = useState<Motorcycle | null>(null);
   const [testRideBike, setTestRideBike] = useState<Motorcycle | null>(null);
   const [olxTargetBike, setOlxTargetBike] = useState<Motorcycle | null>(null);
@@ -134,27 +135,18 @@ export default function App() {
   }, [location.pathname, location.hash]);
 
   const handleToggleCompareBike = (bike: Motorcycle) => {
-    setCompareBikeIds((prev) => {
-      if (prev.includes(bike.id)) {
-        return prev.filter((id) => id !== bike.id);
-      }
-      if (prev.length >= 2) {
-        const updated = [prev[0]!, bike.id];
-        const first = state.bikes.find((b) => b.id === prev[0]) || null;
-        setCompareBikeA(first);
-        setCompareBikeB(bike);
-        setIsCompareOpen(true);
-        return updated;
-      }
-      const updated = [...prev, bike.id];
-      if (updated.length === 2) {
-        const first = state.bikes.find((b) => b.id === updated[0]) || null;
-        setCompareBikeA(first);
-        setCompareBikeB(bike);
-        setIsCompareOpen(true);
-      }
-      return updated;
-    });
+    if (compareBikeIds.includes(bike.id)) {
+      setCompareBikeIds(compareBikeIds.filter((id) => id !== bike.id));
+      return;
+    }
+
+    const updated = compareBikeIds.length >= 2 ? [compareBikeIds[0]!, bike.id] : [...compareBikeIds, bike.id];
+    setCompareBikeIds(updated);
+    if (updated.length === 2) {
+      setCompareBikeA(state.bikes.find((candidate) => candidate.id === updated[0]) ?? null);
+      setCompareBikeB(bike);
+      setIsCompareOpen(true);
+    }
   };
 
   const handleOpenCompare = (bikeA?: Motorcycle, bikeB?: Motorcycle) => {
@@ -293,7 +285,10 @@ export default function App() {
                 dealershipInfo={state.dealershipInfo}
                 onEnquire={openEnquire}
                 onBookTestRide={openTestRide}
-                onBookNow={(b) => setDetailBike(b)}
+                onBookNow={(b) => {
+                  setOpenBookingForm(true);
+                  setDetailBike(b);
+                }}
               />
             }
           />
@@ -390,8 +385,13 @@ export default function App() {
       {detailBike && (
         <BikeDetailModal
           bike={detailBike}
-          onClose={() => setDetailBike(null)}
+          initialBookingForm={openBookingForm}
+          onClose={() => {
+            setOpenBookingForm(false);
+            setDetailBike(null);
+          }}
           onOpenTestRide={(b) => {
+            setOpenBookingForm(false);
             setDetailBike(null);
             openTestRide(b);
           }}
@@ -430,21 +430,22 @@ export default function App() {
       )}
 
       {/* Side-by-Side Motorcycle Specification Comparison Modal */}
-      <BikeCompareModal
-        isOpen={isCompareOpen}
-        onClose={() => setIsCompareOpen(false)}
-        bikes={state.bikes}
-        initialBikeA={compareBikeA}
-        initialBikeB={compareBikeB}
-        onBookBike={(b) => {
-          setIsCompareOpen(false);
-          setDetailBike(b);
-        }}
-        onTestRideBike={(b) => {
-          setIsCompareOpen(false);
-          openTestRide(b);
-        }}
-      />
+      {isCompareOpen && state.bikes.length > 0 && (
+        <BikeCompareModal
+          onClose={() => setIsCompareOpen(false)}
+          bikes={state.bikes}
+          initialBikeA={compareBikeA}
+          initialBikeB={compareBikeB}
+          onBookBike={(b) => {
+            setIsCompareOpen(false);
+            setDetailBike(b);
+          }}
+          onTestRideBike={(b) => {
+            setIsCompareOpen(false);
+            openTestRide(b);
+          }}
+        />
+      )}
 
       {/* OLX India 1-Click Second-Hand Bike Ad Publisher Modal */}
       <OlxPostingModal

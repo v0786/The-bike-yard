@@ -1,5 +1,5 @@
 import React, { useEffect, useMemo, useState } from 'react';
-import { Link, useSearchParams } from 'react-router-dom';
+import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Motorcycle } from '../types';
 import { formatInr } from '../lib/currency';
 import { Search, AlertCircle, ArrowUpRight, ZoomIn, ShoppingBag, Check, Share2, Scale, Upload, X, ChevronLeft, ChevronRight, Info } from 'lucide-react';
@@ -21,6 +21,7 @@ const PAGE_SIZE = 9;
 
 interface BikeListingProps {
   bikes: Motorcycle[];
+  scope?: 'new' | 'used';
   onSelectBike: (bike: Motorcycle) => void;
   onBookTestRide: (bike: Motorcycle) => void;
   onZoomBike?: (bike: Motorcycle) => void;
@@ -35,6 +36,7 @@ interface BikeListingProps {
 
 export const BikeListing: React.FC<BikeListingProps> = ({
   bikes,
+  scope = 'new',
   onSelectBike,
   onBookTestRide,
   onZoomBike,
@@ -46,10 +48,15 @@ export const BikeListing: React.FC<BikeListingProps> = ({
   onClearCompare,
   selectedBikeId,
 }) => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const brandFromUrl = searchParams.get('brand') ?? 'ALL';
-  const categoryFromUrl = searchParams.get('category') ?? 'ALL';
-  const sortFromUrl = (searchParams.get('sort') as CatalogueSort | null) ?? 'POPULARITY';
+  const [searchParams] = useSearchParams();
+  const { hash } = useLocation();
+  const navigate = useNavigate();
+  const brandKey = scope === 'used' ? 'usedBrand' : 'brand';
+  const categoryKey = scope === 'used' ? 'usedCategory' : 'category';
+  const sortKey = scope === 'used' ? 'usedSort' : 'sort';
+  const brandFromUrl = searchParams.get(brandKey) ?? 'ALL';
+  const categoryFromUrl = searchParams.get(categoryKey) ?? 'ALL';
+  const sortFromUrl = (searchParams.get(sortKey) as CatalogueSort | null) ?? 'POPULARITY';
 
   const [filters, setFilters] = useState<CatalogueFilters>({ ...DEFAULT_FILTERS, brand: brandFromUrl, category: categoryFromUrl });
   const [sort, setSort] = useState<CatalogueSort>(sortFromUrl);
@@ -72,9 +79,10 @@ export const BikeListing: React.FC<BikeListingProps> = ({
     setPage(1);
     if (key === 'brand' || key === 'category') {
       const next = new URLSearchParams(searchParams);
-      if (value === 'ALL') next.delete(key);
-      else next.set(key, String(value));
-      setSearchParams(next, { replace: true });
+      const param = key === 'brand' ? brandKey : categoryKey;
+      if (value === 'ALL') next.delete(param);
+      else next.set(param, String(value));
+      navigate({ search: next.toString(), hash }, { replace: true });
     }
   };
 
@@ -82,9 +90,9 @@ export const BikeListing: React.FC<BikeListingProps> = ({
     setSort(value);
     setPage(1);
     const next = new URLSearchParams(searchParams);
-    if (value === 'POPULARITY') next.delete('sort');
-    else next.set('sort', value);
-    setSearchParams(next, { replace: true });
+    if (value === 'POPULARITY') next.delete(sortKey);
+    else next.set(sortKey, value);
+    navigate({ search: next.toString(), hash }, { replace: true });
   };
 
   const { selectedBrand, selectedCategory, selectedBudget, selectedEngineCc, searchQuery, onlyInStock } = {
@@ -113,12 +121,13 @@ export const BikeListing: React.FC<BikeListingProps> = ({
 
   const resetFilters = () => {
     setFilters(DEFAULT_FILTERS);
+    setSort('POPULARITY');
     setPage(1);
     const next = new URLSearchParams(searchParams);
-    next.delete('brand');
-    next.delete('category');
-    next.delete('sort');
-    setSearchParams(next, { replace: true });
+    next.delete(brandKey);
+    next.delete(categoryKey);
+    next.delete(sortKey);
+    navigate({ search: next.toString(), hash }, { replace: true });
   };
 
   const brands = useMemo(
@@ -157,20 +166,20 @@ export const BikeListing: React.FC<BikeListingProps> = ({
   };
 
   return (
-    <div className="space-y-8" id="catalogue-section">
+    <div className="space-y-8" id={scope === 'new' ? 'catalogue-section' : undefined}>
       {/* Controls & Filter Bar */}
       <div className="rounded-2xl border border-slate-800 bg-slate-900/60 p-4 sm:p-6 backdrop-blur-md space-y-4">
         <div className="flex flex-col md:flex-row md:items-center justify-between gap-4">
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase font-extrabold text-amber-500">Premium Machine Selection</span>
-              <span className="text-xs text-slate-400">Live MH-04 On-Road Pricing</span>
+              <span className="text-xs text-slate-400">Demo MH-04 On-Road Pricing</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Digital Showroom Catalogue
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Select any motorcycle below to view live On-Road Thane (MH-04) pricing and detailed specifications.
+              Select any motorcycle below to view illustrative On-Road Thane (MH-04) pricing and detailed specifications.
             </p>
           </div>
 

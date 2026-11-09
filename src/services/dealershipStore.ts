@@ -121,7 +121,15 @@ class DealershipStore {
       bikes: [
         ...INITIAL_BIKES.map((b) => {
           const rawRupees = Number(b.exShowroomPaise / 100n);
-          const variants = b.variants || buildVariantsForModel(rawRupees);
+          const variants = b.variants ?? buildVariantsForModel(rawRupees).map((variant, index) =>
+            index === 0 ? {
+              ...variant,
+              exShowroomPaise: b.exShowroomPaise,
+              rtoTaxPaise: b.rtoTaxPaise,
+              insurancePaise: b.insurancePaise,
+              handlingPaise: b.handlingPaise,
+            } : variant
+          );
           return {
             ...b,
             variants,
@@ -461,7 +469,7 @@ class DealershipStore {
               if (!stored) continue;
               try {
                 const paise = BigInt(stored);
-                if (paise > 0n) {
+                if (paise > 0n && paise !== variant.exShowroomPaise) {
                   variant.exShowroomPaise = paise;
                   variant.rtoTaxPaise = (paise * 1100n) / 10000n; // MH-04 individual 11%
                 }
@@ -469,17 +477,7 @@ class DealershipStore {
                 /* ignore malformed entry */
               }
             }
-            // Re-sync the bike-level snapshot to its selected variant
-            const selected =
-              bike.variants.find((v) => v.id === bike.selectedVariantId) ?? bike.variants[0];
-            if (selected) {
-              bike.selectedVariantId = selected.id;
-              bike.variant = selected.name;
-              bike.exShowroomPaise = selected.exShowroomPaise;
-              bike.rtoTaxPaise = selected.rtoTaxPaise;
-              bike.insurancePaise = selected.insurancePaise;
-              bike.handlingPaise = selected.handlingPaise;
-            }
+            this.syncSelectedVariantSnapshot(bikeId);
           }
           if (typeof ov.feat === 'boolean') bike.featured = ov.feat;
         }

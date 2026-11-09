@@ -12,6 +12,7 @@ const bikeSchema = z.object({
   engineCc: z.number().nonnegative().optional(),
   imageUrl: z.string().url().optional(),
   sourceUrl: z.string().url().optional(),
+  retrievedAt: z.string().datetime({ offset: true }).optional().catch(undefined),
 });
 const feedSchema = z.array(bikeSchema).max(100);
 

@@ -6,7 +6,7 @@ import {
 } from 'lucide-react';
 import { Motorcycle, DealershipInfo } from '../types';
 import { formatInr, toRupees } from '../lib/currency';
-import { computeEmi } from '../lib/emi';
+import { computeEmi, SHOWROOM_EMI_DEFAULTS } from '../lib/emi';
 import { whatsAppLink, telLink } from '../lib/whatsapp';
 import { getColorBikeImage } from '../data/dealershipData';
 import { dealershipStore } from '../services/dealershipStore';
@@ -33,9 +33,9 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
   const bike = useMemo(() => bikes.find((b) => b.id === bikeId), [bikes, bikeId]);
 
   const [galleryIndex, setGalleryIndex] = useState(0);
-  const [downPaymentPct, setDownPaymentPct] = useState(20);
-  const [tenure, setTenure] = useState<number>(36);
-  const [roi, setRoi] = useState(8.99);
+  const [downPaymentPct, setDownPaymentPct] = useState(SHOWROOM_EMI_DEFAULTS.downPaymentPercent);
+  const [tenure, setTenure] = useState(SHOWROOM_EMI_DEFAULTS.months);
+  const [roi, setRoi] = useState(SHOWROOM_EMI_DEFAULTS.annualRatePercent);
 
   // Reset gallery when navigating between bikes
   useEffect(() => {
@@ -261,8 +261,8 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
               <dd className="text-lg sm:text-2xl font-extrabold text-amber-400 tabular-nums">{formatInr(onRoadPaise)}</dd>
             </div>
           </dl>
-          <p className="mt-1.5 text-[10px] text-slate-600">On-road figure is computed from dataset tax &amp; insurance values; accessories, extended warranty and fast-tag are extra as applicable. Final invoice at the showroom.</p>
-          <p className="mt-0.5 text-[10px] text-slate-600 font-mono">On-road: ₹{onRoadRupees.toLocaleString('en-IN')} (exact)</p>
+          <p className="mt-1.5 text-[10px] text-slate-600">Bike Yard demo estimate, computed from the showroom dataset’s tax and insurance values. See the BikeWale reference catalogue for separately sourced listings when available; accessories, extended warranty and fast-tag are extra as applicable. Final invoice at the showroom.</p>
+          <p className="mt-0.5 text-[10px] text-slate-600 font-mono">On-road: ₹{onRoadRupees.toLocaleString('en-IN')} (demo estimate)</p>
 
           {/* CTAs */}
           <div className="mt-5 grid grid-cols-2 gap-2">
@@ -296,7 +296,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
               onClick={() => onBookNow(bike)}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-xs font-bold text-slate-100 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
             >
-              Book with ₹10,000
+              Demo booking · ₹10,000
             </button>
           </div>
 

@@ -24,6 +24,7 @@ export interface BackendBikewaleBike {
   engineCc?: number;
   imageUrl?: string;
   sourceUrl?: string;
+  retrievedAt?: string;
 }
 
 export interface BackendBikewaleFeed {

@@ -172,6 +172,7 @@ export const ShowroomHome: FC<ShowroomHomeProps> = ({
 
           <BikeListing
             bikes={usedBikes}
+            scope="used"
             onSelectBike={onSelectBike}
             onBookTestRide={onBookTestRide}
             onZoomBike={onZoomBike}
