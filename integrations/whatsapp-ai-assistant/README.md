@@ -123,7 +123,7 @@ Complete these steps in the Meta developer dashboard:
 4. Locate the Meta-provided test phone number.
 5. Add a developer-controlled WhatsApp recipient number and complete Meta's recipient verification flow.
 6. Record the displayed Phone Number ID and WhatsApp Business Account ID.
-7. Generate/use the temporary access token for initial development.
+7. Generate/use the temporary access token for initial testing.
 8. Send a first test message from the dashboard or a small backend test script.
 9. Configure a publicly reachable HTTPS webhook URL and verify the webhook challenge.
 10. Subscribe the app to the WhatsApp message webhook events required for inbound messages and delivery status.
