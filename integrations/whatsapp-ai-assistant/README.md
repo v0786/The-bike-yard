@@ -22,6 +22,26 @@ The first working milestone is complete when:
 
 Start with a simple greeting and general FAQ response. Add live catalogue, pricing, stock, EMI, and lead workflows only after the message loop is reliable.
 
+## 2a. Implementation status (repo — honest)
+
+**Safety:** Meta **test number only**. The existing showroom WhatsApp Business App number must **not** be migrated, disconnected, or modified. Production behavior is blocked unless `WHATSAPP_MODE=production` **and** `WHATSAPP_PRODUCTION_APPROVED=true` (owner approval + Meta eligibility required).
+
+**Implemented in repo (software foundations, test-mode guarded):**
+- Additive Prisma models/enums: `WhatsappConversation`, `WhatsappMessage`, `WhatsappWebhookEvent`, `WhatsappLeadLink`, `WhatsappAuditLog` (+ status/mode/direction enums) in `backend/prisma/schema.prisma` (validated with dummy `DATABASE_URL`; **DB migration/deploy still required**).
+- Env placeholders in `backend/.env.example` (`WHATSAPP_*`, `AI_*`, `CORS_ORIGINS`). **No secrets committed.**
+- Isolated module: `backend/src/lib/integrations/whatsapp/*` — config/guards, webhook challenge verification, `X-Hub-Signature-256` validation (when `WHATSAPP_APP_SECRET` set), Meta Cloud API text send (timeout, safe errors), payload parsing (text-only), dedup (DB unique claim + bounded in-memory fallback), sender rate limit, policy (opt-out/human/handoff/language hints/no-invention rules), verified env knowledge block, AI adapter (`gemini`/`none` fallback), conversation processing (inbound store, opt-out, human takeover suppression, lead intent capture best-effort, reply store).
+- Routes (Node runtime): `GET/POST /api/integrations/whatsapp/webhook`; protected admin `GET /api/integrations/whatsapp/status`, `GET /api/integrations/whatsapp/admin/conversations`, `GET/PATCH /api/integrations/whatsapp/admin/conversations/[id]` (takeover `AI|HUMAN` + audit log).
+- Tests (Vitest): `backend/tests/integrations/whatsapp/*.test.ts` + `backend/vitest.config.ts` — security, parsing, policy, config safety, dedup fallback, webhook route (verify, bad signature, duplicate processing, unsupported events). **Backend:** `npx vitest run` **29 passed (7 files)**; `NODE_OPTIONS=--max-old-space-size=4096 npx tsc --noEmit` **clean** (as of this implementation pass).
+
+**Operational TODOs (cannot be completed from this environment):**
+- M1: create Meta developer app/WhatsApp product, add test recipient, obtain/rotate tokens, record IDs (dashboard).
+- M2 live: deploy backend with public HTTPS webhook URL, set `WHATSAPP_VERIFY_TOKEN`/secrets, configure Meta callback + subscriptions, verify challenge end-to-end.
+- M3 live: set `WHATSAPP_ACCESS_TOKEN` + `WHATSAPP_PHONE_NUMBER_ID` (test number), confirm replies on real Meta test loop.
+- M4 config: set `AI_PROVIDER`/`AI_MODEL`/keys (e.g., Gemini) as approved.
+- M5: connect **authoritative** catalogue/pricing/inventory sources (never guess); add validated tool/data layer.
+- M6 ops: deploy Postgres, run Prisma migration/generate in target env, add staff inbox UI + notifications, define consent/retention.
+- M7/M8: monitoring/alerts/backups/access controls/privacy notices; **owner approval + Meta eligibility** before any production number work.
+
 ## 3. Proposed architecture
 
 ```text
@@ -220,14 +240,14 @@ Do not store more customer data than is necessary. Define retention and deletion
 | Milestone | Deliverable | Status |
 |---|---|---|
 | M0 | Project plan and setup guide | Documented |
-| M1 | Meta test app, test recipient, first API message | Not started |
-| M2 | Verified webhook receives inbound messages | Not started |
-| M3 | Automated basic reply loop | Not started |
-| M4 | AI Hinglish conversation engine | Not started |
-| M5 | Approved catalogue/price/FAQ tools | Not started |
-| M6 | Lead capture and human handover | Not started |
-| M7 | Admin operations, monitoring, production checks | Not started |
-| M8 | Owner-approved production number onboarding | Not started |
+| M1 | Meta test app, test recipient, first API message | **Operational — pending** (requires Meta developer app, test recipient, tokens; not available in this environment) |
+| M2 | Verified webhook receives inbound messages | **Code implemented (repo)** — `GET/POST /api/integrations/whatsapp/webhook` with verify challenge, signature validation, parsing, dedup, safe ack; **live verification pending** public HTTPS webhook URL + Meta subscription + creds |
+| M3 | Automated basic reply loop | **Code implemented (repo, guarded)** — inbound text → policy/AI → Cloud API send, test-mode guards; **live loop pending** configured Meta test credentials + deployed DB/webhook |
+| M4 | AI Hinglish conversation engine | **Code implemented (repo)** — adapter-based provider (`gemini`/`none` fallback), Hinglish/Hindi/English hinting, bounded history, grounded system prompt; **provider config pending** |
+| M5 | Approved catalogue/price/FAQ tools | **Partial scaffolding** — verified env-configured knowledge block + strict “confirm with staff / never guess” policy; **pending** authoritative live catalogue/pricing/inventory tool integration and DB-backed source of truth |
+| M6 | Lead capture and human handover | **Code implemented (repo)** — intent capture, WhatsApp lead/conversation records, opt-out, human takeover state, protected admin conversation list/detail/takeover APIs; **pending** deployed Postgres migration, staff UI wiring, notifications, release flow UX |
+| M7 | Admin operations, monitoring, production checks | **Partial (repo)** — status endpoint, safe logging, rate limiting, audit hooks in takeover flow; **pending** ops monitoring/alerts, retention/deletion, backups, access controls, hosted deployment runbook |
+| M8 | Owner-approved production number onboarding | **Not started / blocked by design** — requires owner approval + Meta eligibility checks; `WHATSAPP_PRODUCTION_APPROVED` guard prevents unsafe production assumptions. **Do not migrate/change the real showroom number.** |
 
 ## 11. Open decisions
 
@@ -250,4 +270,4 @@ Create the Meta developer app, add the WhatsApp product, and open **WhatsApp →
 **Project:** The Bike Yard AI WhatsApp Sales Assistant  
 **Repository:** `v0786/The-bike-yard`  
 **Documentation location:** `integrations/whatsapp-ai-assistant/README.md`  
-**Scope of this document:** Initial plan and test-number setup; this is not a claim that the integration has already been implemented.
+**Scope of this document:** Plan + test-number setup + **repo implementation status** (software foundations present; live Meta/DB/deployment/approvals remain operational). Backend `POST /api/sales` remains intentionally disabled (503) by design.

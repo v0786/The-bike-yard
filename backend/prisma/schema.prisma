@@ -753,3 +753,114 @@ model ChatbotFeedback {
 
   @@map("chatbot_feedbacks")
 }
+
+// -----------------------------------------------------------------------------
+// WHATSAPP AI ASSISTANT (Meta Cloud API, test-number first)
+// Additive models: safe to migrate when DB is available. Do not store secrets.
+// -----------------------------------------------------------------------------
+
+enum WhatsappConversationStatus {
+  OPEN
+  PENDING_STAFF
+  HUMAN_TAKEOVER
+  RESOLVED
+  OPTED_OUT
+}
+
+enum WhatsappConversationMode {
+  AI
+  HUMAN
+}
+
+enum WhatsappMessageDirection {
+  INBOUND
+  OUTBOUND
+}
+
+model WhatsappConversation {
+  id               String                     @id @default(uuid()) @db.Uuid
+  waId             String                     @unique @db.VarChar(40) // WhatsApp user id/phone (E.164 digits)
+  profileName      String?                    @db.VarChar(120)
+  status           WhatsappConversationStatus @default(OPEN)
+  mode             WhatsappConversationMode   @default(AI)
+  assignedStaffId  String?                    @db.Uuid
+  languageHint     String?                    @db.VarChar(16) // en/hi/hinglish
+  optedOutAt       DateTime?                  @db.Timestamptz(6)
+  lastMessageAt    DateTime?                  @db.Timestamptz(6)
+  metadata         Json?                      @db.JsonB
+  createdAt        DateTime                   @default(now()) @db.Timestamptz(6)
+  updatedAt        DateTime                   @updatedAt @db.Timestamptz(6)
+
+  messages         WhatsappMessage[]
+  leadLinks        WhatsappLeadLink[]
+  auditLogs        WhatsappAuditLog[]
+
+  @@index([status, mode])
+  @@index([lastMessageAt])
+  @@map("whatsapp_conversations")
+}
+
+model WhatsappMessage {
+  id                String                   @id @default(uuid()) @db.Uuid
+  conversationId    String                   @db.Uuid
+  providerMessageId String?                  @unique @db.VarChar(191) // Meta wamid; unique for dedup/outbound tracking
+  direction         WhatsappMessageDirection
+  messageType       String                   @default("text") @db.VarChar(40)
+  bodyText          String?                  @db.Text // minimal required content; avoid logging full bodies
+  status            String                   @default("received") @db.VarChar(40)
+  rawPayload        Json?                    @db.JsonB // sanitized/minimal where possible
+  errorMessage      String?                  @db.Text
+  createdAt         DateTime                 @default(now()) @db.Timestamptz(6)
+
+  conversation      WhatsappConversation     @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId, createdAt])
+  @@map("whatsapp_messages")
+}
+
+model WhatsappWebhookEvent {
+  id              String   @id @default(uuid()) @db.Uuid
+  providerEventId String   @unique @db.VarChar(191) // dedup key (message/status id)
+  eventType       String   @db.VarChar(60)
+  status          String   @default("received") @db.VarChar(40) // received/processed/ignored/failed
+  attempts        Int      @default(0)
+  safeError       String?  @db.Text
+  receivedAt      DateTime @default(now()) @db.Timestamptz(6)
+  processedAt     DateTime? @db.Timestamptz(6)
+
+  @@index([status, receivedAt])
+  @@map("whatsapp_webhook_events")
+}
+
+model WhatsappLeadLink {
+  id             String               @id @default(uuid()) @db.Uuid
+  conversationId String               @db.Uuid
+  leadId         String?              @db.Uuid // optional link to existing leads.id
+  intent         String?              @db.VarChar(80) // enquiry/test_ride/callback/price/finance
+  bikeInterest   String?              @db.VarChar(120)
+  customerName   String?              @db.VarChar(120)
+  phone          String?              @db.VarChar(20)
+  notes          String?              @db.Text
+  createdAt      DateTime             @default(now()) @db.Timestamptz(6)
+
+  conversation   WhatsappConversation @relation(fields: [conversationId], references: [id], onDelete: Cascade)
+
+  @@index([conversationId])
+  @@index([leadId])
+  @@map("whatsapp_lead_links")
+}
+
+model WhatsappAuditLog {
+  id             String               @id @default(uuid()) @db.Uuid
+  conversationId String?              @db.Uuid
+  actorUserId    String?              @db.Uuid
+  action         String               @db.VarChar(80)
+  details        Json?                @db.JsonB
+  createdAt      DateTime             @default(now()) @db.Timestamptz(6)
+
+  conversation   WhatsappConversation? @relation(fields: [conversationId], references: [id], onDelete: SetNull)
+
+  @@index([conversationId, createdAt])
+  @@index([action])
+  @@map("whatsapp_audit_logs")
+}
