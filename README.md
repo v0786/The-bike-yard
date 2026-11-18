@@ -85,3 +85,40 @@ npx vercel --prod
 - Currency is BigInt **paise** end-to-end (`formatInr`, `splitGst`).
 - Staff can edit **prices and dealership-specific fields only** — never factory specs.
 - Enquiry leads always land in the staff call queue with an audit log entry.
+
+## Customer service chat (Ask Bike Yard)
+
+The public chat in the navigation is available without login. It answers customer
+questions about the **published showroom catalogue only**. It does not expose
+project code, staff activity, ledgers, customer records, bank details or internal
+operations. It cannot execute actions, take payments or confirm bookings.
+
+- `POST /api/customer-chat` is a root Vercel Node function, independent of `backend/`.
+- The same endpoint works with `npm run dev` through a development-only middleware.
+- Set **`OPENAI_API_KEY`** in Vercel → the-bike-yard → Settings → Environment
+  Variables (Production and any desired Preview environments), then redeploy.
+  Create the key in your own OpenAI API project. Never paste it into chat, commit
+  it, or prefix it with `VITE_`. Configure provider-side quotas/spend controls.
+- Optional `OPENAI_MODEL` defaults to `gpt-4.1-mini`. The model must support
+  Responses API structured outputs. No new dependencies are required.
+- With no key, provider errors, refusals or timeouts, the widget explicitly labels
+  the response **Showroom help mode** and uses a small deterministic FAQ router.
+  Semantic recommendations and context-aware follow-ups need a working API key.
+- OpenAI selects a topic and up to three public bike IDs through strict JSON.
+  Server validation and approved answer templates construct all customer text
+  and links. Raw model prose is never displayed. Responses are currently English;
+  routing may understand other languages but fallback keyword coverage is limited.
+- Only allowlisted public fields from the committed catalogue reach the model.
+  Browser localStorage overrides and unverified reference feeds are not trusted.
+  Prices/offers are labelled demo figures. Live stock and approvals are never claimed.
+- A consent checkbox applies equally to typed messages and suggested questions.
+  The last six messages accompany AI requests; chats remain in page memory and
+  are not saved by this endpoint. `store: false` is sent to OpenAI; provider and
+  hosting operational retention policies still apply.
+- Input/output sizes, timeouts, same-origin browser checks and a 12-request/minute
+  hashed-IP, per-instance limiter reduce abuse. This memory limiter is **not a
+  distributed quota or a global billing cap**. Add durable rate limits/WAF and
+  provider quotas before a high-traffic production rollout. Origin checks alone
+  do not authenticate direct HTTP callers.
+- Verify with `npm run lint`, `npm test`, `npm run build`. Adapter tests mock OpenAI;
+  live AI responses require a configured key and must be verified separately.
