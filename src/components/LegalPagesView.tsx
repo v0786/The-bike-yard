@@ -113,6 +113,12 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
         {/* TAB 1: PRIVACY POLICY */}
         {activeTab === 'privacy' && (
           <div className="space-y-8 text-xs sm:text-sm text-slate-300 leading-relaxed bg-slate-900/40 border border-slate-800 rounded-3xl p-6 sm:p-10 shadow-lg">
+            <section className="space-y-2 rounded-2xl border border-slate-700 p-5">
+              <h2 className="text-lg font-bold text-white">Customer service chat</h2>
+              <p>After you agree in chat, your question and up to six recent messages may be sent to OpenAI to match your enquiry to public showroom information. Do not share identity documents, phone numbers, passwords or payment details. Our chat endpoint does not save conversations; the thread stays in page memory until cleared or the page reloads. Hosting and AI providers may retain operational data under their own policies. We request that OpenAI not store the response as conversation state.</p>
+              <p>When AI is unavailable, the chat uses labelled showroom help mode. Answers use the website’s published demo catalogue and cannot confirm real stock, prices, appointments, loans, payments or bookings.</p>
+            </section>
+
             {/* Priority Direct Calling Consent Notice */}
             <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-5 space-y-2">
               <div className="flex items-center gap-2 font-bold text-amber-400 text-sm">

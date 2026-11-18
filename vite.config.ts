@@ -1,11 +1,29 @@
 import tailwindcss from '@tailwindcss/vite';
 import react from '@vitejs/plugin-react';
 import path from 'path';
-import {defineConfig} from 'vite';
+import {defineConfig, loadEnv} from 'vite';
 
-export default defineConfig(() => {
+export default defineConfig(({ mode }) => {
+  const env = loadEnv(mode, process.cwd(), '');
+  for (const key of ['OPENAI_API_KEY', 'OPENAI_MODEL']) {
+    if (env[key] && !process.env[key]) process.env[key] = env[key];
+  }
   return {
-    plugins: [react(), tailwindcss()],
+    plugins: [react(), tailwindcss(), {
+      name: 'customer-chat-dev-api',
+      configureServer(server) {
+        server.middlewares.use('/api/customer-chat', async (req, res) => {
+          try {
+            const { default: handler } = await server.ssrLoadModule('/api/customer-chat.ts');
+            await handler(req, res);
+          } catch {
+            res.statusCode = 503;
+            res.setHeader('Content-Type', 'application/json');
+            res.end(JSON.stringify({ error: 'Chat is temporarily unavailable. Please try again.' }));
+          }
+        });
+      },
+    }],
     resolve: {
       alias: {
         '@': path.resolve(__dirname, '.'),

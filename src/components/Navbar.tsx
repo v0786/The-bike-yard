@@ -89,7 +89,7 @@ export const Navbar: React.FC<NavbarProps> = ({
               className="flex items-center gap-1.5 text-slate-300 hover:text-amber-400 transition-colors"
             >
               <Sparkles className="w-3.5 h-3.5 text-amber-400" />
-              <span className="hidden sm:inline">Grounded AI Desk</span>
+              <span className="hidden sm:inline">Ask Bike Yard</span>
             </button>
             <span className="text-slate-700">|</span>
             <ThemePicker compact />
