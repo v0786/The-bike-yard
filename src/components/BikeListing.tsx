@@ -1,4 +1,6 @@
 import React, { useEffect, useMemo, useState } from 'react';
+import { BikeSearchDiscovery } from './BikeSearchDiscovery';
+import { PRICE_ENQUIRY, PRICE_EXPLANATION } from '../lib/bike-search';
 import { BikeCardRail } from './BikeCardRail';
 import { Link, useLocation, useNavigate, useSearchParams } from 'react-router-dom';
 import { Motorcycle } from '../types';
@@ -59,12 +61,15 @@ export const BikeListing: React.FC<BikeListingProps> = ({
   const sortKey = scope === 'used' ? 'usedSort' : 'sort';
   const brandFromUrl = searchParams.get(brandKey) ?? 'ALL';
   const categoryFromUrl = searchParams.get(categoryKey) ?? 'ALL';
+  const queryFromUrl = searchParams.get(scope === 'new' ? 'q' : 'usedQ') || '';
   const sortFromUrl = (searchParams.get(sortKey) as CatalogueSort | null) ?? 'POPULARITY';
 
-  const [filters, setFilters] = useState<CatalogueFilters>({ ...DEFAULT_FILTERS, brand: brandFromUrl, category: categoryFromUrl });
-  const [sort, setSort] = useState<CatalogueSort>(sortFromUrl);
+  const [filters, setFilters] = useState<CatalogueFilters>({ ...DEFAULT_FILTERS, search: queryFromUrl, brand: brandFromUrl, category: categoryFromUrl });
+  const [sort, setSort] = useState<CatalogueSort>('POPULARITY');
   const [page, setPage] = useState<number>(1);
   const [addedBikeId, setAddedBikeId] = useState<string | null>(null);
+
+  useEffect(() => { setFilters(f => ({ ...f, search: queryFromUrl })); setPage(1); }, [queryFromUrl]);
 
   // React to ?brand= / ?category= / ?sort= navigation from brand rails & homepage links
   useEffect(() => {
@@ -74,7 +79,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
     setFilters((f) => (f.category === categoryFromUrl ? f : { ...f, category: categoryFromUrl }));
   }, [categoryFromUrl]);
   useEffect(() => {
-    setSort(sortFromUrl);
+    setSort('POPULARITY');
   }, [sortFromUrl]);
 
   const updateFilter = <K extends keyof CatalogueFilters>(key: K, value: CatalogueFilters[K]) => {
@@ -118,8 +123,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
 
   const sortOptions: { id: CatalogueSort; label: string }[] = [
     { id: 'POPULARITY', label: 'Sort: Popularity' },
-    { id: 'PRICE_ASC', label: 'Price: Low to High' },
-    { id: 'PRICE_DESC', label: 'Price: High to Low' },
+
   ];
 
   const resetFilters = () => {
@@ -130,6 +134,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
     next.delete(brandKey);
     next.delete(categoryKey);
     next.delete(sortKey);
+    next.delete(scope === 'new' ? 'q' : 'usedQ');
     navigate({ search: next.toString(), hash }, { replace: true });
   };
 
@@ -138,13 +143,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
     [bikes]
   );
   const categories = ['ALL', 'Roadster', 'Sport', 'Cruiser', 'Scooter', 'Adventure', 'Commuter'];
-  const budgets = [
-    { id: 'ALL', label: 'All Budgets' },
-    { id: 'UNDER_1L', label: 'Under ₹1 Lakh' },
-    { id: '1L_2L', label: '₹1 - ₹2 Lakh' },
-    { id: '2L_3L', label: '₹2 - ₹3 Lakh' },
-    { id: 'ABOVE_3L', label: 'Above ₹3 Lakh' },
-  ] as const;
+
 
   const popularity = useMemo(() => {
     const { leads, bookings } = dealershipStore.getState();
@@ -176,13 +175,13 @@ export const BikeListing: React.FC<BikeListingProps> = ({
           <div>
             <div className="flex items-center gap-2">
               <span className="text-xs uppercase font-extrabold text-amber-500">Premium Machine Selection</span>
-              <span className="text-xs text-slate-400">Demo MH-04 On-Road Pricing</span>
+              <span className="text-xs text-slate-400">Price confirmed by Bike Yard</span>
             </div>
             <h2 className="text-xl sm:text-2xl font-bold tracking-tight text-white">
               Digital Showroom Catalogue
             </h2>
             <p className="text-xs sm:text-sm text-slate-400">
-              Select any motorcycle below to view illustrative On-Road Thane (MH-04) pricing and detailed specifications.
+              Explore bike specifications. Prices are negotiable and confirmed by our staff or the owner.
             </p>
           </div>
 
@@ -222,7 +221,9 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                 type="text"
                 value={searchQuery}
                 onChange={(e) => updateFilter('search', e.target.value)}
-                placeholder="Search Hunter, Duke, Speed 400..."
+                aria-label={scope === 'new' ? 'Search bikes and external references' : 'Search pre-owned bikes'}
+                maxLength={100}
+                placeholder="Search any brand or model…"
                 className="w-full rounded-xl border border-slate-700 bg-slate-950/80 pl-9 pr-4 py-2 text-xs sm:text-sm text-slate-100 placeholder-slate-500 focus:border-amber-500 focus:outline-none transition-colors"
               />
             </div>
@@ -261,23 +262,6 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                 }`}
               >
                 {cat === 'ALL' ? 'All Types' : cat}
-              </button>
-            ))}
-          </div>
-
-          {/* Budget tabs */}
-          <div className="flex flex-wrap items-center gap-1.5 p-1 bg-slate-950 rounded-xl border border-slate-800/80">
-            {budgets.map((b) => (
-              <button
-                key={b.id}
-                onClick={() => updateFilter('budget', b.id)}
-                className={`px-3 py-1.5 text-xs font-medium rounded-lg transition-all ${
-                  selectedBudget === b.id
-                    ? 'bg-amber-500/20 text-amber-400 border border-amber-500/40 font-bold'
-                    : 'text-slate-400 hover:text-slate-200 hover:bg-slate-900'
-                }`}
-              >
-                {b.label}
               </button>
             ))}
           </div>
@@ -325,6 +309,8 @@ export const BikeListing: React.FC<BikeListingProps> = ({
         </div>
       </div>
 
+      <BikeSearchDiscovery query={searchQuery} bikes={bikes} noLocalResults={pageSlice.totalItems === 0} />
+
       {/* Result count */}
       <p className="text-[11px] text-slate-500 font-medium tabular-nums" role="status" aria-live="polite">
         Showing {pageSlice.totalItems === 0 ? 0 : (pageSlice.page - 1) * PAGE_SIZE + 1}–{Math.min(pageSlice.page * PAGE_SIZE, pageSlice.totalItems)} of {pageSlice.totalItems} motorcycles
@@ -334,8 +320,8 @@ export const BikeListing: React.FC<BikeListingProps> = ({
       {pageSlice.totalItems === 0 ? (
         <div className="rounded-2xl border border-slate-800 bg-slate-900/40 p-12 text-center space-y-3">
           <AlertCircle className="w-8 h-8 text-slate-500 mx-auto" />
-          <h3 className="text-base font-semibold text-white">No motorcycles match your filter</h3>
-          <p className="text-xs text-slate-400">Try clearing filters or search query to view all available machines.</p>
+          <h3 className="text-base font-semibold text-white">Find the right bike with our team</h3>
+          <p className="text-xs text-slate-400">Try a model name, explore related bikes above, or clear filters to browse the showroom.</p>
           <button
             onClick={resetFilters}
             className="rounded-lg bg-slate-800 px-4 py-2 text-xs font-medium text-slate-200 hover:bg-slate-700"
@@ -421,17 +407,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                     )}
                   </div>
 
-                  {/* Market Price Below Every Bike Picture */}
-                  <div className="mt-3 p-3 rounded-xl bg-slate-950 border border-slate-800/80 flex items-center justify-between text-xs">
-                    <div>
-                      <div className="text-[10px] uppercase font-semibold text-slate-400">Market Ex-Showroom</div>
-                      <div className="font-bold text-white tabular-nums">{formatInr(bike.exShowroomPaise)}</div>
-                    </div>
-                    <div className="text-right">
-                      <div className="text-[10px] uppercase font-semibold text-amber-400">On-Road Thane (MH-04)</div>
-                      <div className="font-extrabold text-amber-400 tabular-nums">{formatInr(onRoadPaise)}</div>
-                    </div>
-                  </div>
+                  <p className="mt-3 rounded-xl border border-slate-800 bg-slate-950 p-3 text-sm font-semibold text-amber-400">{PRICE_ENQUIRY}</p>
 
                   {/* Body Info */}
                   <div className="pt-3 space-y-2.5">
@@ -501,7 +477,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                                     ? 'bg-amber-500 text-slate-950 border-amber-400 shadow-sm'
                                     : 'bg-slate-950 text-slate-400 border-slate-800 hover:text-white hover:border-slate-700'
                                 }`}
-                                title={`${v.name}: ₹${Number(v.exShowroomPaise / 100n).toLocaleString('en-IN')}`}
+                                title={v.name}
                               >
                                 {v.name}
                               </button>
@@ -527,10 +503,7 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                       </div>
                     </div>
 
-                    <div className="text-[11px] text-slate-400 flex items-center justify-between pt-1">
-                      <span>Estimated EMI (36 Months)</span>
-                      <span className="font-bold text-white">~ ₹{approxEmi.toLocaleString('en-IN')}/mo</span>
-                    </div>
+
                   </div>
                 </div>
 
@@ -555,10 +528,10 @@ export const BikeListing: React.FC<BikeListingProps> = ({
                         ? 'bg-slate-800 text-amber-400 ring-1 ring-amber-500/40'
                         : 'bg-slate-800 text-slate-200 hover:bg-slate-700 hover:text-white'
                     }`}
-                    title="Select this motorcycle to update the EMI calculator below"
+                    title="Select this motorcycle for an enquiry"
                   >
                     <Info className="w-3.5 h-3.5" />
-                    <span className="hidden xl:inline">{isSelected ? 'Selected' : 'Calculate'}</span>
+                    <span className="hidden xl:inline">{isSelected ? 'Selected' : 'Select bike'}</span>
                   </button>
 
                   {bike.isUsed && onOpenOlxModal && (
