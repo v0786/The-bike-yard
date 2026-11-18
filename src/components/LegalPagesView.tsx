@@ -116,7 +116,7 @@ export const LegalPagesView: React.FC<LegalPagesViewProps> = ({
             <section className="space-y-2 rounded-2xl border border-slate-700 p-5">
               <h2 className="text-lg font-bold text-white">Customer service chat</h2>
               <p>After you agree in chat, your question and up to six recent messages may be sent to OpenAI to match your enquiry to public showroom information. Do not share identity documents, phone numbers, passwords or payment details. Our chat endpoint does not save conversations; the thread stays in page memory until cleared or the page reloads. Hosting and AI providers may retain operational data under their own policies. We request that OpenAI not store the response as conversation state.</p>
-              <p>When AI is unavailable, the chat uses labelled showroom help mode. Answers use the website’s published demo catalogue and cannot confirm real stock, prices, appointments, loans, payments or bookings.</p>
+              <p>When AI is unavailable, the chat uses labelled showroom help mode. Answers use public bike information and cannot confirm real stock, appointments, loans, payments or bookings. Bike prices are negotiable and confirmed only by Bike Yard staff or the owner. External search shares only the requested brand or model with public reference sources; factual results are cached for up to an hour and marked with a retrieval time. External prices are not imported.</p>
             </section>
 
             {/* Priority Direct Calling Consent Notice */}
