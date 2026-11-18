@@ -1,170 +1,114 @@
-import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useState, useRef, useEffect } from 'react';
-import { Sparkles, Send, X, Bot, User, CheckCircle2 } from 'lucide-react';
-import { dealershipStore } from '../services/dealershipStore';
+import { Sparkles, Send, X, Bot, User, LoaderCircle, RotateCcw } from 'lucide-react';
+import { Link } from 'react-router-dom';
 
 interface Message {
   id: string;
   sender: 'bot' | 'user';
   text: string;
-  timestamp: string;
+  links?: { label: string; href: string }[];
 }
-
-interface GroundedChatbotProps {
-  isOpen: boolean;
-  onClose: () => void;
-}
+interface GroundedChatbotProps { isOpen: boolean; onClose: () => void; }
+const welcome: Message = {
+  id: 'welcome', sender: 'bot',
+  text: 'Namaste! I’m your Bike Yard customer assistant. Ask about our listed bikes, colours, prices, offers, test rides or showroom details. Prices and bookings on this website are a demo; our team must confirm them.',
+};
+const suggestions = ['Hunter 350 price?', 'Compare Hunter 350 and Speed 400', 'Where is your showroom?', 'How do I request a test ride?'];
 
 export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClose }) => {
-  const [messages, setMessages] = useState<Message[]>([
-    {
-      id: 'm-0',
-      sender: 'bot',
-      text: 'Namaste! I am The Bike Yard Assistant in Khopat, Thane. I can give you exact On-Road MH-04 prices, live floor stock, test ride slots, and 45-minute finance approvals. How can I help your ride today?',
-      timestamp: 'Just now',
-    },
-  ]);
-  const [input, setInput] = useState<string>('');
-  const messagesEndRef = useRef<HTMLDivElement>(null);
-
-  const scrollToBottom = () => {
-    messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-  };
-
+  const [messages, setMessages] = useState<Message[]>([welcome]);
+  const [input, setInput] = useState('');
+  const [busy, setBusy] = useState(false);
+  const [error, setError] = useState('');
+  const [mode, setMode] = useState<'ai' | 'help' | null>(null);
+  const [accepted, setAccepted] = useState(false);
+  const endRef = useRef<HTMLDivElement>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const triggerRef = useRef<HTMLElement | null>(null);
+  const pendingRef = useRef(false);
+  const abortRef = useRef<AbortController | null>(null);
+  useEffect(() => () => abortRef.current?.abort(), []);
+  useEffect(() => { if (isOpen) endRef.current?.scrollIntoView({ behavior: 'smooth' }); }, [messages, busy, isOpen]);
   useEffect(() => {
-    if (isOpen) {
-      scrollToBottom();
-    }
-  }, [messages, isOpen]);
+    if (!isOpen) return;
+    triggerRef.current = document.activeElement as HTMLElement;
+    inputRef.current?.focus();
+    return () => triggerRef.current?.focus();
+  }, [isOpen]);
 
-  const handleSend = (textToSend?: string) => {
-    const query = textToSend || input;
-    if (!query.trim()) return;
-
-    const userMsg: Message = {
-      id: `u-${Date.now()}`,
-      sender: 'user',
-      text: query,
-      timestamp: 'Just now',
-    };
-
-    setMessages((prev) => [...prev, userMsg]);
-    if (!textToSend) setInput('');
-
-    setTimeout(() => {
-      const response = dealershipStore.queryChatbot(query);
-      const botMsg: Message = {
-        id: `b-${Date.now()}`,
-        sender: 'bot',
-        text: response,
-        timestamp: 'Just now',
-      };
-      setMessages((prev) => [...prev, botMsg]);
-    }, 250);
-  };
-
-  const sampleQuestions = [
-    'On-Road price of Hunter 350 in Thane?',
-    'What bikes are ready in stock today?',
-    'Showroom timings & Khopat address?',
-    'How does two-wheeler finance work?',
-  ];
+  async function handleSend(text = input) {
+    const query = text.trim();
+    if (!query || query.length > 1000 || pendingRef.current || !accepted) return;
+    pendingRef.current = true;
+    setBusy(true); setError(''); setInput('');
+    const userMessage: Message = { id: crypto.randomUUID(), sender: 'user', text: query };
+    const history = messages.filter(m => m.id !== 'welcome').slice(-6).map(m => ({ role: m.sender === 'user' ? 'user' : 'assistant', text: m.text }));
+    setMessages(previous => [...previous.slice(-29), userMessage]);
+    const controller = new AbortController();
+    abortRef.current = controller;
+    const timeout = setTimeout(() => controller.abort(), 25000);
+    try {
+      const response = await fetch('/api/customer-chat', {
+        method: 'POST', headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ message: query, history }), signal: controller.signal,
+      });
+      const data = await response.json();
+      if (!response.ok) throw new Error(data.error || 'Chat is unavailable. Please try again.');
+      if (typeof data.text !== 'string' || !['ai', 'help'].includes(data.mode)) throw new Error('Chat is unavailable. Please try again.');
+      setMode(data.mode);
+      setMessages(previous => [...previous, { id: crypto.randomUUID(), sender: 'bot', text: data.text, links: data.links }]);
+    } catch (err) {
+      setError(err instanceof Error && err.name !== 'AbortError' ? err.message : 'The reply took too long. Please try again or contact the showroom.');
+      setMessages(previous => previous.filter(m => m.id !== userMessage.id));
+      setInput(query);
+    } finally { clearTimeout(timeout); pendingRef.current = false; setBusy(false); }
+  }
 
   if (!isOpen) return null;
-
   return (
-    <div className="fixed inset-x-2 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-50 h-[520px] max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] sm:left-auto sm:right-6 sm:w-[400px] md:bottom-6 rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl flex flex-col overflow-hidden backdrop-blur-xl animate-in fade-in slide-in-from-bottom-4 duration-300">
-      {/* Header */}
-      <div className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-8 w-8 items-center justify-center rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400">
-            <Sparkles className="w-4 h-4" />
-          </div>
-          <div>
-            <div className="flex items-center gap-1.5">
-              <span className="text-xs font-bold text-white">Dealership AI Assistant</span>
-              <span className="rounded bg-emerald-500/20 px-1.5 py-0.2 text-[9px] font-bold text-emerald-400">
-                Grounded
-              </span>
-            </div>
-            <div className="text-[10px] text-slate-400">Khopat Showroom Real-Time Data</div>
-          </div>
+    <section role="dialog" aria-modal="false" aria-labelledby="chat-title"
+      onKeyDown={e => { if (e.key === 'Escape') onClose(); }}
+      className="fixed inset-x-2 bottom-[calc(4rem+env(safe-area-inset-bottom))] z-50 flex h-[640px] max-h-[calc(100dvh-5rem-env(safe-area-inset-bottom))] flex-col overflow-hidden rounded-2xl border border-slate-700 bg-slate-900 shadow-2xl sm:left-auto sm:right-6 sm:w-[420px] md:bottom-6">
+      <header className="flex items-center justify-between border-b border-slate-800 bg-slate-950 px-4 py-3">
+        <div className="flex items-center gap-3">
+          <Sparkles className="h-5 w-5 text-amber-400" aria-hidden="true" />
+          <div><h2 id="chat-title" className="text-base font-bold text-white">Ask Bike Yard</h2>
+            <p className="text-sm text-slate-400">Customer service · No login needed</p></div>
         </div>
-        <button
-          onClick={onClose}
-          className="rounded-lg p-1 text-slate-400 hover:bg-slate-800 hover:text-white"
-        >
-          <X className="w-5 h-5" />
-        </button>
-      </div>
-
-      {/* Message List */}
-      <div className="flex-1 overflow-y-auto p-4 space-y-3 text-xs">
-        {messages.map((m) => (
-          <div
-            key={m.id}
-            className={`flex items-start gap-2.5 ${m.sender === 'user' ? 'flex-row-reverse' : ''}`}
-          >
-            <div
-              className={`flex h-6 w-6 shrink-0 items-center justify-center rounded-full text-[10px] font-bold ${
-                m.sender === 'user' ? 'bg-amber-500 text-slate-950' : 'bg-slate-800 text-slate-300'
-              }`}
-            >
-              {m.sender === 'user' ? <User className="w-3.5 h-3.5" /> : <Bot className="w-3.5 h-3.5" />}
-            </div>
-            <div
-              className={`max-w-[80%] [overflow-wrap:anywhere] rounded-2xl p-3 leading-relaxed ${
-                m.sender === 'user'
-                  ? 'bg-amber-500 text-slate-950 font-medium'
-                  : 'bg-slate-950 border border-slate-800 text-slate-200'
-              }`}
-            >
-              {m.text}
+        <div className="flex gap-1">
+          <button type="button" aria-label="Clear conversation" disabled={busy} onClick={() => { setMessages([welcome]); setError(''); setMode(null); setInput(''); }} className="rounded-lg p-2 text-slate-400 hover:bg-slate-800 disabled:opacity-40"><RotateCcw className="h-4 w-4" /></button>
+          <button type="button" aria-label="Close chat" onClick={onClose} className="rounded-lg p-2 text-slate-400 hover:bg-slate-800"><X className="h-5 w-5" /></button>
+        </div>
+      </header>
+      <div role="log" aria-label="Conversation" aria-live="polite" aria-relevant="additions" className="min-h-0 flex-1 space-y-4 overflow-y-auto p-4 text-base">
+        {messages.map(m => (
+          <div key={m.id} className={`flex items-start gap-2 ${m.sender === 'user' ? 'flex-row-reverse' : ''}`}>
+            <span className="mt-1 shrink-0 text-slate-400" aria-label={m.sender === 'user' ? 'You' : 'Bike Yard'}>{m.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}</span>
+            <div className={`max-w-[88%] rounded-2xl p-3 leading-relaxed [overflow-wrap:anywhere] ${m.sender === 'user' ? 'bg-amber-500 font-medium text-slate-950' : 'border border-slate-800 bg-slate-950 text-slate-200'}`}>
+              <p className="whitespace-pre-line">{m.text}</p>
+              {m.links && <div className="mt-3 flex flex-wrap gap-2">{m.links.map(link => link.href.startsWith('/bike/') || link.href === '/#catalogue-section'
+                ? <Link key={link.href} to={link.href} onClick={onClose} className="rounded-lg border border-slate-700 px-2 py-1 text-sm text-amber-400 underline">{link.label}</Link>
+                : link.href.startsWith('tel:') ? <a key={link.href} href={link.href} className="rounded-lg border border-slate-700 px-2 py-1 text-sm text-amber-400 underline">{link.label}</a> : null)}</div>}
             </div>
           </div>
         ))}
-        <div ref={messagesEndRef} />
+        {busy && <p role="status" className="flex items-center gap-2 text-sm text-slate-400"><LoaderCircle className="h-4 w-4 animate-spin" />Finding showroom information…</p>}
+        <div ref={endRef} />
       </div>
-
-      {/* Suggested prompts strip */}
-      <div className="px-3 py-2 border-t border-slate-800/80 bg-slate-950/50 flex overflow-x-auto gap-1.5 scrollbar-none">
-        {sampleQuestions.map((q, idx) => (
-          <button
-            key={idx}
-            onClick={() => handleSend(q)}
-            className="whitespace-nowrap rounded-lg border border-slate-800 bg-slate-900 px-2 py-1 text-[10px] font-medium text-slate-300 hover:border-amber-500/50 hover:text-white"
-          >
-            {q}
-          </button>
-        ))}
+      <div className="flex gap-2 overflow-x-auto border-t border-slate-800 px-3 py-2">
+        {suggestions.map(q => <button key={q} type="button" disabled={busy || !accepted} onClick={() => handleSend(q)} className="shrink-0 rounded-xl border border-slate-700 px-3 py-2 text-sm text-slate-200 hover:border-amber-500 disabled:opacity-40">{q}</button>)}
       </div>
-
-      {/* Input row */}
-      <form
-        onSubmit={(e) => {
-          e.preventDefault();
-          if (!readCustomerAcceptance(e.currentTarget)) return;
-          handleSend();
-        }}
-        className="space-y-2 border-t border-slate-800 bg-slate-950 p-2.5"
-      >
-        <div className="flex items-center gap-2">
-          <input
-            type="text"
-            value={input}
-            onChange={(e) => setInput(e.target.value)}
-            placeholder="Ask for prices, waiting periods, RTO..."
-            className="min-w-0 flex-1 rounded-xl border border-slate-800 bg-slate-900 px-3 py-2 text-xs text-white placeholder-slate-500 focus:border-amber-500 focus:outline-none"
-          />
-          <button
-            type="submit"
-            className="rounded-xl bg-amber-500 p-2 text-slate-950 hover:bg-amber-400 active:scale-95 transition-all"
-          >
-            <Send className="w-4 h-4" />
-          </button>
+      <form onSubmit={e => { e.preventDefault(); void handleSend(); }} className="space-y-2 border-t border-slate-800 bg-slate-950 p-3">
+        {!accepted && <label className="flex items-start gap-2 text-sm text-slate-300"><input type="checkbox" checked={accepted} onChange={e => setAccepted(e.target.checked)} className="mt-1 accent-amber-500" />
+          <span>I agree to the <Link to="/terms-and-conditions" className="text-amber-400 underline">terms</Link> and understand my question and recent chat may be sent to OpenAI. <Link to="/privacy-policy" className="text-amber-400 underline">Privacy</Link></span></label>}
+        {error && <p role="alert" className="text-sm text-amber-300">{error}</p>}
+        <div className="flex gap-2">
+          <label htmlFor="customer-chat-input" className="sr-only">Your Bike Yard question</label>
+          <input id="customer-chat-input" ref={inputRef} value={input} onChange={e => setInput(e.target.value)} maxLength={1000} autoComplete="off" placeholder="Ask about Bike Yard…" className="min-w-0 flex-1 rounded-xl border border-slate-700 bg-slate-900 px-3 py-2 text-base text-white focus:border-amber-500 focus:outline-none" />
+          <button type="submit" aria-label="Send question" disabled={busy || !accepted || !input.trim()} className="rounded-xl bg-amber-500 p-3 text-slate-950 hover:bg-amber-400 disabled:opacity-40"><Send className="h-5 w-5" /></button>
         </div>
-        <CustomerTerms purpose="answer your showroom question. Keep personal information out of chat" />
+        <p className="text-sm text-slate-400">{mode === 'ai' ? 'AI-assisted showroom answers.' : mode === 'help' ? 'Showroom help mode · AI is unavailable for this reply.' : 'Answers from Bike Yard’s published information.'} Don’t share personal or payment details.</p>
       </form>
-    </div>
+    </section>
   );
 };
