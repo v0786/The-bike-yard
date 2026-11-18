@@ -1,3 +1,4 @@
+import { BikeQuoteCard } from '../components/BikeQuoteCard';
 import { useState, type FC } from 'react';
 import { ChevronDown, ShieldCheck, Flame, Sparkles } from 'lucide-react';
 import type { Motorcycle } from '../types';
@@ -15,7 +16,6 @@ import { LatestArrivals } from '../components/LatestArrivals';
 import { OffersSection } from '../components/OffersSection';
 import { WhyChoose } from '../components/WhyChoose';
 import { ShowroomLocation } from '../components/ShowroomLocation';
-import { FinanceEmiSection } from '../components/FinanceEmiSection';
 import { ApplicationsHub } from '../components/ApplicationsHub';
 import { PersistentOnRoadBar } from '../components/PersistentOnRoadBar';
 
@@ -190,15 +190,7 @@ export const ShowroomHome: FC<ShowroomHomeProps> = ({
         {/* Why choose */}
         <WhyChoose />
 
-        {/* 10 Institutional Finance Partners & Live EMI Calculator */}
-        {currentActiveBike && (
-          <FinanceEmiSection
-            selectedBike={currentActiveBike}
-            onApplySuccess={() => {
-              /* Lead is captured inside the section and lands in the staff call queue */
-            }}
-          />
-        )}
+        <section id="emi-section" aria-label="Finance enquiry"><h2 className="text-xl font-bold text-white">Your quote, your finance options</h2><p className="mt-2 text-base text-slate-400">Our team confirms the negotiable bike price before preparing finance options.</p><BikeQuoteCard model={currentActiveBike ? `${currentActiveBike.brand} ${currentActiveBike.model}` : undefined} /></section>
 
         {/* Finance, Insurance & RTO Hub */}
         <div id="applications-hub">
