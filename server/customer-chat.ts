@@ -151,7 +151,8 @@ export async function answerCustomer(input: ChatInput): Promise<ChatReply> {
   }
   const reply = renderReply(selection, mode);
   if (['catalogue', 'price', 'specs', 'availability', 'unknown'].includes(selection.topic) && input.message.length <= 100) {
-    reply.links.unshift({ label: 'Search bike information', href: `/?q=${encodeURIComponent(input.message)}#catalogue-section` });
+    const searchQuery = input.message.replace(/[^\p{L}\p{N}\s.'’&()+-]/gu, ' ').replace(/\b(price|cost|please|show|me|tell|about|what|is|the|of|on|road)\b/gi, ' ').replace(/\s+/g, ' ').trim();
+    if (searchQuery.length >= 2) reply.links.unshift({ label: 'Search bike information', href: `/?q=${encodeURIComponent(searchQuery)}#catalogue-section` });
   }
   return reply;
 }
