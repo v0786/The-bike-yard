@@ -11,7 +11,7 @@ interface Message {
 interface GroundedChatbotProps { isOpen: boolean; onClose: () => void; }
 const welcome: Message = {
   id: 'welcome', sender: 'bot',
-  text: 'Namaste! I’m your Bike Yard customer assistant. Ask about our listed bikes, colours, prices, offers, test rides or showroom details. Prices and bookings on this website are a demo; our team must confirm them.',
+  text: 'Namaste! I’m your Bike Yard customer assistant. Ask about our listed bikes, colours, prices, offers, test rides or showroom details. Bike prices are negotiable and confirmed by our staff or owner. Ask us for a quote.',
 };
 const suggestions = ['Hunter 350 price?', 'Compare Hunter 350 and Speed 400', 'Where is your showroom?', 'How do I request a test ride?'];
 
@@ -86,7 +86,7 @@ export const GroundedChatbot: React.FC<GroundedChatbotProps> = ({ isOpen, onClos
             <span className="mt-1 shrink-0 text-slate-400" aria-label={m.sender === 'user' ? 'You' : 'Bike Yard'}>{m.sender === 'user' ? <User className="h-4 w-4" /> : <Bot className="h-4 w-4" />}</span>
             <div className={`max-w-[88%] rounded-2xl p-3 leading-relaxed [overflow-wrap:anywhere] ${m.sender === 'user' ? 'bg-amber-500 font-medium text-slate-950' : 'border border-slate-800 bg-slate-950 text-slate-200'}`}>
               <p className="whitespace-pre-line">{m.text}</p>
-              {m.links && <div className="mt-3 flex flex-wrap gap-2">{m.links.map(link => link.href.startsWith('/bike/') || link.href === '/#catalogue-section'
+              {m.links && <div className="mt-3 flex flex-wrap gap-2">{m.links.map(link => link.href.startsWith('/bike/') || link.href === '/#catalogue-section' || link.href.startsWith('/?q=')
                 ? <Link key={link.href} to={link.href} onClick={onClose} className="rounded-lg border border-slate-700 px-2 py-1 text-sm text-amber-400 underline">{link.label}</Link>
                 : link.href.startsWith('tel:') ? <a key={link.href} href={link.href} className="rounded-lg border border-slate-700 px-2 py-1 text-sm text-amber-400 underline">{link.label}</a> : null)}</div>}
             </div>
