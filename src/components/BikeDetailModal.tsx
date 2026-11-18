@@ -1,3 +1,5 @@
+import { BikeQuoteCard } from './BikeQuoteCard';
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import { CustomerTerms, readCustomerAcceptance } from './CustomerTerms';
 import React, { useEffect, useRef, useState } from 'react';
 import { Motorcycle } from '../types';
@@ -155,7 +157,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
                       >
                         <div className="text-xs font-bold truncate">{v.name}</div>
                         <div className="text-[10px] text-amber-400 font-semibold tabular-nums mt-0.5">
-                          {formatInr(v.exShowroomPaise)}
+                          {PRICE_ENQUIRY}
                         </div>
                       </button>
                     );
@@ -235,138 +237,7 @@ export const BikeDetailModal: React.FC<BikeDetailModalProps> = ({
 
           {/* Right Column: Complete On-Road Breakdown & EMI Calculator */}
           <div className="md:col-span-6 space-y-6">
-            {/* Price Breakdown Card */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 space-y-4">
-              <div className="flex items-center justify-between border-b border-slate-800 pb-3">
-                <div className="text-xs font-bold uppercase tracking-wider text-amber-400">
-                  On-Road Thane (MH-04) Breakdown
-                </div>
-                <div className="text-xs text-slate-400">Paise-Safe Integer Math</div>
-              </div>
-
-              <div className="space-y-2 text-xs">
-                <div className="flex justify-between text-slate-300">
-                  <span>Ex-Showroom Price</span>
-                  <span className="font-semibold text-white tabular-nums">
-                    {formatInr(bike.exShowroomPaise)}
-                  </span>
-                </div>
-
-                {/* Maharashtra GST split info */}
-                <div className="pl-3 border-l border-slate-800 text-[11px] text-slate-400 space-y-1 py-1">
-                  <div className="flex justify-between">
-                    <span>CGST (9.00% Intra-State)</span>
-                    <span className="tabular-nums">{formatInr(gstDetails.cgstPaise)}</span>
-                  </div>
-                  <div className="flex justify-between">
-                    <span>SGST (9.00% Maharashtra)</span>
-                    <span className="tabular-nums">{formatInr(gstDetails.sgstPaise)}</span>
-                  </div>
-                </div>
-
-                <div className="flex justify-between text-slate-300">
-                  <span>Maharashtra RTO Tax (MH-04 Central)</span>
-                  <span className="font-semibold text-white tabular-nums">
-                    {formatInr(bike.rtoTaxPaise)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-slate-300">
-                  <span>Comprehensive Insurance (1-Yr OD + 5-Yr TP)</span>
-                  <span className="font-semibold text-white tabular-nums">
-                    {formatInr(bike.insurancePaise)}
-                  </span>
-                </div>
-
-                <div className="flex justify-between text-slate-300">
-                  <span>Handling, PDI & HSRP Number Plate</span>
-                  <span className="font-semibold text-white tabular-nums">
-                    {formatInr(bike.handlingPaise)}
-                  </span>
-                </div>
-
-                <div className="pt-3 border-t border-slate-800 flex justify-between items-baseline">
-                  <div>
-                    <div className="text-xs text-slate-400">Total On-Road Delivery Price</div>
-                    <div className="text-[10px] text-emerald-400">All-Inclusive. Zero Hidden Charges.</div>
-                  </div>
-                  <div className="text-2xl font-black text-amber-400 tabular-nums">
-                    {formatInr(totalOnRoadPaise)}
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Interactive EMI Calculator Module */}
-            <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 space-y-4">
-              <div className="flex items-center justify-between">
-                <div className="flex items-center gap-1.5 text-xs font-bold uppercase tracking-wider text-slate-300">
-                  <Calculator className="w-4 h-4 text-amber-400" />
-                  <span>On-Road Finance & EMI Calculator</span>
-                </div>
-                <div className="text-xs font-bold text-amber-400">
-                  ~ {formatInr(emiPaise)}/month
-                </div>
-              </div>
-
-              {/* Sliders */}
-              <div className="space-y-3 text-xs">
-                <div>
-                  <div className="flex justify-between text-slate-400 mb-1">
-                    <span>Down Payment</span>
-                    <span className="text-white font-semibold">{formatInr(downPaymentPaise)}</span>
-                  </div>
-                  <input
-                    type="range"
-                    aria-label="Down payment in rupees"
-                    min={Math.min(minDownPayment, Number(downPaymentPaise) / 100)}
-                    max={maxDownPayment}
-                    step={0.01}
-                    value={Number(downPaymentPaise) / 100}
-                    onChange={(e) => setCustomDownPayment(Number(e.target.value))}
-                    className="w-full accent-amber-500 bg-slate-800 rounded-lg h-1.5"
-                  />
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-slate-400 mb-1">
-                    <span>Loan Tenure</span>
-                    <span className="text-white font-semibold">{tenureMonths} Months ({tenureMonths / 12} Yrs)</span>
-                  </div>
-                  <div className="grid grid-cols-4 gap-2">
-                    {[12, 24, 36, 48].map((m) => (
-                      <button
-                        key={m}
-                        onClick={() => setTenureMonths(m)}
-                        className={`rounded-lg py-1.5 text-xs font-semibold transition-all ${
-                          tenureMonths === m
-                            ? 'bg-amber-500 text-slate-950'
-                            : 'bg-slate-900 text-slate-400 hover:text-white border border-slate-800'
-                        }`}
-                      >
-                        {m} Mos
-                      </button>
-                    ))}
-                  </div>
-                </div>
-
-                <div>
-                  <div className="flex justify-between text-slate-400 mb-1">
-                    <span>Bank Interest Rate (APR)</span>
-                    <span className="text-white font-semibold">{interestRate}% p.a.</span>
-                  </div>
-                  <input
-                    type="range"
-                    min={8.5}
-                    max={13.5}
-                    step={0.01}
-                    value={interestRate}
-                    onChange={(e) => setInterestRate(Number(e.target.value))}
-                    className="w-full accent-amber-500 bg-slate-800 rounded-lg h-1.5"
-                  />
-                </div>
-              </div>
-            </div>
+            <BikeQuoteCard model={`${bike.brand} ${bike.model}`} />
 
             {/* Action Bar */}
             {!showBookingForm ? (
