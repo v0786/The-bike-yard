@@ -122,3 +122,37 @@ operations. It cannot execute actions, take payments or confirm bookings.
   do not authenticate direct HTTP callers.
 - Verify with `npm run lint`, `npm test`, `npm run build`. Adapter tests mock OpenAI;
   live AI responses require a configured key and must be verified separately.
+
+## Bike discovery and negotiated pricing
+
+The current public price policy overrides the older demo-price descriptions above:
+**Bike prices are negotiable and must be confirmed by Bike Yard staff or the owner.**
+External prices are not extracted or returned. Public catalogue cards, detail pages,
+comparison/zoom modals, featured/latest/trending rails, the selected-bike bar, AI
+answers and product SEO no longer publish the seeded vehicle prices. Price sorting,
+budget filters and automatic bike-price-based EMI panels are removed. Internal staff
+price records remain intact. Existing demo booking advances are separate demo amounts,
+not vehicle prices or confirmed quotations.
+
+Search accepts reordered/compact names and keeps useful recovery results for unknown
+or misspelled models. `/?q=Honda%20Wingman#catalogue-section` offers possible reference
+matches (such as Goldwing) and related showroom bikes; it does not invent a Wingman
+model or claim that external bikes are held in dealership stock.
+
+`GET /api/bike-search?q=...` retrieves public model names/links from BikeWale's brand
+listing and, for Honda, its official manufacturer product directory. It extracts a
+small allowlist of factual specifications from structured product data for up to two
+BikeWale results. It does not copy reviews/descriptions/images, ingest prices or
+write anything to inventory. Only validated source URLs can be followed, with bounded
+response sizes, timeouts, no redirects and per-instance request limits. No API key is
+needed for this search feature. Upstream access/layout changes can reduce coverage;
+blocked sources are not bypassed. The UI retains related bikes and source-search links.
+
+Source pages refresh on demand after a one-hour server cache. While the customer keeps
+a search active, the browser rechecks every five minutes and on returning to the tab.
+The last successful source may be served for up to 24 hours if refresh fails, labelled
+as a saved reference with its original retrieval time. These are per-instance caches,
+not an always-running crawler or a shared durable catalogue. Google buttons open Google
+search; Google results are not scraped or represented as internally verified facts.
+Manufacturer/reference listings can include announced, archived or discontinued models;
+current India availability and Bike Yard availability must be confirmed by staff.
