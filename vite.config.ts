@@ -12,9 +12,9 @@ export default defineConfig(({ mode }) => {
     plugins: [react(), tailwindcss(), {
       name: 'customer-chat-dev-api',
       configureServer(server) {
-        server.middlewares.use('/api/customer-chat', async (req, res) => {
+        for (const endpoint of ['customer-chat', 'bike-search']) server.middlewares.use(`/api/${endpoint}`, async (req, res) => {
           try {
-            const { default: handler } = await server.ssrLoadModule('/api/customer-chat.ts');
+            const { default: handler } = await server.ssrLoadModule(`/api/${endpoint}.ts`);
             await handler(req, res);
           } catch {
             res.statusCode = 503;

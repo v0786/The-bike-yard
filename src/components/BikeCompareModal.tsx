@@ -1,3 +1,4 @@
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import React, { useState, useMemo } from 'react';
 import { Motorcycle } from '../types';
 import { formatInr } from '../lib/currency';
@@ -83,56 +84,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
   const specRows: SpecRow[] = useMemo(() => {
     const rows: SpecRow[] = [];
 
-    // 1. Pricing Specs
-    const priceDiffPaise = onRoadPaiseA - onRoadPaiseB;
-    rows.push({
-      category: 'Thane (MH-04) Pricing & Finance',
-      label: 'On-Road Thane Price',
-      valA: formatInr(onRoadPaiseA),
-      valB: formatInr(onRoadPaiseB),
-      isDifferent: onRoadPaiseA !== onRoadPaiseB,
-      advantage: priceDiffPaise < 0n ? 'A' : priceDiffPaise > 0n ? 'B' : 'EQUAL',
-      advantageNote:
-        priceDiffPaise !== 0n
-          ? `₹${Math.abs(Number(priceDiffPaise / 100n)).toLocaleString('en-IN')} more affordable`
-          : undefined,
-    });
-
-    const exDiff = bikeA.exShowroomPaise - bikeB.exShowroomPaise;
-    rows.push({
-      category: 'Thane (MH-04) Pricing & Finance',
-      label: 'Market Ex-Showroom',
-      valA: formatInr(bikeA.exShowroomPaise),
-      valB: formatInr(bikeB.exShowroomPaise),
-      isDifferent: bikeA.exShowroomPaise !== bikeB.exShowroomPaise,
-      advantage: exDiff < 0n ? 'A' : exDiff > 0n ? 'B' : 'EQUAL',
-    });
-
-    rows.push({
-      category: 'Thane (MH-04) Pricing & Finance',
-      label: 'MH RTO Tax (11%)',
-      valA: formatInr(bikeA.rtoTaxPaise),
-      valB: formatInr(bikeB.rtoTaxPaise),
-      isDifferent: bikeA.rtoTaxPaise !== bikeB.rtoTaxPaise,
-    });
-
-    rows.push({
-      category: 'Thane (MH-04) Pricing & Finance',
-      label: 'Comprehensive Insurance',
-      valA: formatInr(bikeA.insurancePaise),
-      valB: formatInr(bikeB.insurancePaise),
-      isDifferent: bikeA.insurancePaise !== bikeB.insurancePaise,
-    });
-
-    const emiDiff = emiA - emiB;
-    rows.push({
-      category: 'Thane (MH-04) Pricing & Finance',
-      label: 'Estimated EMI (36 Months)',
-      valA: `~ ₹${emiA.toLocaleString('en-IN')}/mo`,
-      valB: `~ ₹${emiB.toLocaleString('en-IN')}/mo`,
-      isDifferent: emiA !== emiB,
-      advantage: emiDiff < 0 ? 'A' : emiDiff > 0 ? 'B' : 'EQUAL',
-    });
+    rows.push({ category: 'Price enquiry', label: 'Negotiable price', valA: PRICE_ENQUIRY, valB: PRICE_ENQUIRY, isDifferent: false });
 
     // 2. Engine & Performance
     const ccDiff = bikeA.engineCc - bikeB.engineCc;
@@ -400,7 +352,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                       On-Road Thane (MH-04)
                     </div>
                     <div className="text-base sm:text-xl font-extrabold text-amber-400 tabular-nums">
-                      {formatInr(onRoadPaiseA)}
+                      {PRICE_ENQUIRY}
                     </div>
                   </div>
                 </div>
@@ -413,7 +365,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                   className="flex items-center justify-center gap-1 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors shadow-sm"
                 >
                   <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Book ₹10,000</span>
+                  <span>Enquire</span>
                 </button>
                 <button
                   onClick={() => onTestRideBike(bikeA)}
@@ -483,7 +435,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                       On-Road Thane (MH-04)
                     </div>
                     <div className="text-base sm:text-xl font-extrabold text-amber-400 tabular-nums">
-                      {formatInr(onRoadPaiseB)}
+                      {PRICE_ENQUIRY}
                     </div>
                   </div>
                 </div>
@@ -496,7 +448,7 @@ export const BikeCompareModal: React.FC<BikeCompareModalProps> = ({
                   className="flex items-center justify-center gap-1 rounded-xl bg-amber-500 px-3 py-2 text-xs font-bold text-slate-950 hover:bg-amber-400 transition-colors shadow-sm"
                 >
                   <ShoppingBag className="w-3.5 h-3.5" />
-                  <span>Book ₹10,000</span>
+                  <span>Enquire</span>
                 </button>
                 <button
                   onClick={() => onTestRideBike(bikeB)}

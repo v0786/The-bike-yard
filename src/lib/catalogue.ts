@@ -1,3 +1,4 @@
+import { matchesBikeQuery } from './bike-search';
 import { Motorcycle } from '../types';
 
 export type CatalogueSort = 'POPULARITY' | 'PRICE_ASC' | 'PRICE_DESC';
@@ -42,7 +43,7 @@ export function filterBikes(bikes: Motorcycle[], f: CatalogueFilters): Motorcycl
     const q = f.search.trim().toLowerCase();
     if (q) {
       const haystack = `${bike.brand} ${bike.model} ${bike.variant} ${bike.category}`.toLowerCase();
-      if (!haystack.includes(q)) return false;
+      if (!matchesBikeQuery(q, haystack)) return false;
     }
     return true;
   });

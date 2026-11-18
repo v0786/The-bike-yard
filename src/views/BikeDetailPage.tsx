@@ -1,3 +1,5 @@
+import { BikeQuoteCard } from '../components/BikeQuoteCard';
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import { useEffect, useMemo, useState, type FC } from 'react';
 import { Link, useParams } from 'react-router-dom';
 import {
@@ -82,7 +84,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
 
   const canonicalPath = `/bike/${bike.id}`;
   const seoTitle = `${bike.brand} ${bike.model} On-Road Price in Thane (MH-04) | The Bike Yard`;
-  const seoDescription = `${bike.brand} ${bike.model} at The Bike Yard, Khopat (Thane). Ex-showroom ${formatInr(bike.exShowroomPaise)} · On-road MH-04 ${formatInr(onRoadPaise)} · ${isElectric ? 'Electric' : `${bike.engineCc}cc`} · Claimed ${bike.mileageKmpl} ${isElectric ? 'km/charge' : 'km/l'} · Test ride & ~45-min finance.`;
+  const seoDescription = `${bike.brand} ${bike.model} specifications at Bike Yard, Thane. Price is negotiable and confirmed by our staff or the owner. Request availability and a personalised quote.`;
 
   const productJsonLd = {
     '@context': 'https://schema.org',
@@ -93,15 +95,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
     description: bike.description,
     image: [`https://the-bike-yard.vercel.app${activeImage}`],
     category: bike.category,
-    offers: {
-      '@type': 'Offer',
-      url: `https://the-bike-yard.vercel.app${canonicalPath}`,
-      priceCurrency: 'INR',
-      price: exRupees,
-      availability: bike.inStockCount > 0 ? 'https://schema.org/InStock' : 'https://schema.org/PreOrder',
-      itemCondition: bike.isUsed ? 'https://schema.org/UsedCondition' : 'https://schema.org/NewCondition',
-      seller: { '@type': 'AutoDealer', name: 'The Bike Yard' },
-    },
+
   };
 
   const breadcrumbJsonLd = {
@@ -114,7 +108,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
     ],
   };
 
-  const enquiryMessage = `Hi The Bike Yard! I'm interested in the ${bike.brand} ${bike.model} (${bike.variant}). Ex-showroom ${formatInr(bike.exShowroomPaise)} · On-road Thane ${formatInr(onRoadPaise)}. Please share a quote / callback.`;
+  const enquiryMessage = `Hi The Bike Yard! I am interested in ${bike.brand} ${bike.model} (${bike.variant}). Please confirm availability and the negotiable price.`;
 
   return (
     <div className="mx-auto max-w-7xl px-4 sm:px-6 py-6 sm:py-10">
@@ -229,7 +223,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
                     >
                       <span className="block text-[11px] font-extrabold truncate">{v.name}</span>
                       <span className={`block text-[9px] tabular-nums ${isCur ? 'text-slate-800' : 'text-slate-500'}`}>
-                        {formatInr(v.exShowroomPaise)}
+                        {PRICE_ENQUIRY}
                       </span>
                     </button>
                   );
@@ -238,31 +232,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
             </div>
           )}
 
-          {/* Price breakup */}
-          <dl className="mt-5 rounded-2xl border border-slate-800 bg-slate-900/60 divide-y divide-slate-800 text-xs sm:text-sm">
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5">
-              <dt className="text-slate-400">Ex-showroom (Thane)</dt>
-              <dd className="font-semibold text-white tabular-nums">{formatInr(bike.exShowroomPaise)}</dd>
-            </div>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5">
-              <dt className="text-slate-400">RTO — MH-04 (11.00%)</dt>
-              <dd className="tabular-nums text-slate-200">{formatInr(bike.rtoTaxPaise)}</dd>
-            </div>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5">
-              <dt className="text-slate-400">Insurance (5-yr TP + 1-yr OD)</dt>
-              <dd className="tabular-nums text-slate-200">{formatInr(bike.insurancePaise)}</dd>
-            </div>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-2.5">
-              <dt className="text-slate-400">Handling &amp; documentation</dt>
-              <dd className="tabular-nums text-slate-200">{formatInr(bike.handlingPaise)}</dd>
-            </div>
-            <div className="flex items-center justify-between px-4 sm:px-5 py-3 bg-slate-950/60 rounded-b-2xl">
-              <dt className="font-extrabold uppercase tracking-wider text-[11px] sm:text-xs text-amber-400">On-Road Thane</dt>
-              <dd className="text-lg sm:text-2xl font-extrabold text-amber-400 tabular-nums">{formatInr(onRoadPaise)}</dd>
-            </div>
-          </dl>
-          <p className="mt-1.5 text-[10px] text-slate-600">Bike Yard demo estimate, computed from the showroom dataset’s tax and insurance values. See the BikeWale reference catalogue for separately sourced listings when available; accessories, extended warranty and fast-tag are extra as applicable. Final invoice at the showroom.</p>
-          <p className="mt-0.5 text-[10px] text-slate-600 font-mono">On-road: ₹{onRoadRupees.toLocaleString('en-IN')} (demo estimate)</p>
+          <BikeQuoteCard model={`${bike.brand} ${bike.model}`} />
 
           {/* CTAs */}
           <div className="mt-5 grid grid-cols-2 gap-2">
@@ -296,7 +266,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
               onClick={() => onBookNow(bike)}
               className="inline-flex items-center justify-center gap-2 rounded-xl border border-slate-700 bg-slate-950 px-4 py-3 text-xs font-bold text-slate-100 hover:border-amber-500/50 hover:text-amber-400 transition-colors"
             >
-              Demo booking · ₹10,000
+              Request booking details
             </button>
           </div>
 
@@ -357,86 +327,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
           <p className="mt-4 text-xs sm:text-sm text-slate-300 leading-relaxed border-l-2 border-amber-500/50 pl-4">{bike.description}</p>
         </section>
 
-        {/* ---------- EMI Calculator ---------- */}
-        <section aria-label="EMI calculator" className="lg:col-span-2 rounded-3xl border border-slate-800 bg-slate-900/60 p-6 sm:p-7 flex flex-col">
-          <h2 className="display-heading text-lg sm:text-xl text-white">On-Road EMI Calculator</h2>
-          <p className="mt-1 text-[10px] text-slate-500">Indicative only — actual sanction depends on lender, CIBIL and documents.</p>
-
-          <div className="mt-5 space-y-5">
-            <div>
-              <div className="flex items-center justify-between text-xs font-semibold text-slate-300">
-                <label htmlFor="down-payment">Down payment</label>
-                <span className="text-amber-400 tabular-nums">{downPaymentPct}% · {formatInr((onRoadPaise * BigInt(downPaymentPct * 100)) / 10000n)}</span>
-              </div>
-              <input
-                id="down-payment"
-                type="range"
-                min={10}
-                max={50}
-                step={5}
-                value={downPaymentPct}
-                onChange={(e) => setDownPaymentPct(Number(e.target.value))}
-                className="mt-2 w-full accent-amber-500"
-              />
-            </div>
-
-            <div>
-              <span className="text-xs font-semibold text-slate-300">Tenure</span>
-              <div className="mt-2 grid grid-cols-5 gap-1.5" role="group" aria-label="Loan tenure in months">
-                {TENURES.map((t) => (
-                  <button
-                    key={t}
-                    onClick={() => setTenure(t)}
-                    aria-pressed={tenure === t}
-                    className={`rounded-lg border px-2 py-1.5 text-xs font-bold tabular-nums transition-all ${
-                      tenure === t ? 'border-amber-500 bg-amber-500 text-slate-950' : 'border-slate-800 bg-slate-950 text-slate-300 hover:border-slate-600'
-                    }`}
-                  >
-                    {t}m
-                  </button>
-                ))}
-              </div>
-            </div>
-
-            <div>
-              <label htmlFor="roi" className="text-xs font-semibold text-slate-300">Interest rate (APR %)</label>
-              <input
-                id="roi"
-                type="number"
-                min={6}
-                max={24}
-                step={0.05}
-                value={roi}
-                onChange={(e) => setRoi(Math.min(24, Math.max(0, Number(e.target.value) || 0)))}
-                className="mt-2 w-full rounded-xl border border-slate-800 bg-slate-950 px-3 py-2 text-sm text-white tabular-nums focus:border-amber-500 focus:outline-none"
-              />
-              <p className="mt-1 text-[10px] text-slate-600">Starting 8.99% APR via Bajaj Finance / HDFC (subject to eligibility).</p>
-            </div>
-          </div>
-
-          {emi && (
-            <div className="mt-6 rounded-2xl border border-amber-500/30 bg-amber-500/5 p-5 text-center">
-              <p className="text-[10px] uppercase tracking-widest text-slate-400 font-bold">Estimated Monthly EMI</p>
-              <p className="mt-1 text-4xl font-extrabold text-amber-400 tabular-nums">{formatInr(emi.emiPaise)}<span className="text-sm text-slate-400 font-semibold">/mo</span></p>
-              <dl className="mt-4 grid grid-cols-2 gap-3 text-left text-[11px]">
-                <div className="rounded-xl bg-slate-950 border border-slate-800 px-3 py-2">
-                  <dt className="text-slate-500">Loan amount</dt>
-                  <dd className="font-bold text-white tabular-nums">{formatInr(emi.principalPaise)}</dd>
-                </div>
-                <div className="rounded-xl bg-slate-950 border border-slate-800 px-3 py-2">
-                  <dt className="text-slate-500">Total interest</dt>
-                  <dd className="font-bold text-white tabular-nums">{formatInr(emi.totalInterestPaise)}</dd>
-                </div>
-              </dl>
-              <button
-                onClick={() => onEnquire(bike)}
-                className="mt-4 w-full inline-flex items-center justify-center gap-2 rounded-xl bg-amber-500 px-4 py-3 text-xs font-extrabold uppercase tracking-wide text-slate-950 hover:bg-amber-400 transition-colors"
-              >
-                Get Exact Quote <ArrowRight className="w-4 h-4" aria-hidden="true" />
-              </button>
-            </div>
-          )}
-        </section>
+        <section aria-label="Finance enquiry" className="lg:col-span-2 rounded-3xl border border-slate-800 p-6"><h2 className="text-xl font-bold text-white">Finance after your confirmed quote</h2><p className="mt-3 text-base text-slate-300">Our staff will confirm the bike price first. Loan amount, EMI, interest, down payment and fees depend on your agreed quote and lender eligibility.</p><BikeQuoteCard model={`${bike.brand} ${bike.model}`} /></section>
       </div>
 
       {/* ---------- Similar motorcycles ---------- */}
@@ -461,7 +352,7 @@ export const BikeDetailPage: FC<BikeDetailPageProps> = ({
                 <div className="p-3">
                   <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">{b.brand}</p>
                   <h3 className="mt-0.5 text-xs sm:text-sm font-bold text-white line-clamp-1">{b.model}</h3>
-                  <p className="mt-1 text-[11px] sm:text-xs font-extrabold text-amber-400 tabular-nums">{formatInr(b.exShowroomPaise)}</p>
+                  <p className="mt-1 text-[11px] sm:text-xs font-extrabold text-amber-400 tabular-nums">{PRICE_ENQUIRY}</p>
                 </div>
               </Link>
             ))}

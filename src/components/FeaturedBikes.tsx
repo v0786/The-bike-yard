@@ -1,3 +1,4 @@
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, Sparkles } from 'lucide-react';
@@ -49,8 +50,8 @@ export const FeaturedBikes: FC<FeaturedBikesProps> = ({ bikes }) => {
               <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">{bike.brand}</p>
               <h3 className="mt-0.5 text-xs sm:text-sm font-bold text-white leading-snug line-clamp-2 min-h-[2em]">{bike.model}</h3>
               <p className="mt-1.5 text-[11px] sm:text-xs font-extrabold text-amber-400 tabular-nums">
-                {formatInr(bike.exShowroomPaise)}
-                <span className="block text-[9px] font-medium text-slate-500">ex-showroom</span>
+                {PRICE_ENQUIRY}
+                <span className="block text-[9px] font-medium text-slate-500">confirmed by Bike Yard</span>
               </p>
             </div>
           </Link>

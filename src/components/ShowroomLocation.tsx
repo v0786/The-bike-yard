@@ -16,7 +16,7 @@ export const ShowroomLocation: FC<ShowroomLocationProps> = ({ info }) => {
   const embedUrl = `https://www.google.com/maps?q=${mapQuery}&output=embed`;
 
   return (
-    <section aria-label="Visit the showroom" className="grid grid-cols-1 lg:grid-cols-5 gap-6 rounded-3xl border border-slate-800 bg-slate-900/60 overflow-hidden">
+    <section id="visit-showroom" aria-label="Visit the showroom" className="grid grid-cols-1 lg:grid-cols-5 gap-6 rounded-3xl border border-slate-800 bg-slate-900/60 overflow-hidden">
       <div className="lg:col-span-2 p-6 sm:p-8 flex flex-col gap-5">
         <div>
           <p className="eyebrow text-amber-500">Visit Us</p>

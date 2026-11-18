@@ -1,3 +1,4 @@
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import type { FC } from 'react';
 import { Link } from 'react-router-dom';
 import { ArrowRight, PackagePlus } from 'lucide-react';
@@ -59,7 +60,7 @@ export const LatestArrivals: FC<LatestArrivalsProps> = ({ bikes }) => {
             <div className="p-3">
               <p className="text-[9px] uppercase tracking-widest text-slate-500 font-bold">{bike.brand}</p>
               <h3 className="mt-0.5 text-sm font-bold text-white leading-snug line-clamp-1">{bike.model}</h3>
-              <p className="mt-1.5 text-xs font-extrabold text-amber-400 tabular-nums">{formatInr(bike.exShowroomPaise)}</p>
+              <p className="mt-1.5 text-xs font-extrabold text-amber-400 tabular-nums">{PRICE_ENQUIRY}</p>
             </div>
           </Link>
         ))}
