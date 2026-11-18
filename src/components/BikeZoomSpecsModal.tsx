@@ -1,3 +1,5 @@
+import { BikeQuoteCard } from './BikeQuoteCard';
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import React, { useState } from 'react';
 import { Motorcycle } from '../types';
 import { formatInr } from '../lib/currency';
@@ -100,7 +102,7 @@ export const BikeZoomSpecsModal: React.FC<BikeZoomSpecsModalProps> = ({
           </button>
 
           <div className="absolute top-3 left-3 rounded-lg bg-slate-900/90 backdrop-blur-md px-3 py-1.5 text-xs text-slate-300 border border-slate-800">
-            Market Ex-Showroom: <strong className="text-white">{formatInr(bike.exShowroomPaise)}</strong>
+            Price: <strong className="text-white">{PRICE_ENQUIRY}</strong>
           </div>
         </div>
 
@@ -161,7 +163,7 @@ export const BikeZoomSpecsModal: React.FC<BikeZoomSpecsModalProps> = ({
                   >
                     <div className="text-xs font-bold truncate">{v.name}</div>
                     <div className="text-[11px] font-semibold text-amber-400 mt-0.5 tabular-nums">
-                      {formatInr(v.exShowroomPaise)}
+                      {PRICE_ENQUIRY}
                     </div>
                   </button>
                 );
@@ -293,39 +295,13 @@ export const BikeZoomSpecsModal: React.FC<BikeZoomSpecsModalProps> = ({
           </div>
         )}
 
-        {activeTab === 'pricing' && (
-          <div className="rounded-2xl border border-slate-800 bg-slate-950 p-5 space-y-4 text-xs">
-            <h4 className="text-sm font-bold text-white">Official Maharashtra On-Road Price (Thane MH-04)</h4>
-            <div className="space-y-2 divide-y divide-slate-800">
-              <div className="flex justify-between py-1">
-                <span className="text-slate-400">Market Ex-Showroom</span>
-                <span className="font-semibold text-white tabular-nums">{formatInr(bike.exShowroomPaise)}</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-slate-400">Maharashtra RTO Tax (MH-04)</span>
-                <span className="font-semibold text-white tabular-nums">{formatInr(bike.rtoTaxPaise)}</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-slate-400">IRDAI 1+5 Year Comprehensive Insurance</span>
-                <span className="font-semibold text-white tabular-nums">{formatInr(bike.insurancePaise)}</span>
-              </div>
-              <div className="flex justify-between py-1">
-                <span className="text-slate-400">HSRP Number Plate & Delivery Handling</span>
-                <span className="font-semibold text-white tabular-nums">{formatInr(bike.handlingPaise)}</span>
-              </div>
-              <div className="flex justify-between pt-2 text-base font-black text-amber-400">
-                <span>Total On-Road Thane Price:</span>
-                <span className="tabular-nums">{formatInr(onRoadPaise)}</span>
-              </div>
-            </div>
-          </div>
-        )}
+        {activeTab === 'pricing' && <BikeQuoteCard model={`${bike.brand} ${bike.model}`} />}
 
         {/* Modal Action Footer */}
         <div className="pt-4 border-t border-slate-800 flex flex-col sm:flex-row items-center justify-between gap-3">
           <div>
-            <div className="text-[10px] text-slate-400 uppercase">On-Road Delivery (Thane)</div>
-            <div className="text-2xl font-black text-amber-400 tabular-nums">{formatInr(onRoadPaise)}</div>
+            <div className="text-[10px] text-slate-400 uppercase">Confirmed by Bike Yard</div>
+            <div className="text-2xl font-black text-amber-400 tabular-nums">{PRICE_ENQUIRY}</div>
           </div>
 
           <div className="flex items-center gap-2.5 w-full sm:w-auto">
