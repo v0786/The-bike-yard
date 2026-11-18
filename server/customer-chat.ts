@@ -1,4 +1,4 @@
-import { DEALERSHIP_INFO, INITIAL_BIKES, INITIAL_OFFERS } from '../src/data/dealershipData';
+import { DEALERSHIP_INFO, INITIAL_BIKES, INITIAL_OFFERS } from '../src/data/dealershipData.js';
 
 // This is the ONLY data passed to the model. Never pass dealershipStore, README,
 // staff records, stock ledgers, bankDetails, environment values or user-supplied context.
