@@ -1,3 +1,4 @@
+import { PRICE_ENQUIRY } from '../lib/bike-search';
 import React from 'react';
 import { Motorcycle } from '../types';
 import { formatInr } from '../lib/currency';
@@ -72,14 +73,7 @@ export const TrendingMarquee: React.FC<TrendingMarqueeProps> = ({
 
               <div className="space-y-1">
                 <h4 className="text-xs sm:text-sm font-bold text-white truncate">{bike.model}</h4>
-                <div className="text-[10px] text-slate-400 flex items-center justify-between">
-                  <span>Market Ex-Showroom</span>
-                  <span className="font-semibold text-slate-300">{formatInr(bike.exShowroomPaise)}</span>
-                </div>
-                <div className="text-xs font-extrabold text-amber-400 flex items-center justify-between pt-1 border-t border-slate-800/80">
-                  <span className="text-[11px] text-slate-400 font-normal">On-Road Thane</span>
-                  <span className="tabular-nums">{formatInr(onRoadPaise)}</span>
-                </div>
+                <p className="text-sm font-semibold text-amber-400">{PRICE_ENQUIRY}</p>
               </div>
             </div>
           );
