@@ -1112,48 +1112,7 @@ class DealershipStore {
     }
   }
 
-  // --- Grounded AI Chatbot ---
-  public queryChatbot(question: string): string {
-    const q = question.toLowerCase();
 
-    if (q.includes('price') || q.includes('cost') || q.includes('on road') || q.includes('ex showroom') || q.includes('rate')) {
-      const found = this.state.bikes.find(
-        (b) => q.includes(b.model.toLowerCase()) || q.includes(b.brand.toLowerCase())
-      );
-      if (found) {
-        const total = found.exShowroomPaise + found.rtoTaxPaise + found.insurancePaise + found.handlingPaise;
-        return `At The Bike Yard (Khopat, Thane), the ${found.brand} ${found.model} has an Ex-Showroom price of ₹${(Number(found.exShowroomPaise) / 100).toLocaleString('en-IN')}, with Thane RTO (MH-04) tax of ₹${(Number(found.rtoTaxPaise) / 100).toLocaleString('en-IN')}, and Comprehensive 5-Year IRDAI Insurance of ₹${(Number(found.insurancePaise) / 100).toLocaleString('en-IN')}. The total all-inclusive On-Road Thane price is ₹${(Number(total) / 100).toLocaleString('en-IN')}. We currently have ${found.inStockCount} physical unit(s) in stock.`;
-      }
-      return `Our verified stock includes the Royal Enfield Hunter 350 (On-Road ₹1,79,089), KTM 390 Duke (On-Road ₹3,69,582), Yamaha Aerox 155 (On-Road ₹1,75,030), and Triumph Speed 400 (On-Road ₹2,80,437). Which specific model's quotation would you like?`;
-    }
-
-    if (q.includes('stock') || q.includes('available') || q.includes('delivery') || q.includes('waiting')) {
-      const inStockSummary = this.state.stockUnits
-        .filter((u) => u.status === 'IN_STOCK')
-        .map((u) => `${u.bikeModel} in ${u.color}`)
-        .join(', ');
-      return `We currently have physical units ready on the showroom floor in Khopat: ${inStockSummary || 'None currently on floor'}. Ready delivery can be arranged within 3-4 working days upon MH-04 Thane RTO documentation and HSRP number plate stamping.`;
-    }
-
-    if (q.includes('where') || q.includes('location') || q.includes('address') || q.includes('timing') || q.includes('open') || q.includes('contact')) {
-      return `The Bike Yard is located at: Shop 4 & 5, Rutu Business Park, Near Cadbury Junction, Khopat, Thane (West) — 400601. We are open Monday to Sunday from 10:00 AM to 8:30 PM. You can reach our sales desk directly at +91 98204 55120.`;
-    }
-
-    if (q.includes('finance') || q.includes('loan') || q.includes('emi') || q.includes('interest')) {
-      return `We provide on-spot two-wheeler finance at our Khopat showroom through HDFC Bank, ICICI Bank, IDFC FIRST Bank, and Bajaj Finance. Down payments start from ₹15,000 with tenure up to 48 months. Standard interest rates range from 8.99% to 11.5% APR depending on CIBIL score.`;
-    }
-
-    if (q.includes('test ride') || q.includes('test drive') || q.includes('ride')) {
-      return `Complimentary test rides are available daily for the Hunter 350, KTM 390 Duke, Aerox 155, and Speed 400! Please carry a valid Indian Two-Wheeler Driving License. You can schedule your preferred slot right now through the 'Book Test Ride' button on our showroom page.`;
-    }
-
-    if (q.includes('used') || q.includes('second hand') || q.includes('pre owned')) {
-      const usedBikes = this.state.bikes.filter((b) => b.isUsed);
-      return `Yes! We have certified pre-owned motorcycles backed by our 45-point PDI inspection and 6-month engine warranty. Available now: ${usedBikes.map((b) => `${b.model} (${b.year}) at ₹${(Number(b.exShowroomPaise) / 100).toLocaleString('en-IN')}`).join(' and ')}. All transfer paperwork for MH-04/MH-02/MH-03 is handled by our in-house RTO desk.`;
-    }
-
-    return `Welcome to The Bike Yard Khopat, Thane. As an authorized multi-brand premium dealership, I can give you exact On-Road Thane prices, live stock status, test ride slots, or two-wheeler finance options for Royal Enfield, KTM, Yamaha, and Triumph. How can I assist your ride today?`;
-  }
 }
 
 export const dealershipStore = new DealershipStore();
