@@ -57,7 +57,10 @@ describe('OpenAI adapter', () => {
   });
   it('uses labelled help without a key or on a provider failure', async () => {
     vi.stubEnv('OPENAI_API_KEY', '');
-    expect((await answerCustomer({ message: 'Hunter 350 price?', history: [] })).mode).toBe('help');
+    const priceReply = await answerCustomer({ message: 'Hunter 350 price?', history: [] });
+    expect(priceReply.mode).toBe('help');
+    expect(priceReply.links[0].href).toBe('/?q=Hunter%20350#catalogue-section');
+    expect(priceReply.text).not.toContain('₹');
     vi.stubEnv('OPENAI_API_KEY', 'test-key');
     vi.stubGlobal('fetch', vi.fn().mockRejectedValue(new Error('secret provider error')));
     const reply = await answerCustomer({ message: 'Where is your showroom?', history: [] });
